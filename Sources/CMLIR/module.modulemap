@@ -1,0 +1,15 @@
+module CMLIR [system] {
+	header "CMLIR.h"
+    
+    // LLVM
+    link "LLVMDemangle"
+    link "LLVMSupport"
+    
+    // MLIR
+    link "MLIRSupport"
+    link "MLIRParser"
+    link "MLIRIR"
+    link "MLIRCAPIIR"
+    
+	export *
+}
