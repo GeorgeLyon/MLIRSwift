@@ -29,6 +29,27 @@ public struct Operation: MlirTypeWrapper, MlirStringCallbackStreamable {
         return Regions(operation: self)
     }
     
+    public struct Attributes: RandomAccessCollection {
+        public let startIndex = 0
+        public let endIndex: Int
+        public subscript(position: Int) -> NamedAttribute {
+            NamedAttribute(c: mlirOperationGetAttribute(operation.c, position))
+        }
+        public subscript(_ name: String) -> Attribute {
+            name.withCString { cString in
+                Attribute(c: mlirOperationGetAttributeByName(operation.c, cString))
+            }
+        }
+        fileprivate init(operation: Operation) {
+            self.operation = operation
+            self.endIndex = mlirOperationGetNumAttributes(operation.c)
+        }
+        private let operation: Operation
+    }
+    public var attributes: Attributes {
+        Attributes(operation: self)
+    }
+    
     public func withPrintingOptions(
         elideElementsAttributesLargerThan: Int32? = nil,
         debugInformationStyle: DebugInfoStyle = nil,
