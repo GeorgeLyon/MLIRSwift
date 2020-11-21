@@ -8,5 +8,6 @@ protocol MlirTypeWrapper {
      */
     associatedtype MlirType
     
+    init(c: MlirType)
     var c: MlirType { get }
 }

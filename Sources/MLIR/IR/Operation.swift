@@ -13,6 +13,22 @@ public struct Operation: MlirTypeWrapper, MlirStringCallbackStreamable {
         }
     }
     
+    public struct Regions: RandomAccessCollection {
+        public let startIndex = 0
+        public let endIndex: Int
+        public subscript(position: Int) -> Region {
+            Region(c: mlirOperationGetRegion(operation.c, position))
+        }
+        fileprivate init(operation: Operation) {
+            self.operation = operation
+            self.endIndex = mlirOperationGetNumRegions(operation.c)
+        }
+        private let operation: Operation
+    }
+    public var regions: Regions {
+        return Regions(operation: self)
+    }
+    
     public func withPrintingOptions(
         elideElementsAttributesLargerThan: Int32? = nil,
         debugInformationStyle: DebugInfoStyle = nil,

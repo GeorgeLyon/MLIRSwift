@@ -8,6 +8,9 @@ public final class Context: MlirTypeWrapper {
             dialect.register(c)
         }
     }
+    init(c: MlirContext) {
+        self.c = c
+    }
     let c: MlirContext
 }
 
