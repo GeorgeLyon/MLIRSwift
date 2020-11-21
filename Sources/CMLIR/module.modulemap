@@ -11,5 +11,21 @@ module CMLIR [system] {
     link "MLIRIR"
     link "MLIRCAPIIR"
     
+    link "MLIRCallInterfaces"
+    link "MLIRControlFlowInterfaces"
+    link "MLIREDSC"
+    link "MLIRSideEffectInterfaces"
+    link "MLIRVectorInterfaces"
+    link "MLIRViewLikeInterface"
+    link "MLIRCallInterfaces"
+    link "MLIRControlFlowInterfaces"
+    link "MLIREDSC"
+    link "MLIRSideEffectInterfaces"
+    link "MLIRVectorInterfaces"
+    link "MLIRViewLikeInterface"
+    
+    link "MLIRStandard"
+    link "MLIRCAPIStandard"
+    
 	export *
 }
