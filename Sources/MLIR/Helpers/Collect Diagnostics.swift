@@ -17,8 +17,8 @@ extension MLIRConfiguration {
 
 private final class DiagnosticCollector: DiagnosticsHandler {
     var diagnostics: [Diagnostic] = []
-    func handle(_ diagnostic: Diagnostic) -> DiagnosticHandlingDirective {
-        diagnostics.append(diagnostic)
+    func handle(_ unsafeDiagnostic: UnsafeDiagnostic) -> DiagnosticHandlingDirective {
+        diagnostics.append(Diagnostic(unsafeDiagnostic))
         return .stop
     }
 }

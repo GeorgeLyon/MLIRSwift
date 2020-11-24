@@ -1,7 +1,7 @@
 
 import CMLIR
 
-public struct Block: MlirTypeWrapper {
+public struct Block: MlirTypeWrapper, MlirStringCallbackStreamable {
     
     public struct Operations: MlirSequence, Sequence {
         public typealias Element = Operation
@@ -11,6 +11,10 @@ public struct Block: MlirTypeWrapper {
     }
     public var operations: Operations {
         Operations(firstMlirElement: mlirBlockGetFirstOperation(c))
+    }
+    
+    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+        mlirBlockPrint(c, unsafeCallback, userData)
     }
     
     init(c: MlirBlock) {

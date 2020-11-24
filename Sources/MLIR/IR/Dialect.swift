@@ -1,16 +1,22 @@
 
 import CMLIR
 
-public protocol Dialect {
-    static var register: (MlirContext) -> Void { get }
-    static var load: (MlirContext) -> MlirDialect { get }
-    static var getNamespace: () -> MlirStringRef { get }
-}
-
-public extension Dialect {
-    typealias Instance = _DialectInstance<Self>
-}
-
-public struct _DialectInstance<Dialect: MLIR.Dialect> {
-    let c: MlirDialect
+public struct Dialect {
+    public init(
+        register: @escaping (MlirContext) -> Void,
+        load: @escaping (MlirContext) -> MlirDialect,
+        getNamespace: @escaping () -> MlirStringRef)
+    {
+        self.register = register
+        self.load = load
+        self.getNamespace = getNamespace
+    }
+    
+    public struct Instance: MlirTypeWrapper {
+        let c: MlirDialect
+    }
+    
+    let register: (MlirContext) -> Void
+    let load: (MlirContext) -> MlirDialect
+    let getNamespace: () -> MlirStringRef
 }

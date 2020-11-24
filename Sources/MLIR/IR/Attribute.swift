@@ -12,9 +12,7 @@ public struct NamedAttribute: CustomDebugStringConvertible, MlirTypeWrapper {
     public var attribute: Attribute {
         Attribute(c: c.attribute)
     }
-    public var name: String {
-        String(cString: c.name)
-    }
+    public var name: String { c.name.string }
     public var debugDescription: String {
         "(name: \(name), attribue: \(attribute))"
     }

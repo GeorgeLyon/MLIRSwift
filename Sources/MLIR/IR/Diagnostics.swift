@@ -1,23 +1,63 @@
 
 import CMLIR
 
-struct Diagnostic: Swift.Error {
-    enum Severity: Comparable {
+// MARK: - Public
+
+public struct Diagnostic: Swift.Error {
+    public enum Severity: Comparable {
         case remark, note, warning, error
     }
     
-    let location: Location
-    let severity: Severity
-    let notes: [Diagnostic]
-    let description: String
+    public let location: Location
+    public let severity: Severity
+    public let notes: [Diagnostic]
+    public let description: String
     
-    fileprivate init(_ unsafeDiagnostic: UnsafeDiagnostic) {
+    init(_ unsafeDiagnostic: UnsafeDiagnostic) {
         self.location = unsafeDiagnostic.location
         self.severity = unsafeDiagnostic.severity
         self.notes = unsafeDiagnostic.notes.map(Diagnostic.init)
         self.description = "\(unsafeDiagnostic)"
     }
 }
+
+// MARK: - Internal
+
+struct UnsafeDiagnostic: MlirTypeWrapper, MlirStringCallbackStreamable {
+    
+    struct Notes: Sequence {
+        func makeIterator() -> Iterator {
+            return Iterator(parent: parent)
+        }
+        struct Iterator: IteratorProtocol {
+            init(parent: UnsafeDiagnostic) {
+                self.parent = parent
+                self.count = mlirDiagnosticGetNumNotes(parent.c)
+            }
+            mutating func next() -> UnsafeDiagnostic? {
+                guard index < count else { return nil }
+                let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent.c, index))
+                index += 1
+                return diagnostic
+            }
+            private let parent: UnsafeDiagnostic
+            private let count: Int
+            private var index = 0
+        }
+        fileprivate let parent: UnsafeDiagnostic
+    }
+    
+    var location: MLIR.Location { Location(c: mlirDiagnosticGetLocation(c)) }
+    var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
+    var notes: Notes { Notes(parent: self) }
+    
+    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+        mlirDiagnosticPrint(c, unsafeCallback, userData)
+    }
+    
+    let c: MlirDiagnostic
+}
+
 
 enum DiagnosticHandlingDirective {
     case stop
@@ -44,13 +84,18 @@ protocol DiagnosticsHandler: AnyObject {
     /**
      - parameter unsafeDiagnostic: A `Diagnostic` which, along with any derived values such as `notes`, will only be valid for the duration of the call to `handle`.
      */
-    func handle(_ diagnostic: Diagnostic) -> DiagnosticHandlingDirective
+    func handle(_ unsafeDiagnostic: UnsafeDiagnostic) -> DiagnosticHandlingDirective
 }
 
 extension Context {
-    func register(_ handler: DiagnosticsHandler) -> DiagnosticHandlerRegistration {
+    func register(_ handler: DiagnosticsHandler) -> DiagnosticHandlerRegistration
+    {
         let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
-        let id = mlirContextAttachDiagnosticHandler(c, registeredDiagnosticHandler, userData)
+        let id = mlirContextAttachDiagnosticHandler(
+            c,
+            mlirDiagnosticHandler,
+            userData,
+            mlirDeleteUserData)
         return DiagnosticHandlerRegistration(id: id)
     }
     func unregister(_ registration: DiagnosticHandlerRegistration) {
@@ -82,44 +127,8 @@ private extension Diagnostic.Severity {
     }
 }
 
-private struct UnsafeDiagnostic: MlirTypeWrapper, MlirStringCallbackStreamable {
-    
-    struct Notes: Sequence {
-        func makeIterator() -> Iterator {
-            return Iterator(parent: parent)
-        }
-        struct Iterator: IteratorProtocol {
-            init(parent: UnsafeDiagnostic) {
-                self.parent = parent
-                self.count = mlirDiagnosticGetNumNotes(parent.c)
-            }
-            mutating func next() -> UnsafeDiagnostic? {
-                guard index < count else { return nil }
-                let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent.c, index))
-                index += 1
-                return diagnostic
-            }
-            private let parent: UnsafeDiagnostic
-            private let count: Int
-            private var index = 0
-        }
-        fileprivate let parent: UnsafeDiagnostic
-    }
-    
-    var location: Location { Location(c: mlirDiagnosticGetLocation(c)) }
-    var severity: Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
-    var notes: Notes { Notes(parent: self) }
-    
-    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-        mlirDiagnosticPrint(c, unsafeCallback, userData)
-    }
-    
-    fileprivate let c: MlirDiagnostic
-}
-
-
-private func registeredDiagnosticHandler(cDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!) -> MlirLogicalResult {
-    let diagnostic = Diagnostic(UnsafeDiagnostic(c: cDiagnostic))
+private func mlirDiagnosticHandler(mlirDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!) -> MlirLogicalResult {
+    let diagnostic = UnsafeDiagnostic(c: mlirDiagnostic)
     let handler = Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticsHandler
     return handler.handle(diagnostic).logicalResult
 }

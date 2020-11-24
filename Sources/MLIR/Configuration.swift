@@ -1,6 +1,4 @@
 
-import CMLIR
-
 public protocol MLIRConfiguration {
-    static var context: Context { get }
+    static var context: MLIR.Context { get }
 }

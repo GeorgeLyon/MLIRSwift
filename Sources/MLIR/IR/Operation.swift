@@ -36,8 +36,8 @@ public struct Operation: MlirTypeWrapper, MlirStringCallbackStreamable {
             NamedAttribute(c: mlirOperationGetAttribute(operation.c, position))
         }
         public subscript(_ name: String) -> Attribute {
-            name.withCString { cString in
-                Attribute(c: mlirOperationGetAttributeByName(operation.c, cString))
+            name.withUnsafeMlirStringRef {
+                Attribute(c: mlirOperationGetAttributeByName(operation.c, $0))
             }
         }
         fileprivate init(operation: Operation) {

@@ -3,7 +3,7 @@ import XCTest
 
 final class MLIRTests: XCTestCase {
     func testModuleParse() throws {
-        let module = try Module<Standard>(parsing: """
+        let module = try Module<Test>(parsing: """
             module {
               func @add(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
                 %c0 = constant 0 : index
