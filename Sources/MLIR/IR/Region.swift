@@ -1,10 +1,14 @@
 
 import CMLIR
 
-public struct Region: MlirTypeWrapper {
+public struct RegionReference: MlirStructWrapper, Destroyable {
+    
+    public func destroy() {
+        mlirRegionDestroy(c)
+    }
     
     public struct Blocks: MlirSequence, Sequence {
-        public typealias Element = Block
+        public typealias Element = BlockReference
         let firstMlirElement: MlirBlock
         static let nextMlirElement = mlirBlockGetNextInRegion
         static let mlirElementIsNull = mlirBlockIsNull

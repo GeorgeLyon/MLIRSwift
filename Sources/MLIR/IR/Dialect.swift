@@ -12,7 +12,7 @@ public struct Dialect {
         self.getNamespace = getNamespace
     }
     
-    public struct Instance: MlirTypeWrapper {
+    public struct Instance: MlirStructWrapper {
         let c: MlirDialect
     }
     

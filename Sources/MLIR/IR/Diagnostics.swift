@@ -23,7 +23,7 @@ public struct Diagnostic: Swift.Error {
 
 // MARK: - Internal
 
-struct UnsafeDiagnostic: MlirTypeWrapper, MlirStringCallbackStreamable {
+struct UnsafeDiagnostic: MlirStructWrapper, MlirStringCallbackStreamable {
     
     struct Notes: Sequence {
         func makeIterator() -> Iterator {

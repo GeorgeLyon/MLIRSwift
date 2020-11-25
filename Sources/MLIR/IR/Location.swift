@@ -1,13 +1,7 @@
 
 import CMLIR
 
-public struct Location: MlirTypeWrapper, MlirStringCallbackStreamable {
-    public init<MLIR: MLIRConfiguration>(_ mlir: MLIR.Type = MLIR.self, file: StaticString, line: Int, column: Int) {
-        precondition(file.hasPointerRepresentation)
-        c = file.withUnsafeMlirStringRef {
-            mlirLocationFileLineColGet(MLIR.context.c, $0, UInt32(line), UInt32(column))
-        }
-    }
+public struct Location: MlirStructWrapper, MlirStringCallbackStreamable {
     init(c: MlirLocation) {
         self.c = c
     }
@@ -17,4 +11,13 @@ public struct Location: MlirTypeWrapper, MlirStringCallbackStreamable {
     }
     
     let c: MlirLocation
+}
+
+extension MLIRConfiguration {
+    static func location(file: StaticString, line: Int, column: Int) -> Location {
+        precondition(file.hasPointerRepresentation)
+        return Location(c: file.withUnsafeMlirStringRef {
+            mlirLocationFileLineColGet(context.c, $0, UInt32(line), UInt32(column))
+        })
+    }
 }

@@ -1,8 +1,8 @@
 
-protocol MlirSequence: Sequence where Element: MlirTypeWrapper {
-    static var nextMlirElement: (Element.MlirType) -> Element.MlirType { get }
-    static var mlirElementIsNull: (Element.MlirType) -> Int32 { get }
-    var firstMlirElement: Element.MlirType { get }
+protocol MlirSequence: Sequence where Element: MlirStructWrapper {
+    static var nextMlirElement: (Element.MlirStruct) -> Element.MlirStruct { get }
+    static var mlirElementIsNull: (Element.MlirStruct) -> Int32 { get }
+    var firstMlirElement: Element.MlirStruct { get }
 }
 
 extension MlirSequence {
@@ -18,5 +18,5 @@ private struct MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
         nextMlirElement = S.nextMlirElement(nextMlirElement)
         return element
     }
-    fileprivate var nextMlirElement: S.Element.MlirType
+    fileprivate var nextMlirElement: S.Element.MlirStruct
 }

@@ -13,6 +13,6 @@ final class MLIRTests: XCTestCase {
               }
             }
             """)
-        print(module.operation)
+        print(module)
     }
 }
