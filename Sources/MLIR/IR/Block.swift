@@ -1,18 +1,29 @@
 
 import CMLIR
 
-public struct BlockReference: MlirStructWrapper, MlirStringCallbackStreamable, Destroyable {
+extension MLIRConfiguration {
+    public typealias Block = MLIR.Block
+}
+
+public struct Block<MLIR: MLIRConfiguration>:
+    MlirStructWrapper,
+    MlirStringCallbackStreamable,
+    Destroyable
+{
+    public typealias Region = MLIR.Region
+    public typealias Operation = MLIR.Operation
+    
     public struct Operations: MlirSequence, Sequence {
-        public typealias Element = OperationReference
-        let firstMlirElement: MlirOperation
-        static let nextMlirElement = mlirOperationGetNextInBlock
-        static let mlirElementIsNull = mlirOperationIsNull
+        public typealias Element = Operation
+        let mlirFirstElement: MlirOperation
+        static var mlirNextElement: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
+        static var mlirElementIsNull: (MlirOperation) -> Int32 { mlirOperationIsNull }
     }
     public var operations: Operations {
-        Operations(firstMlirElement: mlirBlockGetFirstOperation(c))
+        Operations(mlirFirstElement: mlirBlockGetFirstOperation(c))
     }
     
-    func append(_ operation: Owned<OperationReference>) {
+    func append(_ operation: Owned<Operation>) {
         mlirBlockAppendOwnedOperation(c, operation.releasingOwnership().c)
     }
     
@@ -24,14 +35,4 @@ public struct BlockReference: MlirStructWrapper, MlirStringCallbackStreamable, D
     }
     
     let c: MlirBlock
-}
-
-extension MLIRConfiguration {
-    static func block(argumentTypes: [Type], operations: [OperationReference]) -> Owned<BlockReference> {
-        let block = BlockReference(c: argumentTypes.withUnsafeMlirStructs { buffer in
-            mlirBlockCreate(buffer.count, buffer.baseAddress)
-        })
-        return Owned.assumingOwnership(of: block)
-    }
-    
 }

@@ -1,36 +1,38 @@
 
 import CMLIR
 
-public struct RegionReference: MlirStructWrapper, Destroyable {
+extension MLIRConfiguration {
+    public typealias Region = MLIR.Region<Self>
+}
+
+public struct Region<MLIR: MLIRConfiguration>:
+    MlirStructWrapper,
+    Destroyable
+{
     
+    public static func create(blocks: [Owned<Block<MLIR>>] = []) -> Owned<Region> {
+        let region = Region(c: mlirRegionCreate())
+        blocks.forEach(region.append)
+        return Owned.assumingOwnership(of: region)
+    }
     public func destroy() {
         mlirRegionDestroy(c)
     }
     
     public struct Blocks: MlirSequence, Sequence {
-        public typealias Element = BlockReference
-        let firstMlirElement: MlirBlock
-        static let nextMlirElement = mlirBlockGetNextInRegion
-        static let mlirElementIsNull = mlirBlockIsNull
+        public typealias Element = Block<MLIR>
+        let mlirFirstElement: MlirBlock
+        static var mlirNextElement: (MlirBlock) -> MlirBlock { mlirBlockGetNextInRegion }
+        static var mlirElementIsNull: (MlirBlock) -> Int32 { mlirBlockIsNull }
     }
     public var blocks: Blocks {
-        return Blocks(firstMlirElement: mlirRegionGetFirstBlock(c))
+        return Blocks(mlirFirstElement: mlirRegionGetFirstBlock(c))
     }
     
-    func append(_ block: Owned<BlockReference>) {
+    func append(_ block: Owned<Block<MLIR>>) {
         mlirRegionAppendOwnedBlock(c, block.releasingOwnership().c)
     }
     
     let c: MlirRegion
     
-}
-
-public extension MLIRConfiguration {
-    static func region(
-        blocks: [Owned<BlockReference>] = []) -> Owned<RegionReference>
-    {
-        let region = RegionReference(c: mlirRegionCreate())
-        blocks.forEach(region.append)
-        return Owned.assumingOwnership(of: region)
-    }
 }

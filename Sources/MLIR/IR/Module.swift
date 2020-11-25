@@ -2,6 +2,9 @@
 import CMLIR
 
 public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper {
+    public typealias Block = MLIR.Block
+    public typealias Operation = MLIR.Operation
+    
     public init(parsing source: String) throws {
         c = try MLIR.parse {
             source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.context.c, $0) }
@@ -16,12 +19,12 @@ public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper {
     deinit {
         mlirModuleDestroy(c)
     }
-    public var body: BlockReference {
-        BlockReference(c: mlirModuleGetBody(c))
+    public var body: Block<MLIR> {
+        Block(c: mlirModuleGetBody(c))
     }
     
-    public var operation: OperationReference {
-        OperationReference(c: mlirModuleGetOperation(c))
+    public var operation: Operation {
+        Operation(c: mlirModuleGetOperation(c))
     }
      
     init(c: MlirModule) {
