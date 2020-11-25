@@ -15,7 +15,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
     
     public static func create(
         name: String,
-        resultTypes: [Type] = [],
+        resultTypes: [Type<MLIR>] = [],
         operands: [Value] = [],
         ownedRegions: [Owned<Region>] = [],
         attributes: [NamedAttribute] = [:],

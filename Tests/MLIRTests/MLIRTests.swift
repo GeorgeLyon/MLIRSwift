@@ -1,6 +1,8 @@
 import XCTest
 @testable import MLIR
 
+
+
 final class MLIRTests: XCTestCase {
     func testModuleParse() throws {
         let module = try Module<Test>(parsing: """
@@ -30,22 +32,40 @@ final class MLIRTests: XCTestCase {
         print(module)
     }
     func testModuleCreate() throws {
-        let module = Module<Test>()
-        let memref = try Test.type(parsing: "memref<?xf32>")
-        module.body.append(
-            Test.operation(
-                name: "func",
-                ownedRegions: [
-                    Test.region(
-                        blocks: [
-                            Test.block(
-                                argumentTypes: [memref, memref],
-                                operations: [
-//                                    Test.operation(
-//                                        name: "std.constant",
-//                                        )
-                                ])
-                        ])
-                ]))
+        
+        let parsed = try! Module<Test>(parsing: """
+            module {
+              func @add(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
+                %c0 = constant 0 : index
+                return
+              }
+            }
+            """)
+        print(parsed.operation)
+        let module = Module<Test>(
+            operations: [
+                Operation.create(
+                    name: "func",
+                    ownedRegions: [
+                        Region.create(
+                            blocks: [
+                                Block.create(
+                                    arguments: TypeList(MemRef.self, MemRef.self),
+                                    operations: { arg0, arg1 in
+                                        [
+                                            Operation.create(
+                                                name: "std.constant",
+                                                resultTypes: [.index],
+                                                operands: [],
+                                                attributes: [
+                                                    "value": Attribute "0 : index"
+                                                ])
+                                        ]
+                                    })
+                            ])
+                    ]),
+                Operation.create(name: "module_terminator")
+            ])
+        print(module.operation)
     }
 }

@@ -11,15 +11,17 @@ public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper {
         }
     }
     public init(
+        operations: [Owned<Operation>],
         file: StaticString = #file, line: Int = #line, column: Int = #column
     ) {
         let location = MLIR.location(file: file, line: line, column: column)
-        c = mlirModuleCreateEmpty(location.c)
+        c =  mlirModuleCreateEmpty(location.c)
+        operations.forEach(body.append)
     }
     deinit {
         mlirModuleDestroy(c)
     }
-    public var body: Block<MLIR> {
+    public var body: Block {
         Block(c: mlirModuleGetBody(c))
     }
     
