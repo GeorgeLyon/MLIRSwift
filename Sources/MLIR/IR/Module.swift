@@ -1,7 +1,7 @@
 
 import CMLIR
 
-public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MlirStringCallbackStreamable {
+public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper {
     public init(parsing source: String) throws {
         c = try MLIR.parse {
             source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.context.c, $0) }
@@ -20,8 +20,8 @@ public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MlirStrin
         BlockReference(c: mlirModuleGetBody(c))
     }
     
-    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-        mlirOperationPrint(mlirModuleGetOperation(c), unsafeCallback, userData)
+    public var operation: OperationReference {
+        OperationReference(c: mlirModuleGetOperation(c))
     }
      
     init(c: MlirModule) {

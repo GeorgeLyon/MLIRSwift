@@ -2,14 +2,6 @@
 import CMLIR
 
 public struct BlockReference: MlirStructWrapper, MlirStringCallbackStreamable, Destroyable {
-    
-    public static func create(with argumentTypes: [Type]) -> Owned<BlockReference> {
-        let block = BlockReference(c: argumentTypes.withUnsafeMlirStructs { buffer in
-            mlirBlockCreate(buffer.count, buffer.baseAddress)
-        })
-        return Owned.assumeOwnership(of: block)
-    }
-    
     public struct Operations: MlirSequence, Sequence {
         public typealias Element = OperationReference
         let firstMlirElement: MlirOperation
@@ -20,8 +12,8 @@ public struct BlockReference: MlirStructWrapper, MlirStringCallbackStreamable, D
         Operations(firstMlirElement: mlirBlockGetFirstOperation(c))
     }
     
-    mutating func append(_ operation: Owned<OperationReference>) {
-        mlirBlockAppendOwnedOperation(c, operation.assumeOwnership().c)
+    func append(_ operation: Owned<OperationReference>) {
+        mlirBlockAppendOwnedOperation(c, operation.releasingOwnership().c)
     }
     
     func destroy() {
@@ -32,4 +24,14 @@ public struct BlockReference: MlirStructWrapper, MlirStringCallbackStreamable, D
     }
     
     let c: MlirBlock
+}
+
+extension MLIRConfiguration {
+    static func block(argumentTypes: [Type], operations: [OperationReference]) -> Owned<BlockReference> {
+        let block = BlockReference(c: argumentTypes.withUnsafeMlirStructs { buffer in
+            mlirBlockCreate(buffer.count, buffer.baseAddress)
+        })
+        return Owned.assumingOwnership(of: block)
+    }
+    
 }

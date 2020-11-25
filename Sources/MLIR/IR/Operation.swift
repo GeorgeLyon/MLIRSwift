@@ -94,7 +94,7 @@ extension MLIRConfiguration {
             operands.withUnsafeMlirStructs { operands in
                 mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
             }
-            ownedRegions.map { $0.assumeOwnership() }.withUnsafeMlirStructs { regions in
+            ownedRegions.map { $0.releasingOwnership() }.withUnsafeMlirStructs { regions in
                 mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
             }
             attributes.withUnsafeMlirStructs { attributes in
@@ -102,7 +102,7 @@ extension MLIRConfiguration {
             }
             return OperationReference(c: mlirOperationCreate(&state))
         }
-        return Owned.assumeOwnership(of: operation)
+        return Owned.assumingOwnership(of: operation)
     }
 }
 

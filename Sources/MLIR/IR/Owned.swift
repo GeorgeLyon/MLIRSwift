@@ -4,7 +4,7 @@
  */
 public final class Owned<Value> {
     
-    func assumeOwnership() -> Value {
+    func releasingOwnership() -> Value {
         precondition(isOwned)
         isOwned = false
         return value
@@ -30,7 +30,7 @@ protocol Destroyable {
 }
 
 extension Owned where Value: Destroyable {
-    static func assumeOwnership(of value: Value) -> Owned {
+    static func assumingOwnership(of value: Value) -> Owned {
         return Owned(value: value, destroy: Value.destroy)
     }
 }
