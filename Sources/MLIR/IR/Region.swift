@@ -10,13 +10,15 @@ public struct Region<MLIR: MLIRConfiguration>:
     Destroyable
 {
     
-    public static func create(blocks: [Owned<MLIR.Block>] = []) -> Owned<Region> {
-        let region = Region(c: mlirRegionCreate())
-        blocks.forEach(region.append)
-        return Owned.assumingOwnership(of: region)
-    }
-    public func destroy() {
-        mlirRegionDestroy(c)
+    public struct Builder: BuilderProtocol {
+        public func build(blocks: (MLIR.Block.Builder) -> Void) {
+            let region = Region(c: mlirRegionCreate())
+            MLIR.Block.Builder
+                .products(blocks)
+                .forEach(region.append)
+            producer.produce(region)
+        }
+        let producer: Producer<Region>
     }
     
     public struct Blocks: MlirSequence, Sequence {
@@ -29,10 +31,12 @@ public struct Region<MLIR: MLIRConfiguration>:
         return Blocks(mlirFirstElement: mlirRegionGetFirstBlock(c))
     }
     
-    func append(_ block: Owned<MLIR.Block>) {
-        mlirRegionAppendOwnedBlock(c, block.releasingOwnership().c)
+    func destroy() {
+        mlirRegionDestroy(c)
     }
-    
     let c: MlirRegion
     
+    private func append(_ block: MLIR.Block) {
+        mlirRegionAppendOwnedBlock(c, block.c)
+    }
 }

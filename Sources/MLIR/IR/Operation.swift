@@ -2,156 +2,198 @@
 import CMLIR
 
 extension MLIRConfiguration {
-    public typealias Operation = MLIR.Operation<Self>
+  public typealias Operation = MLIR.Operation<Self>
 }
 
 public struct Operation<MLIR: MLIRConfiguration>:
-    MlirStructWrapper,
-    MlirStringCallbackStreamable,
-    Destroyable
+  MlirStructWrapper,
+  MlirStringCallbackStreamable,
+  Destroyable
 {
-    public static func create(
-        name: String,
-        resultTypes: [MLIR.`Type`] = [],
-        operands: [Value] = [],
-        ownedRegions: [Owned<MLIR.Region>] = [],
-        attributes: MLIR.NamedAttributes = [:],
-        file: StaticString = #file, line: Int = #line, column: Int = #column
-    ) -> Owned<Operation>
-    {
-        let location = MLIR.location(file: file, line: line, column: column)
-        let operation = name.withUnsafeMlirStringRef { name -> Operation in
-            var state = mlirOperationStateGet(name, location.c)
-            resultTypes.withUnsafeMlirStructs { resultTypes in
-                mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
-            }
-            operands.withUnsafeMlirStructs { operands in
-                mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
-            }
-            ownedRegions.map { $0.releasingOwnership() }.withUnsafeMlirStructs { regions in
-                mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
-            }
-            attributes.withUnsafeMlirStructs { attributes in
-                mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
-            }
-            return Operation(c: mlirOperationCreate(&state))
+  public struct Regions: RandomAccessCollection {
+    public let startIndex = 0
+    public let endIndex: Int
+    public subscript(position: Int) -> MLIR.Region {
+      Region(c: mlirOperationGetRegion(operation.c, position))
+    }
+    fileprivate init(operation: Operation) {
+      self.operation = operation
+      self.endIndex = mlirOperationGetNumRegions(operation.c)
+    }
+    private let operation: Operation
+  }
+  public var regions: Regions {
+    return Regions(operation: self)
+  }
+  
+  public struct Attributes: RandomAccessCollection {
+    public let startIndex = 0
+    public let endIndex: Int
+    public subscript(position: Int) -> (key: String, value: MLIR.Attribute) {
+      let namedAttribute = mlirOperationGetAttribute(operation.c, position)
+      return (namedAttribute.name.string, Attribute(c: namedAttribute.attribute))
+    }
+    public subscript(_ name: String) -> MLIR.Attribute {
+      name.withUnsafeMlirStringRef {
+        Attribute(c: mlirOperationGetAttributeByName(operation.c, $0))
+      }
+    }
+    fileprivate init(operation: Operation) {
+      self.operation = operation
+      self.endIndex = mlirOperationGetNumAttributes(operation.c)
+    }
+    private let operation: Operation
+  }
+  public var attributes: Attributes {
+    Attributes(operation: self)
+  }
+  
+  public struct Results: MemberCollection, RandomAccessCollection {
+    public static var keyPath: KeyPath<Operation, Results> { \.results }
+    public let startIndex = 0
+    public let endIndex: Int
+    public subscript(position: Int) -> Value {
+      Value(c: mlirOperationGetResult(operation.c, position))
+    }
+    fileprivate init(operation: Operation) {
+      self.operation = operation
+      self.endIndex = mlirOperationGetNumResults(operation.c)
+    }
+    private let operation: Operation
+  }
+  public var results: Results {
+    Results(operation: self)
+  }
+  
+  public typealias DebugInfoStyle = _OperationDebugInfoStyle
+  public func withPrintingOptions(
+    elideElementsAttributesLargerThan: Int32? = nil,
+    debugInformationStyle: DebugInfoStyle = nil,
+    alwaysPrintInGenericForm: Bool = false,
+    useLocalScope: Bool = false) -> TextOutputStreamable
+  {
+    return OperationWithPrintingOptions(
+      operation: c,
+      options: .init(
+        elideElementsAttributesLargerThan: elideElementsAttributesLargerThan,
+        debugInformationStyle: debugInformationStyle,
+        alwaysPrintInGenericForm: alwaysPrintInGenericForm,
+        useLocalScope: useLocalScope))
+  }
+  
+  public struct Builder: BuilderProtocol {
+    public func build<Values>(
+      _ name: String,
+      results: TypeList<MLIR, Values, Results>,
+      operands: [Value] = [],
+      attributes: MLIR.NamedAttributes = [:],
+      regions: (MLIR.Region.Builder) -> Void = { _ in },
+      file: StaticString = #file, line: Int = #line, column: Int = #column
+    ) -> Values {
+      let operation = Operation(
+        name,
+        resultTypes: results.types,
+        operands: operands,
+        attributes: attributes,
+        regions: regions,
+        file: file, line: line, column: column)
+      producer.produce(operation)
+      return results.values(from: operation)
+    }
+    let producer: Producer<Operation>
+  }
+  
+  func destroy() {
+    mlirOperationDestroy(c)
+  }
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirOperationPrint(c, unsafeCallback, userData)
+  }
+  init(c: MlirOperation) {
+    self.c = c
+  }
+  let c: MlirOperation
+  
+  private init(
+    _ name: String,
+    resultTypes: [MLIR.`Type`] = [],
+    operands: [Value] = [],
+    attributes: MLIR.NamedAttributes = [:],
+    regions: (MLIR.Region.Builder) -> Void,
+    file: StaticString = #file, line: Int = #line, column: Int = #column
+  ) {
+    let location = MLIR.location(file: file, line: line, column: column)
+    c = name.withUnsafeMlirStringRef { name in
+      var state = mlirOperationStateGet(name, location.c)
+      resultTypes.withUnsafeMlirStructs { resultTypes in
+        mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
+      }
+      operands.withUnsafeMlirStructs { operands in
+        mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
+      }
+      MLIR.Region.Builder
+        .products(regions)
+        .withUnsafeMlirStructs { regions in
+          mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
         }
-        return Owned.assumingOwnership(of: operation)
+      attributes.withUnsafeMlirStructs { attributes in
+        mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
+      }
+      return mlirOperationCreate(&state)
     }
-    
-    public struct Regions: RandomAccessCollection {
-        public let startIndex = 0
-        public let endIndex: Int
-        public subscript(position: Int) -> MLIR.Region {
-            Region(c: mlirOperationGetRegion(operation.c, position))
-        }
-        fileprivate init(operation: Operation) {
-            self.operation = operation
-            self.endIndex = mlirOperationGetNumRegions(operation.c)
-        }
-        private let operation: Operation
-    }
-    public var regions: Regions {
-        return Regions(operation: self)
-    }
-    
-    public struct Attributes: RandomAccessCollection {
-        public let startIndex = 0
-        public let endIndex: Int
-        public subscript(position: Int) -> (key: String, value: MLIR.Attribute) {
-            let namedAttribute = mlirOperationGetAttribute(operation.c, position)
-            return (namedAttribute.name.string, Attribute(c: namedAttribute.attribute))
-        }
-        public subscript(_ name: String) -> MLIR.Attribute {
-            name.withUnsafeMlirStringRef {
-                Attribute(c: mlirOperationGetAttributeByName(operation.c, $0))
-            }
-        }
-        fileprivate init(operation: Operation) {
-            self.operation = operation
-            self.endIndex = mlirOperationGetNumAttributes(operation.c)
-        }
-        private let operation: Operation
-    }
-    public var attributes: Attributes {
-        Attributes(operation: self)
-    }
-    
-    public typealias DebugInfoStyle = _OperationDebugInfoStyle
-    public func withPrintingOptions(
-        elideElementsAttributesLargerThan: Int32? = nil,
-        debugInformationStyle: DebugInfoStyle = nil,
-        alwaysPrintInGenericForm: Bool = false,
-        useLocalScope: Bool = false) -> TextOutputStreamable
-    {
-        return OperationWithPrintingOptions(
-            operation: c,
-            options: .init(
-                elideElementsAttributesLargerThan: elideElementsAttributesLargerThan,
-                debugInformationStyle: debugInformationStyle,
-                alwaysPrintInGenericForm: alwaysPrintInGenericForm,
-                useLocalScope: useLocalScope))
-    }
-    
-    func destroy() {
-        mlirOperationDestroy(c)
-    }
-    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-        mlirOperationPrint(c, unsafeCallback, userData)
-    }
-    let c: MlirOperation
+  }
 }
 
 public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
-    case none
-    case standard
-    case pretty
-    
-    public init(nilLiteral: ()) {
-        self = .none
-    }
+  case none
+  case standard
+  case pretty
+  
+  public init(nilLiteral: ()) {
+    self = .none
+  }
 }
 
 // MARK: - Private
 
 private struct OperationWithPrintingOptions: MlirStringCallbackStreamable {
-
-    struct PrintingOptions {
-        var elideElementsAttributesLargerThan: Int32? = nil
-        var debugInformationStyle: _OperationDebugInfoStyle = nil
-        var alwaysPrintInGenericForm: Bool = false
-        var useLocalScope: Bool = false
-        
-        func withUnsafeMlirOpPrintingFlags(_ body: (MlirOpPrintingFlags) -> Void) {
-            let c = mlirOpPrintingFlagsCreate()
-            if let value = elideElementsAttributesLargerThan {
-                mlirOpPrintingFlagsEnableDebugInfo(c, value)
-            }
-            switch debugInformationStyle {
-            case .none:
-                break
-            case .standard:
-                mlirOpPrintingFlagsEnableDebugInfo(c, 0)
-            case .pretty:
-                mlirOpPrintingFlagsEnableDebugInfo(c, 1)
-            }
-            if alwaysPrintInGenericForm {
-                mlirOpPrintingFlagsPrintGenericOpForm(c)
-            }
-            if useLocalScope {
-                mlirOpPrintingFlagsUseLocalScope(c)
-            }
-            body(c)
-            mlirOpPrintingFlagsDestroy(c)
-        }
-    }
+  
+  struct PrintingOptions {
+    var elideElementsAttributesLargerThan: Int32? = nil
+    var debugInformationStyle: _OperationDebugInfoStyle = nil
+    var alwaysPrintInGenericForm: Bool = false
+    var useLocalScope: Bool = false
     
-    func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-        options.withUnsafeMlirOpPrintingFlags { flags in
-            mlirOperationPrintWithFlags(operation, flags, unsafeCallback, userData)
-        }
+    func withUnsafeMlirOpPrintingFlags(_ body: (MlirOpPrintingFlags) -> Void) {
+      let c = mlirOpPrintingFlagsCreate()
+      if let value = elideElementsAttributesLargerThan {
+        mlirOpPrintingFlagsEnableDebugInfo(c, value)
+      }
+      switch debugInformationStyle {
+      case .none:
+        break
+      case .standard:
+        mlirOpPrintingFlagsEnableDebugInfo(c, 0)
+      case .pretty:
+        mlirOpPrintingFlagsEnableDebugInfo(c, 1)
+      }
+      if alwaysPrintInGenericForm {
+        mlirOpPrintingFlagsPrintGenericOpForm(c)
+      }
+      if useLocalScope {
+        mlirOpPrintingFlagsUseLocalScope(c)
+      }
+      body(c)
+      mlirOpPrintingFlagsDestroy(c)
     }
-    
-    fileprivate let operation: MlirOperation
-    fileprivate let options: PrintingOptions
+  }
+  
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    options.withUnsafeMlirOpPrintingFlags { flags in
+      mlirOperationPrintWithFlags(operation, flags, unsafeCallback, userData)
+    }
+  }
+  
+  fileprivate let operation: MlirOperation
+  fileprivate let options: PrintingOptions
 }

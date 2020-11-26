@@ -39,16 +39,24 @@ extension Array where Element == String {
         switch count {
         case 0:
             return try body([])
-//        case 1:
-//            return try self[0].withUnsafeMlirStringRef { s0 in
-//                try body([s0])
-//            }
-//        case 2:
-//            return try self[0].withUnsafeMlirStringRef { s0 in
-//                try self[1].withUnsafeMlirStringRef { s1 in
-//                    try body([s0, s1])
-//                }
-//            }
+        case 1:
+            return try self[0].withUnsafeMlirStringRef { s0 in
+                try body([s0])
+            }
+        case 2:
+            return try self[0].withUnsafeMlirStringRef { s0 in
+                try self[1].withUnsafeMlirStringRef { s1 in
+                    try body([s0, s1])
+                }
+            }
+        case 3:
+            return try self[0].withUnsafeMlirStringRef { s0 in
+                try self[1].withUnsafeMlirStringRef { s1 in
+                    try self[2].withUnsafeMlirStringRef { s2 in
+                        try body([s0, s1, s2])
+                    }
+                }
+            }
         default:
             var buffers: [UnsafeMutableBufferPointer<Int8>] = []
             for string in self {
