@@ -1,12 +1,12 @@
 
 import CMLIR
 
-public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper {
+public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MLIRConfigurable {
     public typealias Block = MLIR.Block
     public typealias Operation = MLIR.Operation
     
-    public init(parsing source: String) throws {
-        c = try MLIR.parse {
+    public convenience init(parsing source: String) throws {
+        try self.init(isNull: mlirModuleIsNull) {
             source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.context.c, $0) }
         }
     }

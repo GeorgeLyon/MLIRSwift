@@ -1,9 +1,16 @@
 
 import CMLIR
 
-public struct Type<MLIR: MLIRConfiguration>: MlirStructWrapper {
+public extension MLIRConfiguration {
+    typealias `Type` = MLIR.`Type`<Self>
+}
+
+public struct Type<MLIR: MLIRConfiguration>:
+    MLIRConfigurable,
+    MlirStructWrapper
+{
     public init(parsing source: String) throws {
-        c = try MLIR.parse {
+        try self.init(isNull: mlirTypeIsNull) {
             source.withUnsafeMlirStringRef { mlirTypeParseGet(MLIR.context.c, $0) }
         }
     }

@@ -11,13 +11,13 @@ public struct Diagnostic: Swift.Error {
     public let location: Location
     public let severity: Severity
     public let notes: [Diagnostic]
-    public let description: String
+    public let message: String
     
     init(_ unsafeDiagnostic: UnsafeDiagnostic) {
         self.location = unsafeDiagnostic.location
         self.severity = unsafeDiagnostic.severity
         self.notes = unsafeDiagnostic.notes.map(Diagnostic.init)
-        self.description = "\(unsafeDiagnostic)"
+        self.message = "\(unsafeDiagnostic)"
     }
 }
 
@@ -80,7 +80,7 @@ struct DiagnosticHandlerRegistration {
     fileprivate let id: MlirDiagnosticHandlerID
 }
 
-protocol DiagnosticsHandler: AnyObject {
+protocol DiagnosticHandler: AnyObject {
     /**
      - parameter unsafeDiagnostic: A `Diagnostic` which, along with any derived values such as `notes`, will only be valid for the duration of the call to `handle`.
      */
@@ -88,7 +88,7 @@ protocol DiagnosticsHandler: AnyObject {
 }
 
 extension Context {
-    func register(_ handler: DiagnosticsHandler) -> DiagnosticHandlerRegistration
+    func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration
     {
         let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
         let id = mlirContextAttachDiagnosticHandler(
@@ -129,7 +129,7 @@ private extension Diagnostic.Severity {
 
 private func mlirDiagnosticHandler(mlirDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!) -> MlirLogicalResult {
     let diagnostic = UnsafeDiagnostic(c: mlirDiagnostic)
-    let handler = Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticsHandler
+    let handler = Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
     return handler.handle(diagnostic).logicalResult
 }
 

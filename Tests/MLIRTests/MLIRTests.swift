@@ -35,10 +35,7 @@ final class MLIRTests: XCTestCase {
         
         let parsed = try! Module<Test>(parsing: """
             module {
-              func @add(%arg0: memref<?xf32>, %arg1: memref<?xf32>) {
                 %c0 = constant 0 : index
-                return
-              }
             }
             """)
         print(parsed.operation)
@@ -58,7 +55,7 @@ final class MLIRTests: XCTestCase {
                                                 resultTypes: [.index],
                                                 operands: [],
                                                 attributes: [
-                                                    "value": Attribute "0 : index"
+                                                    "value": try! Attribute(parsing: "0 : index")
                                                 ])
                                         ]
                                     })

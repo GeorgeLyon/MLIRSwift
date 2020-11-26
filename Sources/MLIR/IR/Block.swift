@@ -10,12 +10,10 @@ public struct Block<MLIR: MLIRConfiguration>:
     MlirStringCallbackStreamable,
     Destroyable
 {
-    public typealias Region = MLIR.Region
-    public typealias Operation = MLIR.Operation
     
     public static func create<Values>(
         arguments: TypeList<MLIR, Values, Arguments>,
-        operations: (Values) -> [Owned<Operation>]
+        operations: (Values) -> [Owned<MLIR.Operation>]
     ) -> Owned<Block> {
         let block = arguments.types.withUnsafeMlirStructs {
             Block(c: mlirBlockCreate($0.count, $0.baseAddress))
@@ -27,7 +25,7 @@ public struct Block<MLIR: MLIRConfiguration>:
     }
     
     public struct Operations: MlirSequence, Sequence {
-        public typealias Element = Operation
+        public typealias Element = MLIR.Operation
         let mlirFirstElement: MlirOperation
         static var mlirNextElement: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
         static var mlirElementIsNull: (MlirOperation) -> Int32 { mlirOperationIsNull }
@@ -53,7 +51,7 @@ public struct Block<MLIR: MLIRConfiguration>:
         Arguments(block: self)
     }
     
-    func append(_ operation: Owned<Operation>) {
+    func append(_ operation: Owned<MLIR.Operation>) {
         mlirBlockAppendOwnedOperation(c, operation.releasingOwnership().c)
     }
     func destroy() {

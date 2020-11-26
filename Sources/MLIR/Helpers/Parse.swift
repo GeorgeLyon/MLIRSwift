@@ -1,16 +1,19 @@
 
 import Foundation
 
-extension MLIRConfiguration {
+extension MlirStructWrapper where Self: MLIRConfigurable {
     /**
      A convenience method for parsing-type operations that collects diagnostics and throws if any exceed a minimum severity.
      */
-    static func parse<T>(minimumSeverity: Diagnostic.Severity = .error, body: () -> T) throws -> T {
-        let (value, diagnostics) = collectDiagnostics(minimumSeverity: minimumSeverity, body)
+    init(isNull: (MlirStruct) -> Int32, parse: () -> MlirStruct) throws {
+        let (c, diagnostics) = MLIR.collectDiagnostics(minimumSeverity: .error, parse)
         guard diagnostics.isEmpty else {
             throw ParsingError(diagnostics: diagnostics)
         }
-        return value
+        guard !isNull(c).boolValue else {
+            throw ParsingError(diagnostics: [])
+        }
+        self.init(c: c)
     }
 }
 

@@ -10,15 +10,12 @@ public struct Operation<MLIR: MLIRConfiguration>:
     MlirStringCallbackStreamable,
     Destroyable
 {
-    public typealias Region = MLIR.Region
-    public typealias Block = MLIR.Block
-    
     public static func create(
         name: String,
-        resultTypes: [Type<MLIR>] = [],
+        resultTypes: [MLIR.`Type`] = [],
         operands: [Value] = [],
-        ownedRegions: [Owned<Region>] = [],
-        attributes: [NamedAttribute] = [:],
+        ownedRegions: [Owned<MLIR.Region>] = [],
+        attributes: MLIR.NamedAttributes = [:],
         file: StaticString = #file, line: Int = #line, column: Int = #column
     ) -> Owned<Operation>
     {
@@ -45,7 +42,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
     public struct Regions: RandomAccessCollection {
         public let startIndex = 0
         public let endIndex: Int
-        public subscript(position: Int) -> Region {
+        public subscript(position: Int) -> MLIR.Region {
             Region(c: mlirOperationGetRegion(operation.c, position))
         }
         fileprivate init(operation: Operation) {
@@ -61,10 +58,11 @@ public struct Operation<MLIR: MLIRConfiguration>:
     public struct Attributes: RandomAccessCollection {
         public let startIndex = 0
         public let endIndex: Int
-        public subscript(position: Int) -> NamedAttribute {
-            NamedAttribute(c: mlirOperationGetAttribute(operation.c, position))
+        public subscript(position: Int) -> (key: String, value: MLIR.Attribute) {
+            let namedAttribute = mlirOperationGetAttribute(operation.c, position)
+            return (namedAttribute.name.string, Attribute(c: namedAttribute.attribute))
         }
-        public subscript(_ name: String) -> Attribute {
+        public subscript(_ name: String) -> MLIR.Attribute {
             name.withUnsafeMlirStringRef {
                 Attribute(c: mlirOperationGetAttributeByName(operation.c, $0))
             }
