@@ -1,7 +1,7 @@
 
 protocol MlirSequence: Sequence where Element: MlirStructWrapper {
   static var mlirNextElement: (Element.MlirStruct) -> Element.MlirStruct { get }
-  static var mlirElementIsNull: (Element.MlirStruct) -> Int32 { get }
+  static var mlirElementIsNull: (Element.MlirStruct) -> Bool { get }
   var mlirFirstElement: Element.MlirStruct { get }
 }
 
@@ -13,7 +13,7 @@ extension MlirSequence {
 
 private struct MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
   mutating func next() -> S.Element? {
-    guard S.mlirElementIsNull(nextMlirElement) == 0 else { return nil }
+    guard S.mlirElementIsNull(nextMlirElement) else { return nil }
     let element = S.Element(c: nextMlirElement)
     nextMlirElement = S.mlirNextElement(nextMlirElement)
     return element

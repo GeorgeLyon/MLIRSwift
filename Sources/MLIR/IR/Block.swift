@@ -15,7 +15,7 @@ public struct Block<MLIR: MLIRConfiguration>:
     public typealias Element = MLIR.Operation
     let mlirFirstElement: MlirOperation
     static var mlirNextElement: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
-    static var mlirElementIsNull: (MlirOperation) -> Int32 { mlirOperationIsNull }
+    static var mlirElementIsNull: (MlirOperation) -> Bool { mlirOperationIsNull }
   }
   public var operations: Operations {
     Operations(mlirFirstElement: mlirBlockGetFirstOperation(c))

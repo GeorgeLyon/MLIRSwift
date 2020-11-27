@@ -90,13 +90,14 @@ public struct Operation<MLIR: MLIRConfiguration>:
       regions: (MLIR.Region.Builder) -> Void = { _ in },
       file: StaticString = #file, line: Int = #line, column: Int = #column
     ) -> Values {
+      let location = MLIR.location(file: file, line: line, column: column)
       let operation = Operation(
         name,
         resultTypes: results.types,
         operands: operands,
         attributes: attributes,
         regions: regions,
-        file: file, line: line, column: column)
+        location: location)
       producer.produce(operation)
       return results.values(from: operation)
     }
@@ -120,26 +121,25 @@ public struct Operation<MLIR: MLIRConfiguration>:
     operands: [Value] = [],
     attributes: MLIR.NamedAttributes = [:],
     regions: (MLIR.Region.Builder) -> Void,
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    location: Location
   ) {
-    let location = MLIR.location(file: file, line: line, column: column)
     c = name.withUnsafeMlirStringRef { name in
-      var state = mlirOperationStateGet(name, location.c)
-      resultTypes.withUnsafeMlirStructs { resultTypes in
-        mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
-      }
       operands.withUnsafeMlirStructs { operands in
-        mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
-      }
-      MLIR.Region.Builder
-        .products(regions)
-        .withUnsafeMlirStructs { regions in
-          mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
+        resultTypes.withUnsafeMlirStructs { resultTypes in
+          attributes.withUnsafeMlirStructs { attributes in
+            MLIR.Region.Builder
+              .products(regions)
+              .withUnsafeMlirStructs { regions in
+                var state = mlirOperationStateGet(name, location.c)
+                mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
+                mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
+                mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
+                mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
+                return mlirOperationCreate(&state)
+              }
+          }
         }
-      attributes.withUnsafeMlirStructs { attributes in
-        mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
       }
-      return mlirOperationCreate(&state)
     }
   }
 }
