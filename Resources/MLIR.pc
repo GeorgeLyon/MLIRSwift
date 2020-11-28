@@ -1,0 +1,7 @@
+prefix=<LLVM install prefix>
+
+Name: MLIR
+Description: Multi-Level Intermediate Representation and associated projects
+Version: local
+Cflags: -I${prefix}/include
+Libs: -lc++ -lcurses -L${prefix}/lib

@@ -1,6 +1,10 @@
 
 import CCoreMLIR
 
+/**
+ This file contains convenience functions for mapping between `MlirStringRef` and Swift strings.
+ */
+
 extension MlirStringRef {
   var buffer: UnsafeBufferPointer<Int8> {
     UnsafeBufferPointer(start: data, count: length)
@@ -35,6 +39,9 @@ extension StaticString {
 }
 
 extension Array where Element == String {
+  /**
+   In Swift, there is no easy way use closure-scoped APIs like `withUTF8` on an array of values. This method bridges the gap for `MlirStringRef`.
+   */
   func withUnsafeMlirStringRefs<T>(_ body: ([MlirStringRef]) throws -> T) rethrows -> T {
     switch count {
     case 0:

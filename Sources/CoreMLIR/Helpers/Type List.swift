@@ -1,4 +1,7 @@
 
+/**
+ `TypeList` provides a limited implementation of variadic generics for MLIR types. It enables the creation of a `Values` object which represents values of the types the represented by this `TypeList`. Under the hood, we just provide initializer for up to N types, similar to how the standard library does for Tuples. 
+ */
 public struct TypeList<MLIR: MLIRConfiguration, Values, Members: MemberCollection>
 where
   Members.Index == Int,
@@ -17,6 +20,7 @@ public extension TypeList where Values == Void {
     getValues = { _ in () }
   }
 }
+
 public extension TypeList {
   init(_ t0: Type<MLIR>) where Values == Value {
     types = [t0]

@@ -1,4 +1,7 @@
 
+/**
+ Maps MLIR-style linked list sequences to `Sequence`
+ */
 protocol MlirSequence: Sequence where Element: MlirStructWrapper {
   static var mlirNextElement: (Element.MlirStruct) -> Element.MlirStruct { get }
   static var mlirElementIsNull: (Element.MlirStruct) -> Bool { get }
@@ -11,7 +14,7 @@ extension MlirSequence {
   }
 }
 
-private struct MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
+private struct _MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
   mutating func next() -> S.Element? {
     guard S.mlirElementIsNull(nextMlirElement) else { return nil }
     let element = S.Element(c: nextMlirElement)

@@ -1,7 +1,6 @@
 
 import CoreMLIR
 
-enum Test: MLIRConfiguration
-{
+enum Test: MLIRConfiguration {
   static let context = Context(dialects: [])
 }

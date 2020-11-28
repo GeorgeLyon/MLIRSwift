@@ -2,6 +2,9 @@
 import CCoreMLIR
 import Foundation
 
+/**
+ This protocol bridges MLIR's callback-style printing API and Swifts `TextOutputStreamable` protocol
+ */
 protocol MlirStringCallbackStreamable: TextOutputStreamable, CustomDebugStringConvertible {
   /**
    - parameter unsafeCallback: The callback with a callback-based C printing API such as `mlirOperationPrint`. While this callback _looks_ like it is `@escaping`, it is very much not safe to have it escape the function scope.

@@ -1,13 +1,17 @@
 
 extension MLIRConfiguration {
   /**
-   A convenience method that captures diagnostics of at least a certain severity level emitted during `body` (and stops them from being forwarded to other registered handlers).
+   This method captures diagnostics of at least a certain severity level emitted during `body` (and stops them from being forwarded to other registered handlers).
    - parameter minimumSeverity: Diagnostics with severity lower than this value will not be collected and instead be forwarded to the existing handler chain
    */
   public static func collectDiagnostics<T>(minimumSeverity: Diagnostic.Severity = .remark, _ body: () -> T) -> (value: T, diagnostics: [Diagnostic]) {
     _collectDiagnostics(minimumSeverity: minimumSeverity, body)
   }
   
+  /**
+   This method captures diagnostics of at least a certain severity level emitted during `body` (and stops them from being forwarded to other registered handlers).
+   - parameter minimumSeverity: Diagnostics with severity lower than this value will not be collected and instead be forwarded to the existing handler chain   
+   */
   public static func collectDiagnostics(minimumSeverity: Diagnostic.Severity = .remark, _ body: () -> Void) -> [Diagnostic] {
     _collectDiagnostics(minimumSeverity: minimumSeverity, body).diagnostics
   }
