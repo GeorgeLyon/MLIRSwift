@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 
 public struct Location: MlirStructWrapper, MlirStringCallbackStreamable {
   init(c: MlirLocation) {

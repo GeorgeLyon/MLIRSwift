@@ -1,7 +1,7 @@
 import XCTest
-@testable import MLIR
+@testable import CoreMLIR
 
-import CMLIR
+import CCoreMLIR
 
 final class DiagnosticTests: XCTestCase {
   func testDiagnosticSeverity() {

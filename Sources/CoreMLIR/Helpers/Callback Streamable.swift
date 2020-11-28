@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 import Foundation
 
 protocol MlirStringCallbackStreamable: TextOutputStreamable, CustomDebugStringConvertible {

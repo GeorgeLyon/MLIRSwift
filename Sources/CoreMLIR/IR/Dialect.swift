@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 
 public struct Dialect {
   public init(

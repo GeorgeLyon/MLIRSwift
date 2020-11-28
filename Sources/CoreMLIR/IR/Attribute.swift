@@ -1,9 +1,9 @@
 
-import CMLIR
+import CCoreMLIR
 
 public extension MLIRConfiguration {
-  typealias Attribute = MLIR.Attribute<Self>
-  typealias NamedAttributes = MLIR.NamedAttributes<Self>
+  typealias Attribute = CoreMLIR.Attribute<Self>
+  typealias NamedAttributes = CoreMLIR.NamedAttributes<Self>
 }
 
 public struct Attribute<MLIR: MLIRConfiguration>:

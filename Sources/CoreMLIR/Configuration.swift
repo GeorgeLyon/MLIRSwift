@@ -1,6 +1,6 @@
 
 public protocol MLIRConfiguration {
-  static var context: MLIR.Context { get }
+  static var context: Context { get }
 }
 
 protocol MLIRConfigurable {

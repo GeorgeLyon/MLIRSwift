@@ -15,11 +15,21 @@ let package = Package(
   ],
   targets: [
     .systemLibrary(
+      name: "CCoreMLIR",
+      pkgConfig: "MLIR"),
+    .target(
+      name: "CoreMLIR",
+      dependencies: ["CCoreMLIR"]),
+    .testTarget(
+      name: "CoreMLIRTests",
+      dependencies: ["CoreMLIR"]),
+    
+    .systemLibrary(
       name: "CMLIR",
       pkgConfig: "MLIR"),
     .target(
       name: "MLIR",
-      dependencies: ["CMLIR"]),
+      dependencies: ["CMLIR", "CoreMLIR"]),
     .testTarget(
       name: "MLIRTests",
       dependencies: ["MLIR"]),

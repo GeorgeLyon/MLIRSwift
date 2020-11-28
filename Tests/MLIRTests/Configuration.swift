@@ -3,9 +3,10 @@ import MLIR
 
 enum Test:
   MLIRConfiguration,
-  ProvidesStandardDialect
+  ProvidesStandardDialect,
+  ProvidesSCFDialect
 {
-  static let context = Context(dialects: [.standard])
+  static let context = Context(dialects: [.standard, .scf])
 }
 
 extension Type where MLIR: ProvidesStandardDialect {

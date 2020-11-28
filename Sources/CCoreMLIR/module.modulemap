@@ -1,0 +1,24 @@
+module CCoreMLIR [system] {
+  header "CCoreMLIR.h"
+  
+  // LLVM
+  link "LLVMDemangle"
+  link "LLVMSupport"
+  
+  // MLIR
+  link "MLIRSupport"
+  link "MLIRParser"
+  link "MLIRIR"
+  link "MLIRCAPIIR"
+  
+  // Interfaces
+  link "MLIRCallInterfaces"
+  link "MLIRControlFlowInterfaces"
+  link "MLIREDSC"
+  link "MLIRLoopLikeInterface"
+  link "MLIRSideEffectInterfaces"
+  link "MLIRVectorInterfaces"
+  link "MLIRViewLikeInterface"
+
+  export *
+}

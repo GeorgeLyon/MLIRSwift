@@ -1,0 +1,7 @@
+#!/bin/zsh
+
+PROJECT_ROOT=$(dirname "$(dirname "${0:A}")")
+
+cat "$PROJECT_ROOT"/Sources/C{Core,}MLIR/module.modulemap |
+  sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p' |
+  xargs echo install-mlir-headers

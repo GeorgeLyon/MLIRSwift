@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 
 // MARK: - Public
 
@@ -47,8 +47,8 @@ struct UnsafeDiagnostic: MlirStructWrapper, MlirStringCallbackStreamable {
     fileprivate let parent: UnsafeDiagnostic
   }
   
-  var location: MLIR.Location { Location(c: mlirDiagnosticGetLocation(c)) }
-  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
+  var location: CoreMLIR.Location { Location(c: mlirDiagnosticGetLocation(c)) }
+  var severity: CoreMLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
   var notes: Notes { Notes(parent: self) }
   
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {

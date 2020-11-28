@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 
 extension MlirStringRef {
   var buffer: UnsafeBufferPointer<Int8> {

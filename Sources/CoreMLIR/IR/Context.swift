@@ -1,5 +1,5 @@
 
-import CMLIR
+import CCoreMLIR
 
 public struct Context: MlirStructWrapper {
   public init(dialects: [Dialect]) {
@@ -12,6 +12,6 @@ public struct Context: MlirStructWrapper {
   init(c: MlirContext) {
     self.c = c
   }
-  let c: MlirContext
+  public let c: MlirContext
 }
 
