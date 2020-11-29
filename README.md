@@ -4,7 +4,7 @@ This project intends to make MLIR APIs accessible from Swift via the MLIR C Bind
 
 ## Usage
 
-The best reference for how to use this package will always be the tests ([Module Tests](Tests/MLIRTests/Module%20Tests.swift) is probablt the most interesting), and I recommend consulting them for more details.
+The best reference for how to use this package will always be the tests ([Module Tests](Tests/MLIRTests/Module%20Tests.swift) is probably the most interesting), and I recommend consulting them for more details.
 
 At a high level, you start by creating an `MLIRConfiguration` (lets call it `MyMLIR`), which involves creating an `MLIRContext` with the dialects you want enabled. Once you have this configuration, you can create a `MyMLIR.Module`.
 
