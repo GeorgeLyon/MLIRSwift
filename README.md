@@ -23,7 +23,7 @@ $ cmake -G Ninja ../llvm \
   -DLLVM_ENABLE_ASSERTIONS=ON \
   -DLLVM_OPTIMIZED_TABLEGEN=ON \
   -DLLVM_ENABLE_PROJECTS=mlir \
-  -DLLVM_TARGETS_TO_BUILD=host
+  -DLLVM_TARGETS_TO_BUILD=x86
 $ ninja check-mlir
 $ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets)
 ```
