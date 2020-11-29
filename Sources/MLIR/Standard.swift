@@ -37,7 +37,8 @@ public extension Type where MLIR: ProvidesStandardDialect {
     precondition(MemoryLayout<Int64>.stride == MemoryLayout<MemRefSize>.stride)
     return shape.withUnsafeBufferPointer { shape in
       shape.withMemoryRebound(to: Int64.self) { shape in
-        Self(c: mlirMemRefTypeContiguousGet(element.c, shape.count, shape.baseAddress, 0))
+        let unsafeMutable = UnsafeMutablePointer(mutating: shape.baseAddress)
+        return Self(c: mlirMemRefTypeContiguousGet(element.c, shape.count, unsafeMutable, 0))
       }
     }
   }

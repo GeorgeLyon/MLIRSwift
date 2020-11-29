@@ -25,7 +25,7 @@ public struct Region<MLIR: MLIRConfiguration>:
     public typealias Element = MLIR.Block
     let mlirFirstElement: MlirBlock
     static var mlirNextElement: (MlirBlock) -> MlirBlock { mlirBlockGetNextInRegion }
-    static var mlirElementIsNull: (MlirBlock) -> Bool { mlirBlockIsNull }
+    static var mlirElementIsNull: (MlirBlock) -> Int32 { mlirBlockIsNull }
   }
   public var blocks: Blocks {
     return Blocks(mlirFirstElement: mlirRegionGetFirstBlock(c))

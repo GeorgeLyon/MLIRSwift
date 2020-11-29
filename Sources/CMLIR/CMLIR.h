@@ -3,4 +3,4 @@
 #include <mlir-c/StandardDialect.h>
 #include <mlir-c/StandardTypes.h>
 
-#include <mlir-c/SCFDialect.h>
+#include <mlir-c/Registration.h>

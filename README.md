@@ -19,7 +19,7 @@ $ mkdir llvm-project/build
 $ cd llvm-project build
 $ cmake -G Ninja ../llvm \
   -DCMAKE_INSTALL_PREFIX=<where-you-want-to-install-MLIR> \
-  -DCMAKE_BUILD_TYPE=Debug \
+  -DCMAKE_BUILD_TYPE=Release \
   -DLLVM_ENABLE_ASSERTIONS=ON \
   -DLLVM_OPTIMIZED_TABLEGEN=ON \
   -DLLVM_ENABLE_PROJECTS=mlir \

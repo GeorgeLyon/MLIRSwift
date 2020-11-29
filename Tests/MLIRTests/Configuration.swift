@@ -6,7 +6,7 @@ enum Test:
   ProvidesStandardDialect,
   ProvidesSCFDialect
 {
-  static let context = Context(dialects: [.standard, .scf])
+  static let context = Context(registerAllDialects: true)
 }
 
 extension Type where MLIR: MLIRConfiguration {
