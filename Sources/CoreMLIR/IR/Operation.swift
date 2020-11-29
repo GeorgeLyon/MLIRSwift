@@ -85,13 +85,13 @@ public struct Operation<MLIR: MLIRConfiguration>:
     public func build<Values>(
       _ name: String,
       results: TypeList<MLIR, Values, Results>,
-      operands: [Value] = [],
+      operands: [ValueProtocol] = [],
       attributes: MLIR.NamedAttributes = [:],
-      regions: (MLIR.Region.Builder) -> Void = { _ in },
+      regions: (MLIR.Region.Builder) throws -> Void = { _ in },
       file: StaticString = #file, line: Int = #line, column: Int = #column
-    ) -> Values {
+    ) rethrows -> Values {
       let location = MLIR.location(file: file, line: line, column: column)
-      let operation = Operation(
+      let operation = try Operation(
         name,
         resultTypes: results.types,
         operands: operands,
@@ -101,6 +101,25 @@ public struct Operation<MLIR: MLIRConfiguration>:
       producer.produce(operation)
       return results.values(from: operation)
     }
+    
+    public func build(
+      _ name: String,
+      operands: [ValueProtocol] = [],
+      attributes: MLIR.NamedAttributes = [:],
+      regions: (MLIR.Region.Builder) throws -> Void = { _ in },
+      file: StaticString = #file, line: Int = #line, column: Int = #column
+    ) rethrows {
+      let location = MLIR.location(file: file, line: line, column: column)
+      let operation = try Operation(
+        name,
+        resultTypes: [],
+        operands: operands,
+        attributes: attributes,
+        regions: regions,
+        location: location)
+      producer.produce(operation)
+    }
+    
     let producer: Producer<Operation>
   }
   
@@ -118,16 +137,16 @@ public struct Operation<MLIR: MLIRConfiguration>:
   private init(
     _ name: String,
     resultTypes: [MLIR.`Type`] = [],
-    operands: [Value] = [],
+    operands: [ValueProtocol] = [],
     attributes: MLIR.NamedAttributes = [:],
-    regions: (MLIR.Region.Builder) -> Void,
+    regions: (MLIR.Region.Builder) throws -> Void,
     location: Location
-  ) {
-    c = name.withUnsafeMlirStringRef { name in
-      operands.withUnsafeMlirStructs { operands in
-        resultTypes.withUnsafeMlirStructs { resultTypes in
-          attributes.withUnsafeMlirStructs { attributes in
-            MLIR.Region.Builder
+  ) rethrows {
+    c = try name.withUnsafeMlirStringRef { name in
+      try operands.map(\.value).withUnsafeMlirStructs { operands in
+        try resultTypes.withUnsafeMlirStructs { resultTypes in
+          try attributes.withUnsafeMlirStructs { attributes in
+            try MLIR.Region.Builder
               .products(regions)
               .withUnsafeMlirStructs { regions in
                 var state = mlirOperationStateGet(name, location.c)

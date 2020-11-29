@@ -11,14 +11,14 @@ extension BuilderProtocol {
   /**
    - returns: Products produced by the builder that is passed to the `body` closure.
    */
-  static func products(_ body: (Self) -> Void) -> [Product] {
+  static func products(_ body: (Self) throws -> Void) rethrows -> [Product] {
     var isComplete = false
     var products: [Product] = []
     let builder = Self(producer: Producer {
       precondition(!isComplete) // Check that this value didn't escape
       products.append($0)
     })
-    body(builder)
+    try body(builder)
     isComplete = true
     return products
   }

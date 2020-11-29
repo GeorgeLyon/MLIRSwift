@@ -11,9 +11,9 @@ public struct Region<MLIR: MLIRConfiguration>:
 {
   
   public struct Builder: BuilderProtocol {
-    public func build(blocks: (MLIR.Block.Builder) -> Void) {
+    public func build(blocks: (MLIR.Block.Builder) throws -> Void) rethrows {
       let region = Region(c: mlirRegionCreate())
-      MLIR.Block.Builder
+      try MLIR.Block.Builder
         .products(blocks)
         .forEach(region.append)
       producer.produce(region)

@@ -13,14 +13,14 @@ public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MLIRConfi
     }
   }
   public init(
-    operations buildOperations: (MLIR.Operation.Builder) -> Void,
+    operations buildOperations: (MLIR.Operation.Builder) throws -> Void,
     file: StaticString = #file, line: Int = #line, column: Int = #column
-  ) {
+  ) rethrows {
     let location = MLIR.location(file: file, line: line, column: column)
     c = mlirModuleCreateEmpty(location.c)
-    MLIR.Operation.Builder
+    try MLIR.Operation.Builder
       .products(buildOperations)
-      .forEach(body.append)
+      .forEach(body.prepend)
   }
   deinit {
     mlirModuleDestroy(c)

@@ -13,6 +13,18 @@ where
   }
   private let getValues: (Members.Base) -> Values
 }
+
+// MARK: - Dynamic Initializer
+
+extension TypeList where Values == Members {
+  init(_ types: [MLIR.`Type`])  {
+    self.types = types
+    self.getValues = { base in base[keyPath: Members.keyPath] }
+  }
+}
+
+// MARK: - Variadic Initializers
+
 public extension TypeList where Values == Void {
   static var none: Self { Self() }
   init() {
@@ -20,7 +32,6 @@ public extension TypeList where Values == Void {
     getValues = { _ in () }
   }
 }
-
 public extension TypeList {
   init(_ t0: Type<MLIR>) where Values == Value {
     types = [t0]

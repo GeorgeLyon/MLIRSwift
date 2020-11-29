@@ -43,5 +43,60 @@ final class ModuleTests: XCTestCase {
         "module_terminator"() : () -> ()
       }) : () -> ()
       """)
+    let constructed = try Test.Module(
+      operations: { builder in
+        try builder.build(
+          "func",
+          attributes: [
+            "sym_name": try Attribute(parsing: "\"add\""),
+            "type": try Attribute(parsing: "(memref<?xf32>, memref<?xf32>) -> ()")
+          ],
+          regions: { builder in
+            try builder.build(
+              blocks: { builder in
+                try builder.build(
+                  arguments: TypeList(MemRef_xf32.self, MemRef_xf32.self),
+                  operations: { (builder, arguments) in
+                    let (arg0, arg1) = arguments
+                    let c0 = try builder.build(
+                      "std.constant",
+                      results: TypeList(Index.self),
+                      attributes: [
+                        "value": try Attribute(parsing: "0 : index")
+                      ])
+                    let dim = builder.build(
+                      "std.dim",
+                      results: TypeList(Index.self),
+                      operands: [arg0, c0],
+                      regions: { _ in /** It seems a non-throwing default value doesn't register as non-throwing unless it is explicit */ })
+                    let c1 = try builder.build(
+                      "std.constant",
+                      results: TypeList(Index.self),
+                      attributes: [
+                        "value": try Attribute(parsing: "1 : index")
+                      ])
+                    try builder.build(
+                      "scf.for",
+                      operands: [c0, dim, c1],
+                      regions: { builder in
+                        try builder.build(
+                          blocks: { builder in
+                            try builder.build(
+                              arguments: TypeList(Index.self),
+                              operations: { builder, index in
+                                let v1 = try builder.build("std.load", results: TypeList(F32.self), operands: [arg0, index])
+                                let v2 = try builder.build("std.load", results: TypeList(F32.self), operands: [arg1, index])
+                                let v3 = try builder.build("std.addf", results: TypeList(F32.self), operands: [v1, v2])
+                                try builder.build("std.store", operands: [v3, arg0, index])
+                                try builder.build("scf.yield")
+                              })
+                          })
+                      })
+                    try builder.build("std.return")
+                  })
+              })
+          })
+      })
+    XCTAssertEqual(input, "\(constructed.operation)")
   }
 }

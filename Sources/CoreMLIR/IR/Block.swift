@@ -41,19 +41,22 @@ public struct Block<MLIR: MLIRConfiguration>:
   public struct Builder: BuilderProtocol {
     public func build<Values>(
       arguments: TypeList<MLIR, Values, Arguments>,
-      operations body: (MLIR.Operation.Builder, Values) -> Void)
+      operations body: (MLIR.Operation.Builder, Values) throws -> Void) rethrows 
     {
       let block = arguments.types.withUnsafeMlirStructs {
         Block(c: mlirBlockCreate($0.count, $0.baseAddress))
       }
-      MLIR.Operation.Builder
-        .products { body($0, arguments.values(from: block)) }
+      try MLIR.Operation.Builder
+        .products { try body($0, arguments.values(from: block)) }
         .forEach(block.append)
       producer.produce(block)
     }
     let producer: Producer<Block>
   }
   
+  func prepend(_ operation: MLIR.Operation) {
+    mlirBlockInsertOwnedOperation(c, 0, operation.c)
+  }
   func append(_ operation: MLIR.Operation) {
     mlirBlockAppendOwnedOperation(c, operation.c)
   }

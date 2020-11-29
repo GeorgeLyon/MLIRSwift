@@ -14,7 +14,7 @@ extension MlirSequence {
   }
 }
 
-private struct _MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
+private struct MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
   mutating func next() -> S.Element? {
     guard S.mlirElementIsNull(nextMlirElement) else { return nil }
     let element = S.Element(c: nextMlirElement)
