@@ -85,7 +85,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
     
     public func build<Values>(
       _ name: String,
-      results: TypeList<MLIR, Values, Results>,
+      results: TypeList<MLIR, Values, Results, Void>,
       operands: [ValueProtocol] = [],
       attributes: MLIR.NamedAttributes = [:],
       regions: Optional<(MLIR.Region.Builder) throws -> Void> = nil,

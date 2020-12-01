@@ -1,8 +1,15 @@
 
 /**
+ `_BuilderProtocol` is an implementation detail which powers `TypeList`
+ */
+public protocol _BuilderProtocol {
+  
+}
+
+/**
  `BuilderProtocol` defines a common interface for "Builder" types, like `Operation.Builder`, which builds some number of `Product`s. These products can be accessed using the static `products` method on the concrete builder type.
  */
-protocol BuilderProtocol {
+protocol BuilderProtocol: _BuilderProtocol {
   associatedtype Product
   init(producer: Producer<Self.Product>)
 }

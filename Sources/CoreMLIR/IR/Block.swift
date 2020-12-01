@@ -40,14 +40,14 @@ public struct Block<MLIR: MLIRConfiguration>:
   
   public struct Builder: BuilderProtocol {
     public func build<Values>(
-      arguments: TypeList<MLIR, Values, Arguments>,
-      operations body: (MLIR.Operation.Builder, Values) throws -> Void) rethrows 
+      arguments: TypeList<MLIR, Values, Arguments, MLIR.Operation.Builder>,
+      operations body: (Values) throws -> Void) rethrows
     {
       let block = arguments.types.withUnsafeMlirStructs {
         Block(c: mlirBlockCreate($0.count, $0.baseAddress))
       }
       try MLIR.Operation.Builder
-        .products { try body($0, arguments.values(from: block)) }
+        .products { try body(arguments.values(from: block, with: $0)) }
         .forEach(block.append)
       producer.produce(block)
     }

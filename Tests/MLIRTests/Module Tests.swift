@@ -44,8 +44,8 @@ final class ModuleTests: XCTestCase {
       }) : () -> ()
       """)
     let constructed = try Test.Module(
-      operations: { builder in
-        try builder.build(
+      operations: { operations in
+        try operations.build(
           "func",
           attributes: [
             "sym_name": try Attribute(parsing: "\"add\""),
@@ -56,8 +56,7 @@ final class ModuleTests: XCTestCase {
               blocks: { builder in
                 try builder.build(
                   arguments: TypeList(MemRef_xf32.self, MemRef_xf32.self),
-                  operations: { (operations, arguments) in
-                    let (arg0, arg1) = arguments
+                  operations: { (operations, arg0, arg1) in
                     let c0 = operations.build(
                       "std.constant",
                       results: TypeList(Index.self),
