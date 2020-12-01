@@ -3,8 +3,7 @@ import MLIR
 
 enum Test:
   MLIRConfiguration,
-  ProvidesStandardDialect,
-  ProvidesSCFDialect
+  ProvidesStandardDialect
 {
   static let context = Context(registerAllDialects: true)
 }

@@ -82,12 +82,13 @@ public struct Operation<MLIR: MLIRConfiguration>:
   }
   
   public struct Builder: BuilderProtocol {
+    
     public func build<Values>(
       _ name: String,
       results: TypeList<MLIR, Values, Results>,
       operands: [ValueProtocol] = [],
       attributes: MLIR.NamedAttributes = [:],
-      regions: (MLIR.Region.Builder) throws -> Void = { _ in },
+      regions: Optional<(MLIR.Region.Builder) throws -> Void> = nil,
       file: StaticString = #file, line: Int = #line, column: Int = #column
     ) rethrows -> Values {
       let location = MLIR.location(file: file, line: line, column: column)
@@ -106,7 +107,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
       _ name: String,
       operands: [ValueProtocol] = [],
       attributes: MLIR.NamedAttributes = [:],
-      regions: (MLIR.Region.Builder) throws -> Void = { _ in },
+      regions: Optional<(MLIR.Region.Builder) throws -> Void> = nil,
       file: StaticString = #file, line: Int = #line, column: Int = #column
     ) rethrows {
       let location = MLIR.location(file: file, line: line, column: column)
@@ -139,7 +140,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
     resultTypes: [MLIR.`Type`] = [],
     operands: [ValueProtocol] = [],
     attributes: MLIR.NamedAttributes = [:],
-    regions: (MLIR.Region.Builder) throws -> Void,
+    regions: Optional<(MLIR.Region.Builder) throws -> Void>,
     location: Location
   ) rethrows {
     c = try name.withUnsafeMlirStringRef { name in

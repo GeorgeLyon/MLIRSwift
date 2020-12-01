@@ -10,15 +10,6 @@ module CCoreMLIR [system] {
   link "MLIRParser"
   link "MLIRIR"
   link "MLIRCAPIIR"
-  
-  // Interfaces
-  link "MLIRCallInterfaces"
-  link "MLIRControlFlowInterfaces"
-  link "MLIREDSC"
-  link "MLIRLoopLikeInterface"
-  link "MLIRSideEffectInterfaces"
-  link "MLIRVectorInterfaces"
-  link "MLIRViewLikeInterface"
 
   export *
 }

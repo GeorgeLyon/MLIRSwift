@@ -88,8 +88,7 @@ protocol DiagnosticHandler: AnyObject {
 }
 
 extension Context {
-  func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration
-  {
+  func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
       c,
