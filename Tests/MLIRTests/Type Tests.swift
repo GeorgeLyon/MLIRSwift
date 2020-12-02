@@ -2,6 +2,8 @@
 import XCTest
 @testable import MLIR
 
+import CMLIR
+
 final class TypeTests: XCTestCase {
   func testMemRef() throws {
     let input = "memref<?xf32>"

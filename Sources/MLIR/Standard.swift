@@ -17,6 +17,8 @@ public protocol ProvidesStandardDialect: MLIRConfiguration {
 }
 
 public extension Type where MLIR: ProvidesStandardDialect {
+  static var index: Self { Self(c: mlirIndexTypeGet(MLIR.context.c)) }
+  
   static var f32: Self { Self(c: mlirF32TypeGet(MLIR.context.c)) }
   
   struct MemRefSize: ExpressibleByIntegerLiteral {
@@ -42,4 +44,12 @@ public extension Type where MLIR: ProvidesStandardDialect {
       }
     }
   }
+}
+
+public enum Index<MLIR: ProvidesStandardDialect>: TypeClass {
+  public static var type: Type<MLIR> { .index }
+}
+
+public enum F32<MLIR: ProvidesStandardDialect>: TypeClass {
+  public static var type: Type<MLIR> { .f32 }
 }
