@@ -8,6 +8,9 @@ let package = Package(
   ],
   products: [
     .library(
+      name: "CoreMLIR",
+      targets: ["CoreMLIR"]),
+    .library(
       name: "MLIR",
       targets: ["MLIR"]),
   ],
