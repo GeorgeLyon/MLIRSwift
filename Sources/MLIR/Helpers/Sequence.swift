@@ -16,7 +16,7 @@ extension MlirSequence {
 
 private struct MlirSequenceIterator<S: MlirSequence>: IteratorProtocol {
   mutating func next() -> S.Element? {
-    guard S.mlirElementIsNull(nextMlirElement) != 0 else { return nil }
+    guard S.mlirElementIsNull(nextMlirElement) == 0 else { return nil }
     let element = S.Element(c: nextMlirElement)
     nextMlirElement = S.mlirNextElement(nextMlirElement)
     return element
