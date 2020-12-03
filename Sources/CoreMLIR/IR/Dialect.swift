@@ -16,6 +16,10 @@ public struct Dialect {
     let c: MlirDialect
   }
   
+  public var namespace: String {
+    getNamespace().string
+  }
+  
   let register: (MlirContext) -> Void
   let load: (MlirContext) -> MlirDialect
   let getNamespace: () -> MlirStringRef
