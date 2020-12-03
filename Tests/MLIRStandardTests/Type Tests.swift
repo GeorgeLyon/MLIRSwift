@@ -1,6 +1,6 @@
 
 import XCTest
-@testable import MLIRDialects
+@testable import MLIRStandard
 
 import MLIR
 

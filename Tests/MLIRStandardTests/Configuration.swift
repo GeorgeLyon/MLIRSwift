@@ -1,12 +1,12 @@
 
 import MLIR
-import MLIRDialects
+import MLIRStandard
 
 enum Test:
   MLIRConfiguration,
   ProvidesStandardDialect
 {
-  static let context = Context(registerAllDialects: true)
+  static let context = Context(dialects: [standard])
 }
 
 enum MemRef_xf32<MLIR: MLIRConfiguration>: TypeClass {

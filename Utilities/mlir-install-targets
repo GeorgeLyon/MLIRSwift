@@ -14,8 +14,8 @@ INSTALL_TARGETS+="\n$(linked_libraries CMLIR)"
 case $1; in
 "")
   ;;
-"--include-dialects")
-  INSTALL_TARGETS+="\n$(linked_libraries CMLIRDialects)"
+"--include-standard-dialect")
+  INSTALL_TARGETS+="\n$(linked_libraries CMLIRStandard)"
   ;;
 *)
   echo "Unknown argument $1" >&2

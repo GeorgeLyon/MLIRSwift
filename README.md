@@ -26,7 +26,7 @@ $ cmake -G Ninja ../llvm \
   -DLLVM_ENABLE_PROJECTS=mlir \
   -DLLVM_TARGETS_TO_BUILD=X86
 $ ninja check-mlir
-$ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets)
+$ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets )
 ```
 
 You also need to install the `Resources/MLIR.pc` file to `/usr/local/lib/pkgconfig/MLIR.pc`, and change the `prefix` value in that file to the value you provided for `CMAKE_INSTALL_PREFIX` above.

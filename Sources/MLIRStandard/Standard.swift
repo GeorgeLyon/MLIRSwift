@@ -1,20 +1,24 @@
 
-import CMLIRDialects
+import CMLIRStandard
 import MLIR
 
-public extension Dialect {
-  static let standard = Dialect(
-    register: mlirContextRegisterStandardDialect,
-    load: mlirContextLoadStandardDialect,
-    getNamespace: mlirStandardDialectGetNamespace)
-}
-
 /**
- This is a marker protocol which indicates that an `MLIRConfiguration` provides the `.standard` dialect via its `context`. The compiler does not enforce this, and it is the responsibility of the conforming type to uphold this invariant.
+ This is a marker protocol which indicates that an `MLIRConfiguration` provides the `standard` dialect via its `context`. The compiler does not enforce this, and it is the responsibility of the conforming type to uphold this invariant.
  */
 public protocol ProvidesStandardDialect: MLIRConfiguration {
   
 }
+
+public extension MLIRConfiguration where Self: ProvidesStandardDialect {
+  static var standard: Dialect {
+    Dialect(
+      register: mlirContextRegisterStandardDialect,
+      load: mlirContextLoadStandardDialect,
+      getNamespace: mlirStandardDialectGetNamespace)
+  }
+}
+
+
 
 public extension Type where MLIR: ProvidesStandardDialect {
   static var index: Self { Self(c: mlirIndexTypeGet(MLIR.context.c)) }

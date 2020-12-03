@@ -11,8 +11,8 @@ let package = Package(
       name: "MLIR",
       targets: ["MLIR"]),
     .library(
-      name: "MLIRDialects",
-      targets: ["MLIRDialects"]),
+      name: "MLIRStandard",
+      targets: ["MLIRStandard"]),
   ],
   dependencies: [
   ],
@@ -28,13 +28,13 @@ let package = Package(
       dependencies: ["MLIR"]),
     
     .systemLibrary(
-      name: "CMLIRDialects",
+      name: "CMLIRStandard",
       pkgConfig: "MLIR"),
     .target(
-      name: "MLIRDialects",
-      dependencies: ["CMLIRDialects", "MLIR"]),
+      name: "MLIRStandard",
+      dependencies: ["CMLIRStandard", "MLIR"]),
     .testTarget(
-      name: "MLIRDialectsTests",
-      dependencies: ["MLIRDialects"]),
+      name: "MLIRStandardTests",
+      dependencies: ["MLIRStandard"]),
   ]
 )
