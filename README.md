@@ -30,3 +30,9 @@ $ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets )
 ```
 
 You also need to install the `Resources/MLIR.pc` file to `/usr/local/lib/pkgconfig/MLIR.pc`, and change the `prefix` value in that file to the value you provided for `CMAKE_INSTALL_PREFIX` above.
+
+## Open Questions
+
+### Over-typing
+
+Is `TypedValue` useful? If so, should we have an analog for `Attribute`?

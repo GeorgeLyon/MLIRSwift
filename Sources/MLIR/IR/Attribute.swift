@@ -11,7 +11,7 @@ public struct Attribute<MLIR: MLIRConfiguration>:
   MlirStructWrapper,
   MlirStringCallbackStreamable
 {
-  public init(parsing source: String) throws {
+  public static func parse(_ source: String) throws -> Attribute {
     try self.init(isNull: mlirAttributeIsNull) {
       source.withUnsafeMlirStringRef { mlirAttributeParseGet(MLIR.context.c, $0) }
     }
