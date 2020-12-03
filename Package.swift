@@ -14,8 +14,6 @@ let package = Package(
       name: "MLIRStandard",
       targets: ["MLIRStandard"]),
   ],
-  dependencies: [
-  ],
   targets: [
     .systemLibrary(
       name: "CMLIR",

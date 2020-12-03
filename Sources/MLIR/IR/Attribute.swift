@@ -16,6 +16,10 @@ public struct Attribute<MLIR: MLIRConfiguration>:
       source.withUnsafeMlirStringRef { mlirAttributeParseGet(MLIR.context.c, $0) }
     }
   }
+  public var type: MLIR.`Type` {
+    `Type`(c: mlirAttributeGetType(c))
+  }
+  
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirAttributePrint(c, unsafeCallback, userData)
   }
