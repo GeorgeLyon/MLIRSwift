@@ -2,6 +2,25 @@
 
 PROJECT_ROOT=$(dirname "$(dirname "${0:A}")")
 
-cat "$PROJECT_ROOT"/Sources/C{Core,}MLIR/module.modulemap |
-  sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p' |
-  xargs echo install-mlir-headers
+function linked_libraries() {
+  cat "$PROJECT_ROOT/Sources/$1/module.modulemap" |
+    sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p'
+}
+
+INSTALL_TARGETS=install-mlir-headers
+
+INSTALL_TARGETS+="\n$(linked_libraries CMLIR)"
+
+case $1; in
+"")
+  ;;
+"--include-dialects")
+  INSTALL_TARGETS+="\n$(linked_libraries CMLIRDialects)"
+  ;;
+*)
+  echo "Unknown argument $1" >&2
+  exit
+  ;;
+esac
+
+echo $INSTALL_TARGETS | xargs
