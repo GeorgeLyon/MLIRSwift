@@ -1,8 +1,8 @@
 
 import XCTest
-@testable import MLIR
+@testable import MLIRDialects
 
-import CMLIR
+import MLIR
 
 final class TypeTests: XCTestCase {
   func testMemRef() throws {

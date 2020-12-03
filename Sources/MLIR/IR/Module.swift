@@ -1,8 +1,8 @@
 
-import CCoreMLIR
+import CMLIR
 
 public extension MLIRConfiguration {
-  typealias Module = CoreMLIR.Module<Self>
+  typealias Module = MLIR.Module<Self>
 }
 
 public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MLIRConfigurable {

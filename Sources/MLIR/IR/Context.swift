@@ -1,5 +1,5 @@
 
-import CCoreMLIR
+import CMLIR
 
 public struct Context: MlirStructWrapper {
   public init(dialects: [Dialect]) {

@@ -1,8 +1,8 @@
 
-import CCoreMLIR
+import CMLIR
 
 extension MLIRConfiguration {
-  public typealias Block = CoreMLIR.Block<Self>
+  public typealias Block = MLIR.Block<Self>
 }
 
 public struct Block<MLIR: MLIRConfiguration>:

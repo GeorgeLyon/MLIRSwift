@@ -1,5 +1,5 @@
 
-import CCoreMLIR
+import CMLIR
 import Foundation
 
 /**

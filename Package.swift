@@ -8,33 +8,33 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "CoreMLIR",
-      targets: ["CoreMLIR"]),
-    .library(
       name: "MLIR",
       targets: ["MLIR"]),
+    .library(
+      name: "MLIRDialects",
+      targets: ["MLIRDialects"]),
   ],
   dependencies: [
   ],
   targets: [
     .systemLibrary(
-      name: "CCoreMLIR",
-      pkgConfig: "MLIR"),
-    .target(
-      name: "CoreMLIR",
-      dependencies: ["CCoreMLIR"]),
-    .testTarget(
-      name: "CoreMLIRTests",
-      dependencies: ["CoreMLIR"]),
-    
-    .systemLibrary(
       name: "CMLIR",
       pkgConfig: "MLIR"),
     .target(
       name: "MLIR",
-      dependencies: ["CMLIR", "CoreMLIR"]),
+      dependencies: ["CMLIR"]),
     .testTarget(
       name: "MLIRTests",
       dependencies: ["MLIR"]),
+    
+    .systemLibrary(
+      name: "CMLIRDialects",
+      pkgConfig: "MLIR"),
+    .target(
+      name: "MLIRDialects",
+      dependencies: ["CMLIRDialects", "MLIR"]),
+    .testTarget(
+      name: "MLIRDialectsTests",
+      dependencies: ["MLIRDialects"]),
   ]
 )

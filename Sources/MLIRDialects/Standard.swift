@@ -1,6 +1,6 @@
 
-import CMLIR
-import CoreMLIR
+import CMLIRDialects
+import MLIR
 
 public extension Dialect {
   static let standard = Dialect(

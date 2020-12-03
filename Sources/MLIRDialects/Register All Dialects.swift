@@ -1,5 +1,6 @@
 
-import CMLIR
+import CMLIRDialects
+import MLIR
 
 extension Context {
   public init(registerAllDialects: Bool) {

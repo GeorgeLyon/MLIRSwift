@@ -1,8 +1,8 @@
 
-import CCoreMLIR
+import CMLIR
 
 extension MLIRConfiguration {
-  public typealias Operation = CoreMLIR.Operation<Self>
+  public typealias Operation = MLIR.Operation<Self>
 }
 
 public struct Operation<MLIR: MLIRConfiguration>:

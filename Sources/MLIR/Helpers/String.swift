@@ -1,5 +1,5 @@
 
-import CCoreMLIR
+import CMLIR
 
 /**
  This file contains convenience functions for mapping between `MlirStringRef` and Swift strings.

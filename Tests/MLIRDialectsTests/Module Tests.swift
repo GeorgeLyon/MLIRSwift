@@ -1,5 +1,7 @@
 import XCTest
-@testable import MLIR
+@testable import MLIRDialects
+
+import MLIR
 
 final class ModuleTests: XCTestCase {
   func testAdd() throws {

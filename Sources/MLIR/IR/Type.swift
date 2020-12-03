@@ -1,8 +1,8 @@
 
-import CCoreMLIR
+import CMLIR
 
 public extension MLIRConfiguration {
-  typealias `Type` = CoreMLIR.`Type`<Self>
+  typealias `Type` = MLIR.`Type`<Self>
 }
 
 /**

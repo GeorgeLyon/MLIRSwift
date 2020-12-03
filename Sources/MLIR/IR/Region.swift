@@ -1,8 +1,8 @@
 
-import CCoreMLIR
+import CMLIR
 
 extension MLIRConfiguration {
-  public typealias Region = CoreMLIR.Region<Self>
+  public typealias Region = MLIR.Region<Self>
 }
 
 public struct Region<MLIR: MLIRConfiguration>:

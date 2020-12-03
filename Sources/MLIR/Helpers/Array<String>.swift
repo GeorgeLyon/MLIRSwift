@@ -7,7 +7,7 @@
  ```
  */
 
-import CCoreMLIR
+import CMLIR
 
 extension Array where Element == String {
   /**
