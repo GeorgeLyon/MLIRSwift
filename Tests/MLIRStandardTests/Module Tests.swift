@@ -38,7 +38,7 @@ final class ModuleTests: XCTestCase {
           "func",
           attributes: [
             "sym_name": .string("add"),
-            "type": try .parse("(memref<?xf32>, memref<?xf32>) -> ()")
+            "type": try .parsing("(memref<?xf32>, memref<?xf32>) -> ()")
           ],
           regions: { regions in
             try regions.build(
@@ -50,7 +50,7 @@ final class ModuleTests: XCTestCase {
                       "std.constant",
                       results: TypeList(Index.self),
                       attributes: [
-                        "value": try .parse("0 : index")
+                        "value": try .parsing("0 : index")
                       ])
                     let _ = operations.build(
                       "std.dim",
@@ -61,7 +61,7 @@ final class ModuleTests: XCTestCase {
                       "std.constant",
                       results: TypeList(Index.self),
                       attributes: [
-                        "value": try .parse("1 : index")
+                        "value": try .parsing("1 : index")
                       ])
                     operations.build("std.return")
                   })

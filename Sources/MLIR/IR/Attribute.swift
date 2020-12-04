@@ -17,7 +17,7 @@ extension Attribute:
 where
   MLIR: MLIRConfiguration
 {
-  public static func parse(_ source: String) throws -> Attribute {
+  public static func parsing(_ source: String) throws -> Attribute {
     try self.init(isNull: mlirAttributeIsNull) {
       source.withUnsafeMlirStringRef { mlirAttributeParseGet(MLIR.context.c, $0) }
     }

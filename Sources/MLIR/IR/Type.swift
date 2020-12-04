@@ -24,7 +24,7 @@ extension Type:
 where
   MLIR: MLIRConfiguration
 {
-  public init(parsing source: String) throws {
+  public static func parsing(_ source: String) throws -> Self {
     try self.init(isNull: mlirTypeIsNull) {
       source.withUnsafeMlirStringRef { mlirTypeParseGet(MLIR.context.c, $0) }
     }

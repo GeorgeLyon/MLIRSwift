@@ -13,5 +13,5 @@ enum Test:
 }
 
 enum MemRef_xf32<MLIR: MLIRConfiguration>: TypeClass {
-  static var type: Type<MLIR> { try! Type(parsing: "memref<?xf32>") }
+  static var type: Type<MLIR> { try! .parsing("memref<?xf32>") }
 }
