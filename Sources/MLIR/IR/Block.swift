@@ -51,6 +51,17 @@ public struct Block<MLIR: MLIRConfiguration>:
         .forEach(block.append)
       producer.produce(block)
     }
+    
+    public func build(
+      operations body: (MLIR.Operation.Builder) throws -> Void) rethrows
+    {
+      let block = Block(c: mlirBlockCreate(0, nil))
+      try MLIR.Operation.Builder
+        .products(body)
+        .forEach(block.append)
+      producer.produce(block)
+    }
+    
     let producer: Producer<Block>
   }
   
