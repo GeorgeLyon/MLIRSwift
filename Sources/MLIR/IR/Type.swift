@@ -1,8 +1,10 @@
 
 import CMLIR
+import MLIRDialect
+@_exported import struct MLIRDialect.Type
 
 public extension MLIRConfiguration {
-  typealias `Type` = MLIR.`Type`<Self>
+  typealias `Type` = MLIRDialect.`Type`<Self>
 }
 
 /**
@@ -13,20 +15,25 @@ public protocol TypeClass {
   static var type: Type<MLIR> { get }
 }
 
-public struct Type<MLIR: MLIRConfiguration>:
+extension Type:
   MLIRConfigurable,
   MlirStructWrapper,
-  MlirStringCallbackStreamable
+  MlirStringCallbackStreamable,
+  CustomDebugStringConvertible,
+  TextOutputStreamable
+where
+  MLIR: MLIRConfiguration
 {
   public init(parsing source: String) throws {
     try self.init(isNull: mlirTypeIsNull) {
       source.withUnsafeMlirStringRef { mlirTypeParseGet(MLIR.context.c, $0) }
     }
   }
-  public init(c: MlirType) {
-    self.c = c
+  
+  init(c: MlirType) {
+    self = c.type()
   }
-  public let c: MlirType
+  var c: MlirType { .from(self) }
   
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirTypePrint(c, unsafeCallback, userData)

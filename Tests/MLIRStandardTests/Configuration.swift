@@ -2,16 +2,13 @@
 import MLIR
 import MLIRStandard
 
-enum Test: MLIRConfiguration
+enum Test:
+  MLIRConfiguration,
+  ProvidesStandardDialect
 {
-  struct DialectRegistry:
-    MLIR.DialectRegistry,
-    ProvidesStandardDialect
-  {
-    static var dialects: [RegisteredDialect] = [
-      \.standard
-    ]
-  }
+  static let dialects: [RegisteredDialect] = [
+    .standard
+  ]
   static let context = Context()
 }
 

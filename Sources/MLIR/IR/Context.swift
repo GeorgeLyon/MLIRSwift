@@ -1,5 +1,6 @@
 
 import CMLIR
+import MLIRDialect
 
 public extension MLIRConfiguration {
   typealias Context = MLIR.Context<Self>
@@ -9,10 +10,8 @@ public struct Context<MLIR: MLIRConfiguration>: MlirStructWrapper {
   public init() {
     c = mlirContextCreate()
     
-    let dialectRegistry = MLIR.DialectRegistry()
-    for keyPath in MLIR.DialectRegistry.dialects {
-      let dialect = dialectRegistry[keyPath: keyPath]
-      dialect.register(c)
+    for dialect in MLIR.dialects {
+      DialectMetadata.of(dialect).register(c)
     }
   }
   public func destroy() { mlirContextDestroy(c) }

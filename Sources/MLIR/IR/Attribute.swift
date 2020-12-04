@@ -1,15 +1,21 @@
 
 import CMLIR
+import MLIRDialect
+@_exported import struct MLIRDialect.Attribute
 
 public extension MLIRConfiguration {
-  typealias Attribute = MLIR.Attribute<Self>
+  typealias Attribute = MLIRDialect.Attribute<Self>
   typealias NamedAttributes = MLIR.NamedAttributes<Self>
 }
 
-public struct Attribute<MLIR: MLIRConfiguration>:
+extension Attribute:
   MLIRConfigurable,
   MlirStructWrapper,
-  MlirStringCallbackStreamable
+  MlirStringCallbackStreamable,
+  CustomDebugStringConvertible,
+  TextOutputStreamable
+where
+  MLIR: MLIRConfiguration
 {
   public static func parse(_ source: String) throws -> Attribute {
     try self.init(isNull: mlirAttributeIsNull) {
@@ -24,9 +30,9 @@ public struct Attribute<MLIR: MLIRConfiguration>:
     mlirAttributePrint(c, unsafeCallback, userData)
   }
   init(c: MlirAttribute) {
-    self.c = c
+    self = c.attribute()
   }
-  let c: MlirAttribute
+  var c: MlirAttribute { MlirAttribute.from(self) }
 }
 
 public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryLiteral {
