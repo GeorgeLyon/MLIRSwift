@@ -10,6 +10,11 @@ extension Attribute where MLIR: MLIRConfiguration {
       Attribute(c: mlirStringAttrGet(MLIR.context.c, $0.length, $0.data))
     }
   }
+  public static func flatSymbolReference(_ symbol: String) -> Attribute {
+    symbol.withUnsafeMlirStringRef {
+      Attribute(c: mlirFlatSymbolRefAttrGet(MLIR.context.c, $0.length, $0.data))
+    }
+  }
   public static func opaque(
     _ dialect: MLIR.RegisteredDialect,
     _ data: UnsafeRawBufferPointer,
