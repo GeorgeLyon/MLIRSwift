@@ -1,10 +1,17 @@
 
 import CMLIR
 
-public struct Context: MlirStructWrapper {
-  public init(dialects: [Dialect]) {
+public extension MLIRConfiguration {
+  typealias Context = MLIR.Context<Self>
+}
+
+public struct Context<MLIR: MLIRConfiguration>: MlirStructWrapper {
+  public init() {
     c = mlirContextCreate()
-    for dialect in dialects {
+    
+    let dialectRegistry = MLIR.DialectRegistry()
+    for keyPath in MLIR.DialectRegistry.dialects {
+      let dialect = dialectRegistry[keyPath: keyPath]
       dialect.register(c)
     }
   }

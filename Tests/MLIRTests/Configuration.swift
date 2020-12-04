@@ -2,5 +2,8 @@
 import MLIR
 
 enum Test: MLIRConfiguration {
-  static let context = Context(dialects: [])
+  struct DialectRegistry: MLIR.DialectRegistry {
+    static let dialects: [RegisteredDialect] = []
+  }
+  static let context = Context()
 }

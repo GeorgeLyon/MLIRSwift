@@ -35,4 +35,4 @@ You also need to install the `Resources/MLIR.pc` file to `/usr/local/lib/pkgconf
 
 ### Over-typing
 
-Is `TypedValue` useful? If so, should we have an analog for `Attribute`?
+Is `TypedValue` useful? If so, should we have an analog for `Attribute`? I have a similar question about `DialectRegistry` and `Attribute.opaque`... is it actually useful to only be able to specify things in registered namespaces?

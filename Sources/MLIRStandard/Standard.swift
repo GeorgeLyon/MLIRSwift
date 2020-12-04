@@ -5,12 +5,12 @@ import MLIR
 /**
  This is a marker protocol which indicates that an `MLIRConfiguration` provides the `standard` dialect via its `context`. The compiler does not enforce this, and it is the responsibility of the conforming type to uphold this invariant.
  */
-public protocol ProvidesStandardDialect: MLIRConfiguration {
+public protocol ProvidesStandardDialect {
   
 }
 
-public extension MLIRConfiguration where Self: ProvidesStandardDialect {
-  static var standard: Dialect {
+public extension DialectRegistry where Self: ProvidesStandardDialect {
+  var standard: Dialect {
     Dialect(
       register: mlirContextRegisterStandardDialect,
       load: mlirContextLoadStandardDialect,
@@ -20,7 +20,8 @@ public extension MLIRConfiguration where Self: ProvidesStandardDialect {
 
 
 
-public extension Type where MLIR: ProvidesStandardDialect {
+public extension Type where MLIR.DialectRegistry: ProvidesStandardDialect
+{
   static var index: Self { Self(c: mlirIndexTypeGet(MLIR.context.c)) }
   
   static var f32: Self { Self(c: mlirF32TypeGet(MLIR.context.c)) }
@@ -50,10 +51,16 @@ public extension Type where MLIR: ProvidesStandardDialect {
   }
 }
 
-public enum Index<MLIR: ProvidesStandardDialect>: TypeClass {
+public enum Index<MLIR: MLIRConfiguration>: TypeClass
+where
+  MLIR.DialectRegistry: ProvidesStandardDialect
+{
   public static var type: Type<MLIR> { .index }
 }
 
-public enum F32<MLIR: ProvidesStandardDialect>: TypeClass {
+public enum F32<MLIR: MLIRConfiguration>: TypeClass
+where
+  MLIR.DialectRegistry: ProvidesStandardDialect
+{
   public static var type: Type<MLIR> { .f32 }
 }
