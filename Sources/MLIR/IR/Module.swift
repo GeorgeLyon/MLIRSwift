@@ -20,6 +20,7 @@ public final class Module<MLIR: MLIRConfiguration>: MlirStructWrapper, MLIRConfi
     c = mlirModuleCreateEmpty(location.c)
     try MLIR.Operation.Builder
       .products(buildOperations)
+      .reversed()
       .forEach(body.prepend)
   }
   deinit {
