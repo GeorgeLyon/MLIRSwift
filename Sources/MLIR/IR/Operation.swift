@@ -5,6 +5,56 @@ extension MLIRConfiguration {
   public typealias Operation = MLIR.Operation<Self>
 }
 
+// MARK: - Operation Protocol
+
+public protocol OperationProtocol {
+  associatedtype MLIR: MLIRConfiguration
+  static var dialect: MLIR.RegisteredDialect { get }
+  static var name: String { get }
+  
+  associatedtype ResultTypes = [MLIR.`Type`]
+  static var resultTypes: ResultTypes { get }
+  static func types(for resultTypes: ResultTypes) -> [MLIR.`Type`]
+  
+  associatedtype Results = [MLIR.Value]
+  static func results(of op: MLIR.Operation) -> Results
+  
+  var operands: [MLIR.Value] { get }
+  var attributes: MLIR.NamedAttributes { get }
+  var regions: () -> Owned<[MLIR.Region]> { get }
+}
+
+public extension OperationProtocol where ResultTypes == [MLIR.`Type`] {
+  static func types(for resultTypes: ResultTypes) -> [MLIR.`Type`] { resultTypes }
+}
+
+public extension OperationProtocol where Results == Operation<MLIR>.Results {
+  static func results(of op: MLIR.Operation) -> Results { op.results }
+}
+
+extension OperationProtocol {
+  func withUnsafeOperationState<T>(at location: MlirLocation, _ body: (UnsafePointer<MlirOperationState>) -> T) -> T {
+    "\(Self.dialect.namespace).\(Self.name)".withUnsafeMlirStringRef { name in
+      operands.withUnsafeMlirStructs { operands in
+        Self.types(for: Self.resultTypes).withUnsafeMlirStructs { results in
+          attributes.withUnsafeMlirStructs { attributes in
+            regions().consume().withUnsafeMlirStructs { regions in
+              var state = mlirOperationStateGet(name, location)
+              mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
+              mlirOperationStateAddResults(&state, results.count, results.baseAddress)
+              mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
+              mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
+              return body(&state)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - Operation
+
 public struct Operation<MLIR: MLIRConfiguration>:
   MlirStructWrapper,
   MlirStringCallbackStreamable,
@@ -52,7 +102,7 @@ public struct Operation<MLIR: MLIRConfiguration>:
     public static var keyPath: KeyPath<Operation, Results> { \.results }
     public let startIndex = 0
     public let endIndex: Int
-    public subscript(position: Int) -> Value {
+    public subscript(position: Int) -> MLIR.Value {
       Value(c: mlirOperationGetResult(operation.c, position))
     }
     fileprivate init(operation: Operation) {
@@ -81,49 +131,38 @@ public struct Operation<MLIR: MLIRConfiguration>:
         useLocalScope: useLocalScope))
   }
   
-  public struct Builder: BuilderProtocol {
-    
-    public func build<Values>(
-      _ name: String,
-      results: TypeList<MLIR, Values, Results, Void>,
-      operands: [ValueProtocol] = [],
-      attributes: MLIR.NamedAttributes = [:],
-      regions: Optional<(MLIR.Region.Builder) throws -> Void> = nil,
-      file: StaticString = #file, line: Int = #line, column: Int = #column
-    ) rethrows -> Values {
+  @_functionBuilder
+  public struct Builder {
+    public struct Component {
+      let get: () -> Operation
+    }
+    public static func buildExpression<Op: OperationProtocol>(
+      _ op: Op,
+      file: StaticString = #file, line: Int = #line, column: Int = #column) -> Component
+    {
       let location = MLIR.location(file: file, line: line, column: column)
-      let operation = try Operation(
-        name,
-        resultTypes: results.types,
-        operands: operands,
-        attributes: attributes,
-        regions: regions,
-        location: location)
-      producer.produce(operation)
-      return results.values(from: operation)
+      return Component { Operation(op, at: location) }
+    }
+    public static func buildBlock(_ components: Component...) -> Owned<[Operation]> {
+      return Owned(components.map { $0.get() })
     }
     
-    public func build(
-      _ name: String,
-      operands: [ValueProtocol] = [],
-      attributes: MLIR.NamedAttributes = [:],
-      regions: Optional<(MLIR.Region.Builder) throws -> Void> = nil,
-      file: StaticString = #file, line: Int = #line, column: Int = #column
-    ) rethrows {
+    public init() { }
+    public mutating func build<Op: OperationProtocol>(
+      _ op: Op,
+      file: StaticString = #file, line: Int = #line, column: Int = #column) -> Op.Results
+    where Op.MLIR == MLIR
+    {
       let location = MLIR.location(file: file, line: line, column: column)
-      let operation = try Operation(
-        name,
-        resultTypes: [],
-        operands: operands,
-        attributes: attributes,
-        regions: regions,
-        location: location)
-      producer.produce(operation)
+      let operation = Operation(op, at: location)
+      operations.append(operation)
+      return Op.results(of: operation)
     }
-    
-    let producer: Producer<Operation>
+    public private(set) var operations: Owned<[Operation]> = Owned([])
   }
-  
+  fileprivate init<Op: OperationProtocol>(_ op: Op, at location: Location) {
+    c = op.withUnsafeOperationState(at: location.c, mlirOperationCreate)
+  }
   func destroy() {
     mlirOperationDestroy(c)
   }
@@ -134,34 +173,6 @@ public struct Operation<MLIR: MLIRConfiguration>:
     self.c = c
   }
   let c: MlirOperation
-  
-  private init(
-    _ name: String,
-    resultTypes: [MLIR.`Type`] = [],
-    operands: [ValueProtocol] = [],
-    attributes: MLIR.NamedAttributes = [:],
-    regions: Optional<(MLIR.Region.Builder) throws -> Void>,
-    location: Location
-  ) rethrows {
-    c = try name.withUnsafeMlirStringRef { name in
-      try operands.map(\.value).withUnsafeMlirStructs { operands in
-        try resultTypes.withUnsafeMlirStructs { resultTypes in
-          try attributes.withUnsafeMlirStructs { attributes in
-            try MLIR.Region.Builder
-              .products(regions)
-              .withUnsafeMlirStructs { regions in
-                var state = mlirOperationStateGet(name, location.c)
-                mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
-                mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
-                mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
-                mlirOperationStateAddOwnedRegions(&state, regions.count, regions.baseAddress)
-                return mlirOperationCreate(&state)
-              }
-          }
-        }
-      }
-    }
-  }
 }
 
 public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {

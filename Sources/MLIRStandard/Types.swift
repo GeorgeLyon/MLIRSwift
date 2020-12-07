@@ -37,14 +37,6 @@ public extension Type where MLIR: ProvidesStandardDialect {
   }
 }
 
-public enum Index<MLIR: ProvidesStandardDialect>: TypeClass {
-  public static var type: Type<MLIR> { .index }
-}
-
-public enum F32<MLIR: ProvidesStandardDialect>: TypeClass {
-  public static var type: Type<MLIR> { .f32 }
-}
-
 /**
  For some reason, deleting this causes the error "Value of `mlirType` has no member  `type`.
  */

@@ -1,18 +1,13 @@
 
 import CMLIR
 
-public protocol ValueProtocol {
-  var value: Value { get }
+public extension MLIRConfiguration {
+  typealias Value = MLIR.Value<Self>
 }
 
-public struct Value: MlirStructWrapper, ValueProtocol {
-  public var value: Value { self }
+public struct Value<MLIR: MLIRConfiguration>: MlirStructWrapper, MlirStringCallbackStreamable {
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirValuePrint(c, unsafeCallback, userData)
+  }
   let c: MlirValue
-}
-
-/**
- A value associated with a `TypeClass`. This is only used to enable the Swift typechecker to reason about MLIR types.
- */
-public struct TypedValue<TypeClass: MLIR.TypeClass>: ValueProtocol {
-  public let value: Value
 }

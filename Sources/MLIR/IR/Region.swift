@@ -10,7 +10,7 @@ public struct Region<MLIR: MLIRConfiguration>:
   Destroyable
 {
   
-  public struct Builder: BuilderProtocol {
+  public struct Builder {
     public func build(blocks: (MLIR.Block.Builder) throws -> Void) rethrows {
       let region = Region(c: mlirRegionCreate())
       try MLIR.Block.Builder

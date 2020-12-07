@@ -5,6 +5,8 @@ extension MLIRConfiguration {
   public typealias Block = MLIR.Block<Self>
 }
 
+// MARK: - Block
+
 public struct Block<MLIR: MLIRConfiguration>:
   MlirStructWrapper,
   MlirStringCallbackStreamable,
@@ -21,11 +23,10 @@ public struct Block<MLIR: MLIRConfiguration>:
     Operations(mlirFirstElement: mlirBlockGetFirstOperation(c))
   }
   
-  public struct Arguments: MemberCollection, RandomAccessCollection {
-    public static var keyPath: KeyPath<Block, Arguments> { \.arguments }
+  public struct Arguments: RandomAccessCollection {
     public let startIndex = 0
     public let endIndex: Int
-    public subscript(position: Int) -> Value {
+    public subscript(position: Int) -> MLIR.Value {
       Value(c: mlirBlockGetArgument(block.c, position))
     }
     fileprivate init(block: Block) {
@@ -38,31 +39,23 @@ public struct Block<MLIR: MLIRConfiguration>:
     Arguments(block: self)
   }
   
-  public struct Builder: BuilderProtocol {
-    public func build<Values>(
-      arguments: TypeList<MLIR, Values, Arguments, MLIR.Operation.Builder>,
-      operations body: (Values) throws -> Void) rethrows
-    {
-      let block = arguments.types.withUnsafeMlirStructs {
-        Block(c: mlirBlockCreate($0.count, $0.baseAddress))
-      }
-      try MLIR.Operation.Builder
-        .products { try body(arguments.values(from: block, with: $0)) }
-        .forEach(block.append)
-      producer.produce(block)
+  @_functionBuilder
+  public struct Builder {
+    public struct Component {
+      let get: () -> Block
     }
+    public func buildExpression()
     
-    public func build(
-      operations body: (MLIR.Operation.Builder) throws -> Void) rethrows
-    {
-      let block = Block(c: mlirBlockCreate(0, nil))
-      try MLIR.Operation.Builder
-        .products(body)
-        .forEach(block.append)
-      producer.produce(block)
+    public init() { }
+    public mutating func build(operations: Owned<[MLIR.Operation]>) {
+      blocks.append(Block(argumentTypes: [], operations: operations))
     }
-    
-    let producer: Producer<Block>
+    public var blocks: Owned<[Block]> = Owned([])
+  }
+  fileprivate init(argumentTypes: [MLIR.`Type`], operations: Owned<[MLIR.Operation]>) {
+    c = argumentTypes.withUnsafeMlirStructs { argumentTypes in
+      mlirBlockCreate(argumentTypes.count, argumentTypes.baseAddress)
+    }
   }
   
   func prepend(_ operation: MLIR.Operation) {
@@ -75,6 +68,9 @@ public struct Block<MLIR: MLIRConfiguration>:
     mlirBlockPrint(c, unsafeCallback, userData)
   }
   
+  init(c: MlirBlock) {
+    self.c = c
+  }
   func destroy() {
     mlirBlockDestroy(c)
   }
