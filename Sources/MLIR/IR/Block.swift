@@ -1,78 +1,36 @@
 
 import CMLIR
 
-extension MLIRConfiguration {
-  public typealias Block = MLIR.Block<Self>
-}
-
-// MARK: - Block
-
-public struct Block<MLIR: MLIRConfiguration>:
-  MlirStructWrapper,
-  MlirStringCallbackStreamable,
-  Destroyable
-{
-  
-  public struct Operations: MlirSequence, Sequence {
-    public typealias Element = MLIR.Operation
-    let mlirFirstElement: MlirOperation
-    static var mlirNextElement: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
-    static var mlirElementIsNull: (MlirOperation) -> Int32 { mlirOperationIsNull }
-  }
-  public var operations: Operations {
-    Operations(mlirFirstElement: mlirBlockGetFirstOperation(c))
+public struct Block<Ownership>: OwnershipSemantics {
+  public init(
+    arguments: [Type] = [],
+    operations: [Operation<OwnedBySwift>] = [])
+  where Ownership == OwnedBySwift {
+    let c = arguments.withUnsafeMlirStructs { arguments in
+      mlirBlockCreate(arguments.count, arguments.baseAddress)
+    }
+    self.init(takingOwnershipOf: c)
+    operations.forEach(append)
   }
   
-  public struct Arguments: RandomAccessCollection {
-    public let startIndex = 0
-    public let endIndex: Int
-    public subscript(position: Int) -> MLIR.Value {
-      Value(c: mlirBlockGetArgument(block.c, position))
-    }
-    fileprivate init(block: Block) {
-      self.block = block
-      self.endIndex = mlirBlockGetNumArguments(block.c)
-    }
-    private let block: Block
-  }
-  public var arguments: Arguments {
-    Arguments(block: self)
+  /**
+   Transfers ownership of `operation` to MLIR,
+   */
+  public func append(_ operation: Operation<OwnedBySwift>) {
+    mlirBlockAppendOwnedOperation(c, operation.transferOwnerhispToMLIR())
   }
   
-  @_functionBuilder
-  public struct Builder {
-    public struct Component {
-      let get: () -> Block
-    }
-    public func buildExpression()
-    
-    public init() { }
-    public mutating func build(operations: Owned<[MLIR.Operation]>) {
-      blocks.append(Block(argumentTypes: [], operations: operations))
-    }
-    public var blocks: Owned<[Block]> = Owned([])
-  }
-  fileprivate init(argumentTypes: [MLIR.`Type`], operations: Owned<[MLIR.Operation]>) {
-    c = argumentTypes.withUnsafeMlirStructs { argumentTypes in
-      mlirBlockCreate(argumentTypes.count, argumentTypes.baseAddress)
-    }
-  }
-  
-  func prepend(_ operation: MLIR.Operation) {
-    mlirBlockInsertOwnedOperation(c, 0, operation.c)
-  }
-  func append(_ operation: MLIR.Operation) {
-    mlirBlockAppendOwnedOperation(c, operation.c)
-  }
-  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirBlockPrint(c, unsafeCallback, userData)
-  }
-  
-  init(c: MlirBlock) {
+  init(c: MlirBlock, ownership: Ownership) {
     self.c = c
-  }
-  func destroy() {
-    mlirBlockDestroy(c)
+    self.ownership = ownership
   }
   let c: MlirBlock
+  let ownership: Ownership
 }
+
+// MARK: - Bridging
+
+extension MlirBlock: Destroyable {
+  static let destroy = mlirBlockDestroy
+}
+
