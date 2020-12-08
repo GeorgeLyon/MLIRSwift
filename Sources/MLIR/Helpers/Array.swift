@@ -1,16 +1,22 @@
 
-/**
- - invariant: `MemoryLayout<OwnedByMLIR>.size` must equal 0
- */
-extension Array where Element: Bridged, Element.Ownership == OwnedByMLIR {
+
+extension Array {
+  
   /**
-   For arrays of types which just wrap an MLIR type (and hence have the same memory layout), this method allows you to use the underlying C types without creating a new `Array`.
+   When a Swift representation of a bridged MLIR type is `OwnedByMLIR`, their memory layouts are identical, so we can access the underlying bridge types without allocating a new array.
    */
-  func withUnsafeMlirStructs<T>(_ body: (UnsafeBufferPointer<Element.MlirStruct>) throws -> T) rethrows -> T {
-    precondition(MemoryLayout<Element>.size == MemoryLayout<Element.MlirStruct>.size)
-    precondition(MemoryLayout<Element>.stride == MemoryLayout<Element.MlirStruct>.stride)
+  func withUnsafeBridgedValues<T, R>(_ body: (UnsafeBufferPointer<T>) throws -> R) rethrows -> R
+  where
+    T: Bridged,
+    Element: OpaqueStorageRepresentable,
+    Element.Storage == BridgingStorage<T, OwnedByMLIR>
+  {
+    precondition(MemoryLayout<Element>.size == MemoryLayout<T>.size)
+    precondition(MemoryLayout<Element>.stride == MemoryLayout<T>.stride)
     return try withUnsafeBufferPointer { buffer in
-      try buffer.withMemoryRebound(to: Element.MlirStruct.self, body)
+      try buffer.withMemoryRebound(to: T.self, body)
     }
   }
+  
 }
+

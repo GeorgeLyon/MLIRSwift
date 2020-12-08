@@ -5,46 +5,37 @@ import CMLIR
  */
 
 protocol LinkedList {
-  associatedtype Element: Bridged where Element.Ownership == OwnedByMLIR
-  associatedtype Index: LinkedListIndex where Index.Element == Element.MlirStruct
-  var first: Element.MlirStruct { get }
+  associatedtype BridgedElement: Bridged
+  associatedtype Element
+  where
+    Element: OpaqueStorageRepresentable,
+    Element.Storage == BridgingStorage<BridgedElement, OwnedByMLIR>
+  associatedtype Index: OpaqueStorageRepresentable
+  where
+    Index.Storage == LinkedListIndexStorage<BridgedElement>
+  var first: BridgedElement { get }
+  static var next: (BridgedElement) -> BridgedElement { get }
 }
 
 extension LinkedList {
-  public var startIndex: Index { .start(first) }
-  public var endIndex: Index { .end }
-  public func index(after i: Index) -> Index { i.next }
-  public subscript(position: Index) -> Element {
-    get { Element(borrowing: position.cursor.value!.element)! }
+  public var startIndex: Index {
+    Index(storage: LinkedListIndexStorage(value: (offset: 0, element: first)))
   }
-}
-
-protocol LinkedListIndex: Comparable {
-  associatedtype Element: Bridgable
-  init(cursor: LinkedListCursor<Element>)
-  var cursor: LinkedListCursor<Element> { get }
-  static var next: (Element) -> Element { get }
-}
-
-extension LinkedListIndex {
-  public static func <(lhs: Self, rhs: Self) -> Bool {
-    lhs.cursor < rhs.cursor
+  public var endIndex: Index {
+    Index(storage: LinkedListIndexStorage(value: nil))
   }
-  fileprivate static func start(_ element: Element?) -> Self {
-    Self(cursor: LinkedListCursor(value: element.map{(0, $0)}))
-  }
-  fileprivate static var end: Self {
-    Self(cursor: LinkedListCursor(value: nil))
-  }
-  fileprivate var next: Self {
-    guard let value = cursor.value else { return .end }
+  public func index(after i: Index) -> Index {
+    guard let value = i.storage.value else { return endIndex }
     let element = Self.next(value.element)
-    guard !element.isNull else { return .end }
-    return Self(cursor: LinkedListCursor(value: (offset: value.offset + 1, element: element)))
+    guard !element.isNull else { return endIndex }
+    return Index(storage: LinkedListIndexStorage(value: (value.offset + 1, element)))
+  }
+  public subscript(_ index: Index) -> Element {
+    get { .borrow(index.storage.value!.element)! }
   }
 }
 
-struct LinkedListCursor<Element: Equatable>: Comparable {
+struct LinkedListIndexStorage<Element: Bridged>: Comparable {
   static func <(lhs: Self, rhs: Self) -> Bool {
     switch (lhs.value?.offset, rhs.value?.offset) {
     case let (lhs?, rhs?): return lhs < rhs

@@ -1,15 +1,13 @@
 
 import CMLIR
 
-public struct Type: Bridged {
-  typealias Ownership = OwnedByMLIR
-  typealias MlirStruct = MlirType
-  let storage: Storage
+public struct Type: OpaqueStorageRepresentable {
+  let storage: BridgingStorage<MlirType, OwnedByMLIR>
 }
 
 // MARK: - Bridging
 
-extension MlirType: Bridgable {
+extension MlirType: Bridged {
   static let areEqual = mlirTypeEqual
   static let isNull = mlirTypeIsNull
 }

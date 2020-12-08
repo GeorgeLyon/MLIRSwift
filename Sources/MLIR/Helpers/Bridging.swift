@@ -2,129 +2,183 @@
 import CMLIR
 
 /**
- This file defines the core mechanisms for bridging types from the MLIR C bindings into Swift. Whe bridging, we are mainly concerned with two things: ownership and nullability. The `BridgedStorage` mechanism provides a bottleneck for `Bridged` type initialization, allowing us to require defining an `isNull` accessor, and regusing to create a `Bridged` type if the underlying MLIR struct is indeed `NULL`.
- We leverage the same initialization bottleneck to encourage thoughtful memory management. `Bridged` types can be initailized either by taking ownership of an MLIR type, or by borrowing one owned by `MLIR`. While Swift currently has little in the way of lifetime semantics, these mechanisms make it easier for developers to reason about the lifetimes of MLIR types.
+ This file defines the basic semantics for bridging types from the MLIR C bindings to Swift.
+ When bridging, we are mainly concerned with two things: ownership and nullability. In the C bindings, a type may be semantically null, but this is not expressed as a null value, instead relying on a helper method like `mlirTypeIsNull`. When bridged to a Swift representation, we enforce that a type has been checked to be non-null. As such, the bridging APIs will return optionals when bridging from C to Swift.
+ An value in the MLIR C bindings may also be owned either by a different MLIR value, or by "the user", meaning it expects to have a destructor called on it (such as `mlirOperationDestory`) or it will leak. Swift has automatic memory management, and we model this by enforcing that the Swift representation has clear ownership (either `OwnedBySwift` or `OwnedByMLIR`), and providing API to transition between ownership types.
+ 
+ - note: Historically, this is the third attempt at modelling ownership in Swift that we've explored. First, we tried to disallow types to be owned by Swift and only create builder functions where all types would end up owned by MLIR once the function returned. This proved to be too limiting, so we tried introducing an `Owned<T>` which would manage owned-by-Swift types. This resulted in some awkwardness deining initializers (since they would need to be extensions on `Owned` if we were to disallow the creation of not-owned values) and didn't allow us to enforce that values aren't accessed after ownership is transferred (since the inner T could have been arbitrarily copied out). `Owned`. By moving the `Owned` mechanisms _into_ the Swift representations of bridged types, we were able to solve these issues and enable more straightforward API.
  */
 
-// MARK: - Bridging
+// MARK: - Bridged Types
 
-protocol Bridged {
-  associatedtype MlirStruct: Bridgable
-  associatedtype Ownership
-  init(storage: Storage)
-  var storage: Storage { get }
-}
-
-extension Bridged {
-  var c: MlirStruct { storage.c }
-}
-
-protocol Bridgable: Equatable {
+/**
+ An MLIR C type which is bridged into Swift.
+ 
+ - note: This protocol does not specify a `SwiftRepresentation`. This is because MLIR C types can be bridged to different Swift types based on ownership semantics. For instance `MlirOperation` can be bridged to `Operation<OwnedBySwift>` or `Operation<OwnedByMLIR>`
+ */
+protocol Bridged: Equatable {
+  
+  /**
+   Initialization to/from opaque pointers
+   */
+  associatedtype Pointer
+  init(ptr: Pointer!)
+  var ptr: Pointer! { get }
+  init(pointer: OpaquePointer)
+  var pointer: OpaquePointer { get }
+  
   static var areEqual: (Self, Self) -> Int32 { get }
   static var isNull: (Self) -> Int32 { get }
+  
 }
 
-extension Bridgable {
-  public static func ==(lhs: Self, rhs: Self) -> Bool {
-    areEqual(lhs, rhs) != 0
+extension Bridged where Pointer == UnsafeRawPointer {
+  init(pointer: OpaquePointer) {
+    self.init(ptr: UnsafeRawPointer(pointer))
   }
-  public var isNull: Bool {
-    Self.isNull(self) != 0
-  }
+  var pointer: OpaquePointer { OpaquePointer(ptr) }
 }
 
-// MARK: - Ownership Semantics
+extension Bridged where Pointer == UnsafeMutableRawPointer {
+  init(pointer: OpaquePointer) {
+    self.init(ptr: UnsafeMutableRawPointer(pointer))
+  }
+  var pointer: OpaquePointer { OpaquePointer(ptr) }
+}
+
+// MARK: - Ownership
+
+/**
+ `Ownership` is a marker protocol which specifies that a generic argument is either `OwnedBySwift` or `OwnedByMLIR`. No other types should conform to this protocol.
+ */
+public protocol Ownership { }
 
 /**
  `OwnedBySwift` types are not owned by an MLIR type, and are managed by Swift's reference counting mechanisms. Once the last reference to such a type goes away, the type will be destroyed.
  */
-public final class OwnedBySwift {
-  fileprivate init<T: Destroyable>(_ value: T) {
-    destroy = { T.destroy(value) }
+public final class OwnedBySwift: Ownership {
+  fileprivate init?<T: Destroyable>(_ value: T) {
+    guard !value.isNull else { return nil }
+    pointer = value.pointer
+    destroy = { T.destroy(T(pointer: $0)) }
   }
   deinit {
-    if isOwned { destroy() }
+    if isOwned { destroy(pointer) }
+  }
+  fileprivate func value<T: Bridged>(of type: T.Type = T.self) -> T {
+    precondition(isOwned)
+    return T(pointer: pointer)
   }
   fileprivate func didTransferOwnershipToMLIR() {
     precondition(isOwned)
     isOwned = false
   }
-  fileprivate var isOwned = true
-  private let destroy: () -> Void
+  private var isOwned = true
+  private let pointer: OpaquePointer
+  private let destroy: (OpaquePointer) -> Void
 }
 
 /**
  Signals that a type is owned by another MLIR type. Developers should take care to not access `OwnedByMLIR` types ourside of the lifetime of their owner.
  - note: The parent of an `OwnedByMLIR` type may be an `OwnedBySwift` type. This just means that the developer must ensure that at least one strong reference to the `OwnedBySwift` parent exist while they are accessing the `OwnedByMLIR` child.
  */
-public struct OwnedByMLIR {
-  fileprivate init() { }
+public struct OwnedByMLIR: Ownership {
+  fileprivate init?<T: Bridged>(_ value: T) {
+    guard !value.isNull else { return nil }
+    pointer = value.pointer
+  }
+  fileprivate func value<T: Bridged>(of type: T.Type = T.self) -> T {
+    T(pointer: pointer)
+  }
+  private let pointer: OpaquePointer
 }
 
-// MARK: - Initialization
+// MARK: - Bridging
 
-extension Bridged where Ownership == OwnedBySwift {
+extension Bridged where Self: Destroyable {
+
+  /**
+   Transfers ownership from the Swift representation of an MLIR type back to MLIR.
+   Subsequent accesses to `swiftRepresentation.bridged()` will crash.
+   */
+  static func assumeOwnership<T>(of swiftRepresentation: T) -> Self
+  where
+    T: OpaqueStorageRepresentable,
+    T.Storage == BridgingStorage<Self, OwnedBySwift>
+  {
+    let ownership = swiftRepresentation.storage.ownership
+    let value = ownership.value(of: Self.self)
+    ownership.didTransferOwnershipToMLIR()
+    return value
+  }
+  
+}
+
+extension OpaqueStorageRepresentable {
   
   /**
-   Transfers ownership of an MLIR type to Swift. Unless `assumeOwnership` is called, this means the type will be destroyed with the last Swift reference to it.
+   Transfers ownership of an MLIR type to Swift.
+   - returns: Either a value which will be destroy `self` when there are no more strong references to it left, or `nil` if the `self` is semantically null.
    */
-  init?(takingOwnershipOf c: MlirStruct) where MlirStruct: Destroyable {
-    guard let storage = Storage(c: c, ownership: OwnedBySwift(c)) else { return nil }
-    self.init(storage: storage)
+  static func assumeOwnership<T: Bridged & Destroyable>(of value: T) -> Self?
+  where
+    Storage == BridgingStorage<T, OwnedBySwift>
+  {
+    OwnedBySwift(value).map(BridgingStorage.init).map(Self.init)
   }
   
   /**
-   Certain API can "consume" `OwnedBySwift` types, and transfer their ownership to MLIR. Such API **must** call `assumeOwnership` so that Swift knows not to destroy the wrapped type once there are no more references to it (which should be pretty soon, since values shouldn't be consume multiple times.
+   Bridges a type without transferring ownership.
+   It is the caller's responsibility to either ensure the returned value is not accessed outside of the lifetime of its parent, or to document this invariant in its own API.
+   - returns: Either a value which will never destroy `self`, or `nil` if `self` is semantically null.
    */
-  func assumeOwnership() -> MlirStruct {
-    storage.ownership.didTransferOwnershipToMLIR()
-    return storage.c
+  static func borrow<T: Bridged>(_ value: T) -> Self?
+  where
+    Storage == BridgingStorage<T, OwnedByMLIR>
+  {
+    OwnedByMLIR(value).map(BridgingStorage.init).map(Self.init)
   }
-}
-
-extension Bridged where Ownership == OwnedByMLIR {
   
-  /**
-   Bridges a type without transferring ownership. Developers should care that the value is not accessed outside of the lifetime of its parent.
-   */
-  init?(borrowing c: MlirStruct) {
-    guard let storage = Storage(c: c, ownership: OwnedByMLIR()) else { return nil }
-    self.init(storage: storage)
+  func bridgedValue<T: Bridged, Ownership: MLIR.Ownership>() -> T
+    where Storage == BridgingStorage<T, Ownership>
+  {
+    if Ownership.self == OwnedByMLIR.self {
+      return (storage.ownership as! OwnedByMLIR).value()
+    } else if Ownership.self == OwnedBySwift.self {
+      return (storage.ownership as! OwnedBySwift).value()
+    } else {
+      preconditionFailure()
+    }
   }
 }
 
 // MARK: - Convenience
 
-extension Array where Element: Bridged, Element.Ownership == OwnedBySwift {
-  
-  /**
-   Convenience method for transfering ownership of an array of values from MLIR to Swift.
-   */
-  func assumeOwnership() -> [Element.MlirStruct] { map { $0.assumeOwnership() } }
+extension Bridged {
+  public static func ==(lhs: Self, rhs: Self) -> Bool {
+    areEqual(lhs, rhs) != 0
+  }
+  var isNull: Bool {
+    Self.isNull(self) != 0
+  }
 }
+
 
 // MARK: - Implementation Details
 
 /**
  A `Bridgable` type that can be explicitly destroyed.
  */
-protocol Destroyable: Bridgable {
+protocol Destroyable: Bridged {
   static var destroy: (Self) -> () { get }
 }
 
 /**
  Opaque storage for a `Bridged` type
  */
-struct BridgedStorage<Bridged: MLIR.Bridged> {
-  fileprivate init?(c: Bridged.MlirStruct, ownership: Bridged.Ownership) {
-    guard !c.isNull else { return nil }
-    self.c = c
+struct BridgingStorage<Bridged, Ownership> {
+  fileprivate init(_ ownership: Ownership) {
     self.ownership = ownership
   }
-  fileprivate let c: Bridged.MlirStruct
-  fileprivate let ownership: Bridged.Ownership
-}
-
-extension Bridged {
-  typealias Storage = BridgedStorage<Self>
+  fileprivate let ownership: Ownership
 }
