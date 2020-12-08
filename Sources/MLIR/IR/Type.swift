@@ -2,5 +2,14 @@
 import CMLIR
 
 public struct Type: Bridged {
-  let c: MlirType
+  typealias Ownership = OwnedByMLIR
+  typealias MlirStruct = MlirType
+  let storage: Storage
+}
+
+// MARK: - Bridging
+
+extension MlirType: Bridgable {
+  static let areEqual = mlirTypeEqual
+  static let isNull = mlirTypeIsNull
 }
