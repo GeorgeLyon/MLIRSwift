@@ -14,31 +14,16 @@ public struct Block<Ownership>: Bridged {
     operations.forEach(append)
   }
   
-  public struct Operations: Collection {
-    public let startIndex: Index
-    public var endIndex: Index { Index(value: nil) }
-    public func index(after i: Index) -> Index {
-      guard let value = i.value else { return endIndex }
-      let operation = mlirOperationGetNextInBlock(value.operation)
-      return Index(value: (offset: value.offset + 1, operation: operation))
+  public struct Operations: Collection, LinkedList {
+    public typealias Element = Operation<OwnedByMLIR>
+    public struct Index: LinkedListIndex {
+      let cursor: LinkedListCursor<MlirOperation>
+      static var next: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
     }
-    public subscript(position: Index) -> Operation<OwnedByMLIR> {
-      get { Operation(borrowing: position.value!.operation)! }
-    }
-    public struct Index: Comparable {
-      public static func <(lhs: Self, rhs: Self) -> Bool {
-        switch (lhs.value?.offset, rhs.value?.offset) {
-        case let (lhs?, rhs?): return lhs < rhs
-        case (.some, .none): return true
-        default: return false
-        }
-      }
-      public static func ==(lhs: Self, rhs: Self) -> Bool {
-        lhs.value?.operation == rhs.value?.operation
-      }
-      fileprivate let value: (offset: Int, operation: MlirOperation)?
-    }
+    var first: MlirOperation { mlirBlockGetFirstOperation(c) }
+    fileprivate let c: MlirBlock
   }
+  public var operations: Operations { Operations(c: c) }
   
   /**
    Transfers ownership of `operation` to MLIR,

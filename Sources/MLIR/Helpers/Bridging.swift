@@ -28,6 +28,9 @@ extension Bridgable {
   public static func ==(lhs: Self, rhs: Self) -> Bool {
     areEqual(lhs, rhs) != 0
   }
+  public var isNull: Bool {
+    Self.isNull(self) != 0
+  }
 }
 
 // MARK: - Ownership Semantics
@@ -114,7 +117,7 @@ protocol Destroyable: Bridgable {
  */
 struct BridgedStorage<Bridged: MLIR.Bridged> {
   fileprivate init?(c: Bridged.MlirStruct, ownership: Bridged.Ownership) {
-    guard Bridged.MlirStruct.isNull(c) == 0 else { return nil }
+    guard !c.isNull else { return nil }
     self.c = c
     self.ownership = ownership
   }
