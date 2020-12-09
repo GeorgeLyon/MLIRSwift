@@ -20,7 +20,11 @@ extension Type {
     guard let type = Self.borrow(bridgedValue) else { return nil }
     self = type
   }
-  public var bridgedValue: MlirType { bridgedValue() }
+  public var bridgedValue: MlirType { borrowedValue() }
+  
+  /**
+   Convenience accessor for getting the `MlirContext`
+   */
   public static var ctx: MlirContext { MLIR.ctx }
 }
 

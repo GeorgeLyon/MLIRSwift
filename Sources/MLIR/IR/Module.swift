@@ -11,10 +11,10 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
   }
   
   public var body: MLIR.Block<OwnedByMLIR> {
-    .borrow(mlirModuleGetBody(bridgedValue()))!
+    .borrow(mlirModuleGetBody(borrowedValue()))!
   }
-  public var operation: Operation<OwnedByMLIR> {
-    .borrow(mlirModuleGetOperation(bridgedValue()))!
+  public var operation: MLIR.Operation<OwnedByMLIR> {
+    .borrow(mlirModuleGetOperation(borrowedValue()))!
   }
   
   init(storage: Storage) {

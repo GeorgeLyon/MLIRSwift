@@ -15,7 +15,9 @@ final class ModuleTests: XCTestCase {
       }
       """
     let parsed: Test.Module = try  .parse(input)
-    XCTAssertEqual(Array(parsed.body.operations).count, 2)
+    XCTAssertEqual(parsed.body.operations.count, 2)
+    XCTAssertEqual(parsed.operation.regions.count, 1)
+    XCTAssertEqual(parsed.operation.regions.first?.blocks.count, 1)
     XCTAssertEqual(input, "\(parsed.operation)")
     XCTAssertEqual(
       "\(parsed.operation.withPrintingOptions(alwaysPrintInGenericForm: true))",

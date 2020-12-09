@@ -166,7 +166,7 @@ extension OpaqueStorageRepresentable {
     Self(storage: BridgingStorage(OwnedByMLIR(value)))
   }
   
-  func bridgedValue<T: Bridged, Ownership: MLIR.Ownership>() -> T
+  func borrowedValue<T: Bridged, Ownership: MLIR.Ownership>() -> T
     where Storage == BridgingStorage<T, Ownership>
   {
     if Ownership.self == OwnedByMLIR.self {

@@ -8,7 +8,7 @@ public extension MLIRConfiguration {
 public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(
     arguments: [MLIR.`Type`] = [],
-    operations: [Operation<OwnedBySwift>] = [])
+    operations: [MLIR.Operation<OwnedBySwift>] = [])
   where
     Ownership == OwnedBySwift
   {
@@ -17,27 +17,25 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
     }
     /// `mlirBlockCreate` should never fail
     self = .assumeOwnership(of: c)!
-    operations.forEach(append)
+    operations.forEach(self.operations.append)
   }
   
   public struct Operations: Collection, LinkedList {
-    public typealias Element = Operation<OwnedByMLIR>
+    public typealias Element = MLIR.Operation<OwnedByMLIR>
     public struct Index: Comparable, OpaqueStorageRepresentable {
       let storage: LinkedListIndexStorage<MlirOperation>
       public static func <(lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
     }
+    
+    public func append(_ operation: MLIR.Operation<OwnedBySwift>) {
+      mlirBlockAppendOwnedOperation(c, .assumeOwnership(of: operation))
+    }
+    
     var first: MlirOperation { mlirBlockGetFirstOperation(c) }
     static var next: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
     fileprivate let c: MlirBlock
   }
-  public var operations: Operations { Operations(c: bridgedValue()) }
-  
-  /**
-   Assumes ownership of `operation`
-   */
-  public func append(_ operation: Operation<OwnedBySwift>) {
-    mlirBlockAppendOwnedOperation(bridgedValue(), .assumeOwnership(of: operation))
-  }
+  public var operations: Operations { Operations(c: borrowedValue()) }
   
   typealias MlirStruct = MlirBlock
   init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
@@ -46,7 +44,7 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
 
 // MARK: - Bridging
 
-extension MlirBlock: Bridged, Destroyable {
+extension MlirBlock: Bridged, Destroyable, CEquatable {
   static let destroy = mlirBlockDestroy
   static let areEqual = mlirBlockEqual
   static let isNull = mlirBlockIsNull

@@ -15,6 +15,21 @@ public struct Attribute<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorag
   let storage: BridgingStorage<MlirAttribute, OwnedByMLIR>
 }
 
+// MARK: - Bridging
+
+public extension Attribute {
+  init?(_ bridgedValue: MlirAttribute) {
+    guard let type = Self.borrow(bridgedValue) else { return nil }
+    self = type
+  }
+  var bridgedValue: MlirAttribute { borrowedValue() }
+  
+  /**
+   Convenience accessor for getting the `MlirContext`
+   */
+  static var ctx: MlirContext { MLIR.ctx }
+}
+
 extension MlirAttribute: Bridged {
   static let isNull = mlirAttributeIsNull
 }
