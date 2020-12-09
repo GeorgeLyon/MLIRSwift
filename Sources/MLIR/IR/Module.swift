@@ -7,9 +7,7 @@ public extension MLIRConfiguration {
 
 public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
-    try parse {
-      .assumeOwnership(of: source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.ctx, $0) })
-    }
+    try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   
   public var body: MLIR.Block<OwnedByMLIR> {

@@ -7,7 +7,7 @@ public extension MLIRConfiguration {
 
 public struct Type<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
-    try parse { .borrow(source.withUnsafeMlirStringRef { mlirTypeParseGet(MLIR.ctx, $0) }) }
+    try parse(borrow, mlirTypeParseGet, source)
   }
   
   init(storage: BridgingStorage<MlirType, OwnedByMLIR>) { self.storage = storage }

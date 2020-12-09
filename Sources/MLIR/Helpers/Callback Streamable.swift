@@ -2,6 +2,12 @@
 import CMLIR
 import Foundation
 
+extension Attribute: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirAttributePrint(bridgedValue(), unsafeCallback, userData)
+  }
+}
+
 extension Block: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirBlockPrint(bridgedValue(), unsafeCallback, userData)
