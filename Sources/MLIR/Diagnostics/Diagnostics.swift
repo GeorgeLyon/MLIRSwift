@@ -47,7 +47,7 @@ struct UnsafeDiagnostic {
     fileprivate let parent: UnsafeDiagnostic
   }
   
-  var location: MLIR.Location { Location(c: mlirDiagnosticGetLocation(c)) }
+  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(c)) }
   var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
   var notes: Notes { Notes(parent: self) }
   

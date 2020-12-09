@@ -17,7 +17,7 @@ import CMLIR
  
  - note: This protocol does not specify a `SwiftRepresentation`. This is because MLIR C types can be bridged to different Swift types based on ownership semantics. For instance `MlirOperation` can be bridged to `Operation<OwnedBySwift>` or `Operation<OwnedByMLIR>`
  */
-protocol Bridged: Equatable {
+protocol Bridged {
   
   /**
    Initialization to/from opaque pointers
@@ -28,13 +28,15 @@ protocol Bridged: Equatable {
   init(pointer: OpaquePointer)
   var pointer: OpaquePointer { get }
   
-  associatedtype IsNull = Never
-  static var isNull: (Self) -> Int32 { get }
-  
-  associatedtype AreEqual = Never
-  static var areEqual: AreEqual { get }
-  
-  
+  /**
+   We use this forumlation rather than a refinement protocol because we want to be able to express non-nullable types, and one cannot write `T != Nullable` in a `where` clause, but one can write `IsNull == Void`.
+   */
+  associatedtype IsNull = Void
+  static var isNull: IsNull { get }
+}
+
+extension Bridged where IsNull == Void {
+  static var isNull: Void { () }
 }
 
 extension Bridged where Pointer == UnsafeRawPointer {
@@ -64,7 +66,7 @@ public protocol Ownership { }
  - note: Creating arrays of `OwnedBySwift` types and immediately transferring ownership to MLIR _should_ optimize away the object allocations (https://swift.godbolt.org/z/xbczfc).
  */
 public final class OwnedBySwift: Ownership {
-  fileprivate init?<T: Destroyable>(_ value: T) {
+  fileprivate init?<T: Destroyable>(_ value: T) where T.IsNull == (T) -> Int32 {
     guard !value.isNull else { return nil }
     pointer = value.pointer
     destroy = { T.destroy(T(pointer: $0)) }
@@ -90,8 +92,11 @@ public final class OwnedBySwift: Ownership {
  - note: The parent of an `OwnedByMLIR` type may be an `OwnedBySwift` type. This just means that the developer must ensure that at least one strong reference to the `OwnedBySwift` parent exist while they are accessing the `OwnedByMLIR` child.
  */
 public struct OwnedByMLIR: Ownership {
-  fileprivate init?<T: Bridged>(_ value: T) {
+  fileprivate init?<T: Bridged>(_ value: T) where T.IsNull == (T) -> Int32 {
     guard !value.isNull else { return nil }
+    pointer = value.pointer
+  }
+  fileprivate init<T: Bridged>(_ value: T) where T.IsNull == Void {
     pointer = value.pointer
   }
   fileprivate func value<T: Bridged>(of type: T.Type = T.self) -> T {
@@ -129,7 +134,8 @@ extension OpaqueStorageRepresentable {
    */
   static func assumeOwnership<T: Bridged & Destroyable>(of value: T) -> Self?
   where
-    Storage == BridgingStorage<T, OwnedBySwift>
+    Storage == BridgingStorage<T, OwnedBySwift>,
+    T.IsNull == (T) -> Int32
   {
     OwnedBySwift(value).map(BridgingStorage.init).map(Self.init)
   }
@@ -141,9 +147,23 @@ extension OpaqueStorageRepresentable {
    */
   static func borrow<T: Bridged>(_ value: T) -> Self?
   where
-    Storage == BridgingStorage<T, OwnedByMLIR>
+    Storage == BridgingStorage<T, OwnedByMLIR>,
+    T.IsNull == (T) -> Int32
   {
     OwnedByMLIR(value).map(BridgingStorage.init).map(Self.init)
+  }
+  
+  /**
+   Bridges a type without transferring ownership.
+   It is the caller's responsibility to either ensure the returned value is not accessed outside of the lifetime of its parent, or to document this invariant in its own API.
+   - returns: A value which will never destroy `self`
+   */
+  static func borrow<T: Bridged>(_ value: T) -> Self
+  where
+    Storage == BridgingStorage<T, OwnedByMLIR>,
+    T.IsNull == Void
+  {
+    Self(storage: BridgingStorage(OwnedByMLIR(value)))
   }
   
   func bridgedValue<T: Bridged, Ownership: MLIR.Ownership>() -> T
@@ -161,10 +181,7 @@ extension OpaqueStorageRepresentable {
 
 // MARK: - Convenience
 
-extension Bridged {
-  public static func ==(lhs: Self, rhs: Self) -> Bool {
-    areEqual(lhs, rhs) != 0
-  }
+extension Bridged where IsNull == (Self) -> Int32 {
   var isNull: Bool {
     Self.isNull(self) != 0
   }

@@ -20,8 +20,14 @@ extension Operation: TextOutputStreamable, CustomStringConvertible, CustomDebugS
   }
 }
 
+extension Type: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirTypePrint(bridgedValue(), unsafeCallback, userData)
+  }
+}
+
 // MARK: - Operation with Printing Options
-/*
+
 public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
   case none
   case standard
@@ -33,26 +39,24 @@ public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
 }
 
 public extension Operation {
-  
-  public typealias DebugInfoStyle = _OperationDebugInfoStyle
-  public func withPrintingOptions(
+  typealias DebugInfoStyle = _OperationDebugInfoStyle
+  func withPrintingOptions(
     elideElementsAttributesLargerThan: Int32? = nil,
     debugInformationStyle: DebugInfoStyle = nil,
     alwaysPrintInGenericForm: Bool = false,
-    useLocalScope: Bool = false) -> TextOutputStreamable
+    useLocalScope: Bool = false) -> TextOutputStreamable & CustomStringConvertible
   {
     return OperationWithPrintingOptions(
-      operation: c,
+      operation: bridgedValue(),
       options: .init(
         elideElementsAttributesLargerThan: elideElementsAttributesLargerThan,
         debugInformationStyle: debugInformationStyle,
         alwaysPrintInGenericForm: alwaysPrintInGenericForm,
         useLocalScope: useLocalScope))
   }
-  
 }
 
-private struct OperationWithPrintingOptions: MlirStringCallbackStreamable {
+private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringConvertible, StringCallbackStreamable {
   
   struct PrintingOptions {
     var elideElementsAttributesLargerThan: Int32? = nil
@@ -93,7 +97,6 @@ private struct OperationWithPrintingOptions: MlirStringCallbackStreamable {
   fileprivate let operation: MlirOperation
   fileprivate let options: PrintingOptions
 }
-*/
 
 // MARK: - Implementation Details
 

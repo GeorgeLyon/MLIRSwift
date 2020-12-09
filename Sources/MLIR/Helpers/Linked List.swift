@@ -6,6 +6,9 @@ import CMLIR
 
 protocol LinkedList {
   associatedtype BridgedElement: Bridged
+  where
+    BridgedElement: Equatable,
+    BridgedElement.IsNull == (BridgedElement) -> Int32
   associatedtype Element
   where
     Element: OpaqueStorageRepresentable,
@@ -35,7 +38,7 @@ extension LinkedList {
   }
 }
 
-struct LinkedListIndexStorage<Element: Bridged>: Comparable {
+struct LinkedListIndexStorage<Element: Bridged & Equatable>: Comparable {
   static func <(lhs: Self, rhs: Self) -> Bool {
     switch (lhs.value?.offset, rhs.value?.offset) {
     case let (lhs?, rhs?): return lhs < rhs

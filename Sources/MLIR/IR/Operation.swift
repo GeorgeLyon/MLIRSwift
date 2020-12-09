@@ -7,7 +7,7 @@ public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
 
 // MARK: - Bridging
 
-extension MlirOperation: Bridged, Destroyable {
+extension MlirOperation: Bridged, CEquatable, Destroyable {
   typealias Pointer = UnsafeMutableRawPointer
   typealias SwiftRepresentation = Operation
   static let destroy = mlirOperationDestroy
