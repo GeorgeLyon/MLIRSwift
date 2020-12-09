@@ -25,6 +25,9 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
       public static func <(lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
     }
     
+    public func prepend(_ operation: MLIR.Operation<OwnedBySwift>) {
+      mlirBlockInsertOwnedOperation(c, 0, .assumeOwnership(of: operation))
+    }
     public func append(_ operation: MLIR.Operation<OwnedBySwift>) {
       mlirBlockAppendOwnedOperation(c, .assumeOwnership(of: operation))
     }
