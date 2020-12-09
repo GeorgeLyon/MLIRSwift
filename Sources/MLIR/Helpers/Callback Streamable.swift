@@ -26,6 +26,12 @@ extension Type: TextOutputStreamable, CustomStringConvertible, CustomDebugString
   }
 }
 
+extension UnsafeDiagnostic: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirDiagnosticPrint(bridgedValue(), unsafeCallback, userData)
+  }
+}
+
 // MARK: - Operation with Printing Options
 
 public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {

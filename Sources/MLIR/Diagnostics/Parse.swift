@@ -2,9 +2,9 @@
 import CMLIR
 
 extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
-  static func parse<T: Bridged>(body: () -> Self?) throws -> Self
+  static func parse<T: Bridged, Ownership: MLIR.Ownership>(body: () -> Self?) throws -> Self
   where
-    Storage == BridgingStorage<T, OwnedByMLIR>
+    Storage == BridgingStorage<T, Ownership>
   {
     let pair = MLIR.collectDiagnostics(minimumSeverity: .error) {
       body()

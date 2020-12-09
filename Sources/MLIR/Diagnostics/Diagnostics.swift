@@ -23,7 +23,7 @@ public struct Diagnostic: Swift.Error {
 
 // MARK: - Internal
 
-struct UnsafeDiagnostic {
+struct UnsafeDiagnostic: OpaqueStorageRepresentable {
   
   struct Notes: Sequence {
     func makeIterator() -> Iterator {
@@ -32,11 +32,11 @@ struct UnsafeDiagnostic {
     struct Iterator: IteratorProtocol {
       init(parent: UnsafeDiagnostic) {
         self.parent = parent
-        self.count = mlirDiagnosticGetNumNotes(parent.c)
+        self.count = mlirDiagnosticGetNumNotes(parent.bridgedValue())
       }
       mutating func next() -> UnsafeDiagnostic? {
         guard index < count else { return nil }
-        let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent.c, index))
+        let diagnostic = UnsafeDiagnostic.borrow(mlirDiagnosticGetNote(parent.bridgedValue(), index))
         index += 1
         return diagnostic
       }
@@ -47,12 +47,14 @@ struct UnsafeDiagnostic {
     fileprivate let parent: UnsafeDiagnostic
   }
   
-  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(c)) }
-  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c)) }
+  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(bridgedValue())) }
+  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(bridgedValue())) }
   var notes: Notes { Notes(parent: self) }
   
-  let c: MlirDiagnostic
+  let storage: BridgingStorage<MlirDiagnostic, OwnedByMLIR>
 }
+
+extension MlirDiagnostic: Bridged { }
 
 enum DiagnosticHandlingDirective {
   case stop
@@ -122,9 +124,8 @@ private extension Diagnostic.Severity {
 }
 
 private func mlirDiagnosticHandler(mlirDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!) -> MlirLogicalResult {
-  let diagnostic = UnsafeDiagnostic(c: mlirDiagnostic)
   let handler = Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
-  return handler.handle(diagnostic).logicalResult
+  return handler.handle(.borrow(mlirDiagnostic)).logicalResult
 }
 
 private func mlirDeleteUserData(userData: UnsafeMutableRawPointer!) {

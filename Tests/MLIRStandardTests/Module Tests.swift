@@ -2,7 +2,6 @@ import XCTest
 @testable import MLIRStandard
 
 import MLIR
-/*
 final class ModuleTests: XCTestCase {
   func testModule() throws {
     let input = """
@@ -15,7 +14,7 @@ final class ModuleTests: XCTestCase {
         }
       }
       """
-    let parsed = try Test.Module(parsing: input)
+    let parsed: Test.Module = try  .parse(input)
     XCTAssertEqual(Array(parsed.body.operations).count, 2)
     XCTAssertEqual(input, "\(parsed.operation)")
     XCTAssertEqual(
@@ -32,6 +31,7 @@ final class ModuleTests: XCTestCase {
         "module_terminator"() : () -> ()
       }) : () -> ()
       """)
+    /*
     let constructed = try Test.Module(
       operations: { operations in
         try operations.build(
@@ -69,6 +69,6 @@ final class ModuleTests: XCTestCase {
           })
       })
     XCTAssertEqual(input, "\(constructed.operation)")
+    */
   }
 }
-*/

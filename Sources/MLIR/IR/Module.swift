@@ -1,13 +1,22 @@
 
 import CMLIR
 
-public struct Module<MLIR: MLIRConfiguration>: OpaqueStorageRepresentable {
-  public init(parsing source: String) throws {
-    let c = source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.ctx, $0) }
-    guard let module = Self.assumeOwnership(of: c) else {
-      fatalError()
+public extension MLIRConfiguration {
+  typealias Module = MLIR.Module<Self>
+}
+
+public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
+  public static func parse(_ source: String) throws -> Self {
+    try parse {
+      .assumeOwnership(of: source.withUnsafeMlirStringRef { mlirModuleCreateParse(MLIR.ctx, $0) })
     }
-    self = module
+  }
+  
+  public var body: MLIR.Block<OwnedByMLIR> {
+    .borrow(mlirModuleGetBody(bridgedValue()))!
+  }
+  public var operation: Operation<OwnedByMLIR> {
+    .borrow(mlirModuleGetOperation(bridgedValue()))!
   }
   
   init(storage: Storage) {
