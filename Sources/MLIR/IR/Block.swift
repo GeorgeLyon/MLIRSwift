@@ -1,12 +1,17 @@
 
 import CMLIR
 
+public extension MLIRConfiguration {
+  typealias Block<T: Ownership> = MLIR.Block<Self, T>
+}
 
-public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
+public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(
-    arguments: [Type] = [],
+    arguments: [MLIR.`Type`] = [],
     operations: [Operation<OwnedBySwift>] = [])
-  where Ownership == OwnedBySwift {
+  where
+    Ownership == OwnedBySwift
+  {
     let c = arguments.withUnsafeBridgedValues { arguments in
       mlirBlockCreate(arguments.count, arguments.baseAddress)
     }
@@ -35,9 +40,7 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   }
   
   typealias MlirStruct = MlirBlock
-  init(storage: Storage) {
-    self.storage = storage
-  }
+  init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirBlock, Ownership>
 }
 

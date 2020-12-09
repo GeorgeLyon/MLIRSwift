@@ -1,7 +1,7 @@
 
 import CMLIR
 
-public struct Operation<Ownership>: OpaqueStorageRepresentable {
+public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   let storage: BridgingStorage<MlirOperation, Ownership>
 }
 

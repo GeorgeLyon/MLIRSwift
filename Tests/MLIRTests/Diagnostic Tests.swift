@@ -2,7 +2,7 @@ import XCTest
 @testable import MLIR
 
 import CMLIR
-
+/*
 final class DiagnosticTests: XCTestCase {
   func testDiagnosticSeverity() {
     XCTAssertGreaterThan(Diagnostic.Severity.error, Diagnostic.Severity.warning)
@@ -25,3 +25,4 @@ final class DiagnosticTests: XCTestCase {
     XCTAssertEqual(diagnostic.message, message)
   }
 }
+*/

@@ -2,7 +2,7 @@ import XCTest
 @testable import MLIRStandard
 
 import MLIR
-
+/*
 final class ModuleTests: XCTestCase {
   func testModule() throws {
     let input = """
@@ -71,3 +71,4 @@ final class ModuleTests: XCTestCase {
     XCTAssertEqual(input, "\(constructed.operation)")
   }
 }
+*/

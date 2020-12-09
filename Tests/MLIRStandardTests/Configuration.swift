@@ -6,7 +6,7 @@ enum Test:
   MLIRConfiguration,
   ProvidesStandardDialect
 {
-  static let dialects: [RegisteredDialect] = [
+  static let dialects: RegisteredDialects = [
     .standard
   ]
   static let context = Context()
