@@ -1,24 +1,22 @@
 
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias Block<T: Ownership> = MLIR.Block<Self, T>
-}
-
 public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
-  public init(
-    arguments: [MLIR.`Type`] = [],
-    operations: [MLIR.Operation<OwnedBySwift>] = [])
-  where
-    Ownership == OwnedBySwift
-  {
-    let c = arguments.withUnsafeBridgedValues { arguments in
-      mlirBlockCreate(arguments.count, arguments.baseAddress)
+  public init(argumentTypes: [MLIR.`Type`]) where Ownership == OwnedBySwift{
+    self = argumentTypes.withUnsafeBorrowedValues {
+      .assumeOwnership(of: mlirBlockCreate($0.count, $0.baseAddress))!
     }
-    /// `mlirBlockCreate` should never fail
-    self = .assumeOwnership(of: c)!
-    operations.forEach(self.operations.append)
   }
+  
+  public struct Arguments: RandomAccessCollection {
+    public let startIndex = 0
+    public var endIndex: Int { mlirBlockGetNumArguments(c) }
+    public subscript(position: Int) -> MLIR.Value {
+      .borrow(mlirBlockGetArgument(c, position))
+    }
+    fileprivate let c: MlirBlock
+  }
+  public var arguments: Arguments { Arguments(c: .borrow(self)) }
   
   public struct Operations: Collection, LinkedList {
     public typealias Element = MLIR.Operation<OwnedByMLIR>
@@ -35,8 +33,8 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
     static var next: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
     fileprivate let c: MlirBlock
   }
-  public var operations: Operations { Operations(c: borrowedValue()) }
-  
+  public var operations: Operations { Operations(c: .borrow(self)) }
+
   typealias MlirStruct = MlirBlock
   init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirBlock, Ownership>

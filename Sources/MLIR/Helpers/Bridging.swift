@@ -126,6 +126,25 @@ extension Bridged where Self: Destroyable {
   
 }
 
+extension Bridged {
+  
+  static func borrow<T, Ownership: MLIR.Ownership>(_ swiftRepresentation: T) -> Self
+  where
+    T: OpaqueStorageRepresentable,
+    T.Storage == BridgingStorage<Self, Ownership>
+  {
+    let ownership = swiftRepresentation.storage.ownership
+    if Ownership.self == OwnedByMLIR.self {
+      return (ownership as! OwnedByMLIR).value()
+    } else if Ownership.self == OwnedBySwift.self {
+      return (ownership as! OwnedBySwift).value()
+    } else {
+      preconditionFailure()
+    }
+  }
+  
+}
+
 extension OpaqueStorageRepresentable {
   
   /**
@@ -166,17 +185,6 @@ extension OpaqueStorageRepresentable {
     Self(storage: BridgingStorage(OwnedByMLIR(value)))
   }
   
-  func borrowedValue<T: Bridged, Ownership: MLIR.Ownership>() -> T
-    where Storage == BridgingStorage<T, Ownership>
-  {
-    if Ownership.self == OwnedByMLIR.self {
-      return (storage.ownership as! OwnedByMLIR).value()
-    } else if Ownership.self == OwnedBySwift.self {
-      return (storage.ownership as! OwnedBySwift).value()
-    } else {
-      preconditionFailure()
-    }
-  }
 }
 
 // MARK: - Convenience

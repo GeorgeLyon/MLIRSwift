@@ -12,7 +12,7 @@ public struct RegisteredDialect<MLIR: MLIRConfiguration> {
     return dialect.getNamespace().string
   }
   func register(with context: MLIR.Context) {
-    dialect.register(context.borrowedValue())
+    dialect.register(.borrow(context))
   }
   fileprivate let dialect: Dialect
   private var isRegistered: Bool { !dialect.load(MLIR.ctx).isNull }

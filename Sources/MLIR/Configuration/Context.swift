@@ -18,7 +18,7 @@ public struct Context<MLIR: MLIRConfiguration>: OpaqueStorageRepresentable {
 
 extension MLIRConfiguration  {
   /// Convenient shorthand for writing `context.bridgedValue()`
-  static var ctx: MlirContext { context.borrowedValue() }
+  static var ctx: MlirContext { .borrow(context) }
 }
 
 extension MlirContext: Bridged, Destroyable {

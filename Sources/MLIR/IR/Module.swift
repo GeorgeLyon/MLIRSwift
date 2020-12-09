@@ -1,25 +1,19 @@
 
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias Module = MLIR.Module<Self>
-}
-
 public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   
   public var body: MLIR.Block<OwnedByMLIR> {
-    .borrow(mlirModuleGetBody(borrowedValue()))!
+    .borrow(mlirModuleGetBody(.borrow(self)))!
   }
   public var operation: MLIR.Operation<OwnedByMLIR> {
-    .borrow(mlirModuleGetOperation(borrowedValue()))!
+    .borrow(mlirModuleGetOperation(.borrow(self)))!
   }
   
-  init(storage: Storage) {
-    self.storage = storage
-  }
+  init(storage: BridgingStorage<MlirModule, OwnedBySwift>) { self.storage = storage }
   let storage: BridgingStorage<MlirModule, OwnedBySwift>
 }
 

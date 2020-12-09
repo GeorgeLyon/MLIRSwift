@@ -4,37 +4,43 @@ import Foundation
 
 extension Attribute: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirAttributePrint(borrowedValue(), unsafeCallback, userData)
+    mlirAttributePrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
 extension Block: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirBlockPrint(borrowedValue(), unsafeCallback, userData)
+    mlirBlockPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
 extension Location: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirLocationPrint(borrowedValue(), unsafeCallback, userData)
+    mlirLocationPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
 extension Operation: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirOperationPrint(borrowedValue(), unsafeCallback, userData)
+    mlirOperationPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
 extension Type: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirTypePrint(borrowedValue(), unsafeCallback, userData)
+    mlirTypePrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
 extension UnsafeDiagnostic: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
-    mlirDiagnosticPrint(borrowedValue(), unsafeCallback, userData)
+    mlirDiagnosticPrint(.borrow(self), unsafeCallback, userData)
+  }
+}
+
+extension Value: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    mlirValuePrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
@@ -59,7 +65,7 @@ public extension Operation {
     useLocalScope: Bool = false) -> TextOutputStreamable & CustomStringConvertible
   {
     return OperationWithPrintingOptions(
-      operation: borrowedValue(),
+      operation: .borrow(self),
       options: .init(
         elideElementsAttributesLargerThan: elideElementsAttributesLargerThan,
         debugInformationStyle: debugInformationStyle,

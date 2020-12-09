@@ -1,10 +1,6 @@
 
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias `Type` = MLIR.`Type`<Self>
-}
-
 public struct Type<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
     try parse(borrow, mlirTypeParseGet, source)
@@ -20,7 +16,7 @@ extension Type {
     guard let type = Self.borrow(bridgedValue) else { return nil }
     self = type
   }
-  public var bridgedValue: MlirType { borrowedValue() }
+  public var bridgedValue: MlirType { MlirType.borrow(self) }
   
   /**
    Convenience accessor for getting the `MlirContext`

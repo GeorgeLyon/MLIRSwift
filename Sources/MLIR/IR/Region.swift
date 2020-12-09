@@ -1,10 +1,6 @@
 
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias Region<Ownership: MLIR.Ownership> = MLIR.Region<Self, Ownership>
-}
-
 public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(blocks: [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
     self = .assumeOwnership(of: mlirRegionCreate())!
@@ -26,7 +22,7 @@ public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opaque
     static var next: (MlirBlock) -> MlirBlock { mlirBlockGetNextInRegion }
     fileprivate let c: MlirRegion
   }
-  public var blocks: Blocks { Blocks(c: borrowedValue()) }
+  public var blocks: Blocks { Blocks(c: .borrow(self)) }
   
   init(storage: BridgingStorage<MlirRegion, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirRegion, Ownership>

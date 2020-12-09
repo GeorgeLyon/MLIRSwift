@@ -32,11 +32,11 @@ struct UnsafeDiagnostic: OpaqueStorageRepresentable {
     struct Iterator: IteratorProtocol {
       init(parent: UnsafeDiagnostic) {
         self.parent = parent
-        self.count = mlirDiagnosticGetNumNotes(parent.borrowedValue())
+        self.count = mlirDiagnosticGetNumNotes(.borrow(parent))
       }
       mutating func next() -> UnsafeDiagnostic? {
         guard index < count else { return nil }
-        let diagnostic = UnsafeDiagnostic.borrow(mlirDiagnosticGetNote(parent.borrowedValue(), index))
+        let diagnostic = UnsafeDiagnostic.borrow(mlirDiagnosticGetNote(.borrow(parent), index))
         index += 1
         return diagnostic
       }
@@ -47,8 +47,8 @@ struct UnsafeDiagnostic: OpaqueStorageRepresentable {
     fileprivate let parent: UnsafeDiagnostic
   }
   
-  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(borrowedValue())) }
-  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(borrowedValue())) }
+  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(.borrow(self))) }
+  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(.borrow(self))) }
   var notes: Notes { Notes(parent: self) }
   
   let storage: BridgingStorage<MlirDiagnostic, OwnedByMLIR>
@@ -88,14 +88,14 @@ extension Context {
   func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
-      borrowedValue(),
+      .borrow(self),
       mlirDiagnosticHandler,
       userData,
       mlirDeleteUserData)
     return DiagnosticHandlerRegistration(id: id)
   }
   func unregister(_ registration: DiagnosticHandlerRegistration) {
-    mlirContextDetachDiagnosticHandler(borrowedValue(), registration.id)
+    mlirContextDetachDiagnosticHandler(.borrow(self), registration.id)
   }
 }
 

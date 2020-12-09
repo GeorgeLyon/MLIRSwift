@@ -2,6 +2,7 @@ import XCTest
 @testable import MLIRStandard
 
 import MLIR
+
 final class ModuleTests: XCTestCase {
   func testModule() throws {
     let input = """
@@ -33,6 +34,7 @@ final class ModuleTests: XCTestCase {
         "module_terminator"() : () -> ()
       }) : () -> ()
       """)
+    
     /*
     let constructed = try Test.Module(
       operations: { operations in
