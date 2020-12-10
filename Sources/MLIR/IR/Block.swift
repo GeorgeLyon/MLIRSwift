@@ -18,6 +18,7 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
   }
   public var arguments: Arguments { Arguments(c: .borrow(self)) }
   
+  public typealias Operation = MLIR.Operation
   public struct Operations: Collection, LinkedList {
     public typealias Element = MLIR.Operation<OwnedByMLIR>
     public struct Index: Comparable, OpaqueStorageRepresentable {

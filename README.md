@@ -30,9 +30,3 @@ $ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets )
 ```
 
 You also need to install the `Resources/MLIR.pc` file to `/usr/local/lib/pkgconfig/MLIR.pc`, and change the `prefix` value in that file to the value you provided for `CMAKE_INSTALL_PREFIX` above.
-
-## Project Structure
-
-The core of the project is split into two module: `MLIR` and `MLIRDialect`. `MLIR` is intended to be imported by modules which are using existing dialects to work with an IR while `MLIRDialect` is intended to be imported by modules bridging dialects. We prioritize working with IR, so `MLIRDialect` goes out of its way to not define any public properties or methods on types used by `MLIR`, and this sometimes leads to awkward constructions (like `Attribute` being intialized via an extension method on `MlirAttribute`).
-
-`MLIRStandard` is an example of using `MLIRDialect` to bridge the standard dialect (but is also intended to be imported by projects using the standard dialect).

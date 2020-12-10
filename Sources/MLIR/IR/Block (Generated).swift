@@ -10,16 +10,16 @@
 
 extension Block {
   public init(
-    operations: (inout MLIR.Operation<OwnedBySwift>.Builder) -> Void)
+    operations: (inout MLIR.Operation<OwnedBySwift>.Builder) throws -> Void) rethrows
   where
     Ownership == OwnedBySwift
   {
     self = Block(argumentTypes: [])
     var builder = MLIR.Operation<OwnedBySwift>.Builder()
-    operations(&builder)
+    try operations(&builder)
     builder.operations.forEach(self.operations.append)
   }
-  
+
   public init(
     _ t0: Type<MLIR>,
     operations: (inout MLIR.Operation<OwnedBySwift>.Builder, MLIR.Value) throws -> Void) rethrows
@@ -151,5 +151,5 @@ extension Block {
     try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10])
     builder.operations.forEach(self.operations.append)
   }
-
+  
 }
