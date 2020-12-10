@@ -23,7 +23,7 @@ public struct Func<MLIR: MLIRConfiguration>: OperationProtocol {
    We believe eventually "func" will belong to a dialect, but for now it is treated special because "std.func" doesn't resolve.
    */
   public var dialect: MLIR.RegisteredDialect { fatalError() }
-  public let name = "func"
+  public let operationName = "func"
   public let attributes: MLIR.NamedAttributes
   public let regions: [MLIR.Region<OwnedBySwift>]
   public let resultTypes: [MLIR.`Type`]

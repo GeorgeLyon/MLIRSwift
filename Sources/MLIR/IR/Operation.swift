@@ -14,9 +14,9 @@ public struct Operation<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opa
     /// For now, "func" is treated special
     let name: String
     if Op.self == Func<MLIR>.self {
-      name = op.name
+      name = op.operationName
     } else {
-      name = "\(op.dialect.namespace).\(op.name)"
+      name = "\(op.dialect.namespace).\(op.operationName)"
     }
     
     self = name.withUnsafeMlirStringRef { name in
@@ -66,7 +66,7 @@ public struct Operation<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opa
 public protocol OperationProtocol {
   associatedtype MLIR: MLIRConfiguration
   var dialect: MLIR.RegisteredDialect { get }
-  var name: String { get }
+  var operationName: String { get }
   var operands: [MLIR.Value] { get }
   var attributes: MLIR.NamedAttributes { get }
   var regions: [MLIR.Region<OwnedBySwift>] { get }

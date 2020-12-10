@@ -7,7 +7,7 @@ public struct Constant<MLIR: ProvidesStandardDialect>: OperationProtocol {
     resultTypes = [type]
   }
   public var dialect: MLIR.RegisteredDialect { .std }
-  public var name: String { "constant" }
+  public var operationName: String { "constant" }
   public let attributes: MLIR.NamedAttributes
   public let resultTypes: [MLIR.`Type`]
   public typealias Results = (MLIR.`Value`)
@@ -19,7 +19,7 @@ public struct Dim<MLIR: ProvidesStandardDialect>: OperationProtocol {
     resultTypes = [.index]
   }
   public var dialect: MLIR.RegisteredDialect { .std }
-  public var name: String { "dim" }
+  public var operationName: String { "dim" }
   public let operands: [MLIR.Value]
   public let resultTypes: [MLIR.`Type`]
   public typealias Results = (MLIR.`Value`)
@@ -28,5 +28,5 @@ public struct Dim<MLIR: ProvidesStandardDialect>: OperationProtocol {
 public struct Return<MLIR: ProvidesStandardDialect>: OperationProtocol {
   public init() { }
   public var dialect: MLIR.RegisteredDialect { .std }
-  public var name: String { "return" }
+  public var operationName: String { "return" }
 }
