@@ -8,14 +8,15 @@ public extension MLIRConfiguration {
 
 public struct RegisteredDialect<MLIR: MLIRConfiguration> {
   public var namespace: String {
-    assert(isRegistered)
+///    We may eventually want to check for registration, but the currently bridged "load" method will crash if the dialect is already registered.
+//    assert(isRegistered)
     return dialect.getNamespace().string
   }
   func register(with context: MLIR.Context) {
     dialect.register(.borrow(context))
   }
   fileprivate let dialect: Dialect
-  private var isRegistered: Bool { !dialect.load(MLIR.ctx).isNull }
+//  private var isRegistered: Bool { !dialect.load(MLIR.ctx).isNull }
 }
 
 /**
