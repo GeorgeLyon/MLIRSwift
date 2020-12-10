@@ -11,7 +11,8 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
   {
     let location = MLIR.location(file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
-    try operations().forEach(body.operations.prepend)
+    /// Ensure that the module terminator is at the end
+    try operations().reversed().forEach(body.operations.prepend)
   }
   
   public var body: MLIR.Block<OwnedByMLIR> {
