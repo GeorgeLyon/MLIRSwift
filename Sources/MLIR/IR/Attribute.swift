@@ -9,12 +9,12 @@ public struct Attribute<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorag
 }
 
 public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryLiteral {
-  public init(dictionaryLiteral elements: (String, MLIR.Attribute)...) {
-    self.names = elements.map(\.0)
+  public init(dictionaryLiteral elements: (AttributeName, MLIR.Attribute)...) {
+    self.names = elements.map(\.0.value)
     self.attributes = elements.map(\.1)
   }
-  public mutating func append(_ name: String, _ attribute: MLIR.Attribute) {
-    names.append(name)
+  public mutating func append(_ name: AttributeName, _ attribute: MLIR.Attribute) {
+    names.append(name.value)
     attributes.append(attribute)
   }
   func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T) rethrows -> T {
@@ -26,6 +26,14 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
   }
   private var names: [String]
   private var attributes: [MLIR.Attribute]
+}
+
+public struct AttributeName: CustomStringConvertible, ExpressibleByStringLiteral {
+  public init(stringLiteral value: String) {
+    self.value = value
+  }
+  public var description: String { value }
+  fileprivate let value: String
 }
 
 // MARK: - Bridging

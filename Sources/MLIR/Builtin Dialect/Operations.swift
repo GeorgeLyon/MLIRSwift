@@ -10,8 +10,8 @@ public struct Func<MLIR: MLIRConfiguration>: OperationProtocol {
   {
     let argumentTypes = entryBlock.arguments.map(\.type)
     var attributes = immutableAttributes
-    attributes.append("type", .type(.function(of: argumentTypes, to: resultTypes)))
-    attributes.append("sym_name", .string(name))
+    attributes.append(.symbolName, .string(name))
+    attributes.append(.type, .type(.function(of: argumentTypes, to: resultTypes)))
     self.attributes = attributes
     self.resultTypes = resultTypes
     self.regions = [
