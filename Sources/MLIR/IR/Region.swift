@@ -6,6 +6,9 @@ public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opaque
     self = .assumeOwnership(of: mlirRegionCreate())!
     blocks.forEach(self.blocks.append)
   }
+  public init(@Block<MLIR, OwnedBySwift>.Builder blocks: () -> [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
+    self.init(blocks: blocks())
+  }
   
   public struct Blocks: Collection, LinkedList {
     public typealias Element = MLIR.Block<OwnedByMLIR>
