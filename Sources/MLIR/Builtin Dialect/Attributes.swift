@@ -6,6 +6,6 @@ extension Attribute {
     .borrow(mlirTypeAttrGet(.borrow(type)))!
   }
   public static func string(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(MLIR.ctx, $0.length, $0.data) })!
+    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(MLIR.ctx, $0) })!
   }
 }

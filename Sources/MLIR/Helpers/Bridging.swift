@@ -66,7 +66,7 @@ public protocol Ownership { }
  - note: Creating arrays of `OwnedBySwift` types and immediately transferring ownership to MLIR _should_ optimize away the object allocations (https://swift.godbolt.org/z/xbczfc).
  */
 public final class OwnedBySwift: Ownership {
-  fileprivate init?<T: Destroyable>(_ value: T) where T.IsNull == (T) -> Int32 {
+  fileprivate init?<T: Destroyable>(_ value: T) where T.IsNull == (T) -> Bool {
     guard !value.isNull else { return nil }
     pointer = value.pointer
     destroy = { T.destroy(T(pointer: $0)) }
@@ -92,7 +92,7 @@ public final class OwnedBySwift: Ownership {
  - note: The parent of an `OwnedByMLIR` type may be an `OwnedBySwift` type. This just means that the developer must ensure that at least one strong reference to the `OwnedBySwift` parent exist while they are accessing the `OwnedByMLIR` child.
  */
 public struct OwnedByMLIR: Ownership {
-  fileprivate init?<T: Bridged>(_ value: T) where T.IsNull == (T) -> Int32 {
+  fileprivate init?<T: Bridged>(_ value: T) where T.IsNull == (T) -> Bool {
     guard !value.isNull else { return nil }
     pointer = value.pointer
   }
@@ -154,7 +154,7 @@ extension OpaqueStorageRepresentable {
   static func assumeOwnership<T: Bridged & Destroyable>(of value: T) -> Self?
   where
     Storage == BridgingStorage<T, OwnedBySwift>,
-    T.IsNull == (T) -> Int32
+    T.IsNull == (T) -> Bool
   {
     OwnedBySwift(value).map(BridgingStorage.init).map(Self.init)
   }
@@ -167,7 +167,7 @@ extension OpaqueStorageRepresentable {
   static func borrow<T: Bridged>(_ value: T) -> Self?
   where
     Storage == BridgingStorage<T, OwnedByMLIR>,
-    T.IsNull == (T) -> Int32
+    T.IsNull == (T) -> Bool
   {
     OwnedByMLIR(value).map(BridgingStorage.init).map(Self.init)
   }
@@ -189,9 +189,9 @@ extension OpaqueStorageRepresentable {
 
 // MARK: - Convenience
 
-extension Bridged where IsNull == (Self) -> Int32 {
+extension Bridged where IsNull == (Self) -> Bool {
   var isNull: Bool {
-    Self.isNull(self) != 0
+    Self.isNull(self)
   }
 }
 
