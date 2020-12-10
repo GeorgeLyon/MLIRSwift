@@ -34,45 +34,17 @@ final class ModuleTests: XCTestCase {
         "module_terminator"() : () -> ()
       }) : () -> ()
       """)
-    
-    /*
-    let constructed = try Test.Module(
-      operations: { operations in
-        try operations.build(
-          "func",
-          attributes: [
-            "sym_name": .string("add"),
-            "type": try .parsing("(memref<?xf32>, memref<?xf32>) -> ()")
-          ],
-          regions: { regions in
-            try regions.build(
-              blocks: { builder in
-                try builder.build(
-                  arguments: TypeList(MemRef_xf32.self, MemRef_xf32.self),
-                  operations: { (operations, arg0, arg1) in
-                    let c0 = operations.build(
-                      "std.constant",
-                      results: TypeList(Index.self),
-                      attributes: [
-                        "value": try .parsing("0 : index")
-                      ])
-                    let _ = operations.build(
-                      "std.dim",
-                      results: TypeList(Index.self),
-                      operands: [arg0, c0],
-                      regions: { _ in })
-                    let _ = operations.build(
-                      "std.constant",
-                      results: TypeList(Index.self),
-                      attributes: [
-                        "value": try .parsing("1 : index")
-                      ])
-                    operations.build("std.return")
-                  })
-              })
-          })
-      })
+    let memref = Type<Test>.memref(shape: [.dynamic], element: .f32)
+    let constructed = try Test.Module {
+      Func(
+        "add",
+        entryBlock: try Block(memref, memref) { op, arg0, arg1 in
+          let c0 = op.build(Constant(value: try .parse("0 : index"), type: .index))
+          let _ = op.build(Dim(of: arg0, c0))
+          let _ = op.build(Constant(value: try .parse("1 : index"), type: .index))
+          op.build(Return())
+        })
+    }
     XCTAssertEqual(input, "\(constructed.operation)")
-    */
   }
 }

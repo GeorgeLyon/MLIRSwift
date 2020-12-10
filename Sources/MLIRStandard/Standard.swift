@@ -10,12 +10,12 @@ public protocol ProvidesStandardDialect: MLIRConfiguration {
 }
 
 public extension RegisteredDialect where MLIR: ProvidesStandardDialect {
-  static var standard: RegisteredDialect {
-    std.registeredDialect()
+  static var std: RegisteredDialect {
+    dialect.registeredDialect()
   }
 }
 
-let std = Dialect(
+private let dialect = Dialect(
   register: mlirContextRegisterStandardDialect,
   load: mlirContextLoadStandardDialect,
   getNamespace: mlirStandardDialectGetNamespace)

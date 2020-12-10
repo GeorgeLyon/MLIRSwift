@@ -24,7 +24,7 @@ public extension Operation where Ownership == OwnedBySwift {
     ) -> Op.Results where Op.MLIR == MLIR {
       let operation = Operation(op)
       operations.append(operation)
-      return Op.results(from: operation.results)
+      return Op.results(from: operation)
     }
     var operations: [Operation] = []
     

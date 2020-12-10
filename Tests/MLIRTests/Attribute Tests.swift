@@ -4,7 +4,7 @@ import XCTest
 import CMLIR
 
 final class AttributeTests: XCTestCase {
-  func testAttributes() {
+  func testAttributes() throws {
     XCTAssertEqual("\(Test.Attribute.string("Foo"))", "\"Foo\"")
   }
 }

@@ -5,6 +5,14 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
   public static func parse(_ source: String) throws -> Self {
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
+  public init(
+    @Operation<MLIR, OwnedBySwift>.Builder _ operations: () throws -> [MLIR.Operation<OwnedBySwift>],
+    file: StaticString = #file, line: Int = #line, column: Int = #column) rethrows
+  {
+    let location = MLIR.location(file: file, line: line, column: column)
+    self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
+    try operations().forEach(body.operations.prepend)
+  }
   
   public var body: MLIR.Block<OwnedByMLIR> {
     .borrow(mlirModuleGetBody(.borrow(self)))!

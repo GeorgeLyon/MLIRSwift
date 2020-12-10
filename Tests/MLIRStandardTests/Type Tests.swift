@@ -9,7 +9,7 @@ final class TypeTests: XCTestCase {
     let input = "memref<?xf32>"
     let parsed = try Type<Test>.parse(input)
     XCTAssertEqual(input, "\(parsed)")
-    let constructed = Type<Test>.memRef(shape: [.dynamic], element: .f32)
+    let constructed = Type<Test>.memref(shape: [.dynamic], element: .f32)
     XCTAssertEqual(input, "\(constructed)")
   }
 }

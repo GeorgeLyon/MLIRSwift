@@ -7,7 +7,7 @@ enum Test:
   ProvidesStandardDialect
 {
   static let dialects: RegisteredDialects = [
-    .standard
+    .std
   ]
   static let context = Context()
 }

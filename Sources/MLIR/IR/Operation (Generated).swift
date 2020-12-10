@@ -8,112 +8,68 @@
  ```
  */
 
-public extension OperationProtocol where ResultTypes == () {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let () = resultTypes
-    return []
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> () {
+extension OperationProtocol where Results == () {
+  public static func results(from operation: Operation) -> Results {
     ()
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0) = resultTypes
-    return [t0]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value) {
-    (operationResults[0])
+extension OperationProtocol where Results == (MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1) = resultTypes
-    return [t0, t1]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2) = resultTypes
-    return [t0, t1, t2]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3) = resultTypes
-    return [t0, t1, t2, t3]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4) = resultTypes
-    return [t0, t1, t2, t3, t4]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4, t5) = resultTypes
-    return [t0, t1, t2, t3, t4, t5]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4], operationResults[5])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4], operation.results[5])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4, t5, t6) = resultTypes
-    return [t0, t1, t2, t3, t4, t5, t6]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4], operationResults[5], operationResults[6])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4], operation.results[5], operation.results[6])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4, t5, t6, t7) = resultTypes
-    return [t0, t1, t2, t3, t4, t5, t6, t7]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4], operationResults[5], operationResults[6], operationResults[7])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4], operation.results[5], operation.results[6], operation.results[7])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4, t5, t6, t7, t8) = resultTypes
-    return [t0, t1, t2, t3, t4, t5, t6, t7, t8]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4], operationResults[5], operationResults[6], operationResults[7], operationResults[8])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4], operation.results[5], operation.results[6], operation.results[7], operation.results[8])
   }
 }
 
-public extension OperationProtocol where ResultTypes == (MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`, MLIR.`Type`) {
-  static func types(of resultTypes: ResultTypes) -> [MLIR.`Type`] {
-    let (t0, t1, t2, t3, t4, t5, t6, t7, t8, t9) = resultTypes
-    return [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9]
-  }
-  static func results(from operationResults: MLIR.Operation<OwnedBySwift>.Results) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
-    (operationResults[0], operationResults[1], operationResults[2], operationResults[3], operationResults[4], operationResults[5], operationResults[6], operationResults[7], operationResults[8], operationResults[9])
+extension OperationProtocol where Results == (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
+  public static func results(from operation: Operation) -> Results {
+    (operation.results[0], operation.results[1], operation.results[2], operation.results[3], operation.results[4], operation.results[5], operation.results[6], operation.results[7], operation.results[8], operation.results[9])
   }
 }

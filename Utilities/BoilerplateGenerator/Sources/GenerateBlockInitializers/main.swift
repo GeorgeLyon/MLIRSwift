@@ -23,14 +23,14 @@ for numArguments in 0...maxNumArguments {
   <<"""
 
   public init(
-    \(names.map { "_ \($0): MLIR.`Type`" }.joined(separator: ", ")),
-    operations: (inout MLIR.Operation<OwnedBySwift>.Builder, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) -> Void)
+    \(names.map { "_ \($0): Type<MLIR>" }.joined(separator: ", ")),
+    operations: (inout MLIR.Operation<OwnedBySwift>.Builder, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) throws -> Void) rethrows
   where
     Ownership == OwnedBySwift
   {
     self = Block(argumentTypes: [\(names.joined(separator: ", "))])
     var builder = MLIR.Operation<OwnedBySwift>.Builder()
-    operations(&builder, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
+    try operations(&builder, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
     builder.operations.forEach(self.operations.append)
   }
   """

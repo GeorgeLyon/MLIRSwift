@@ -25,7 +25,7 @@ public extension Type where MLIR: ProvidesStandardDialect {
       self.value = value
     }
   }
-  static func memRef(shape: [MemRefSize], element: `Type`) -> Self {
+  static func memref(shape: [MemRefSize], element: `Type`) -> Self {
     precondition(MemoryLayout<Int64>.size == MemoryLayout<MemRefSize>.size)
     precondition(MemoryLayout<Int64>.stride == MemoryLayout<MemRefSize>.stride)
     return shape.withUnsafeBufferPointer { shape in

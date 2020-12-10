@@ -5,9 +5,6 @@ public struct Attribute<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorag
   public static func parse(_ source: String) throws -> Self {
     try parse(borrow, mlirAttributeParseGet, source)
   }
-  public static func string(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(MLIR.ctx, $0.length, $0.data) })!
-  }
   let storage: BridgingStorage<MlirAttribute, OwnedByMLIR>
 }
 
@@ -16,6 +13,10 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
     self.names = elements.map(\.0)
     self.attributes = elements.map(\.1)
   }
+  public mutating func append(_ name: String, _ attribute: MLIR.Attribute) {
+    names.append(name)
+    attributes.append(attribute)
+  }
   func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T) rethrows -> T {
     return try names.withUnsafeMlirStringRefs { names in
       precondition(names.count == attributes.count)
@@ -23,8 +24,8 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
       return try namedAttributes.withUnsafeBufferPointer(body)
     }
   }
-  private let names: [String]
-  private let attributes: [MLIR.Attribute]
+  private var names: [String]
+  private var attributes: [MLIR.Attribute]
 }
 
 // MARK: - Bridging
