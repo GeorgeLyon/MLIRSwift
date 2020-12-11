@@ -3,9 +3,6 @@ import PackageDescription
 
 let package = Package(
   name: "MLIR",
-  platforms: [
-    .macOS(.v11),
-  ],
   products: [
     .library(
       name: "MLIR",
