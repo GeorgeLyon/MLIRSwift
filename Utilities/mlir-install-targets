@@ -8,12 +8,13 @@ function linked_libraries() {
 
 INSTALL_TARGETS=install-mlir-headers
 
-INSTALL_TARGETS+="\n$(linked_libraries "$PROJECT_ROOT/Sources/CMLIR/module.modulemap")"
+INSTALL_TARGETS+=""
 
 while test ${#} -gt 0
 do
   case $1; in
-  "")
+  "--include-mlir-core")
+    INSTALL_TARGETS+="\n$(linked_libraries "$PROJECT_ROOT/Sources/CMLIR/module.modulemap")"
     ;;
   "--include-standard-dialect")
     INSTALL_TARGETS+="\n$(linked_libraries "$PROJECT_ROOT/Sources/CMLIRStandard/module.modulemap")"
