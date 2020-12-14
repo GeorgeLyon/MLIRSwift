@@ -22,6 +22,20 @@ extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
   }
 }
 
-struct ParsingError: Swift.Error {
+struct ParsingError: Swift.Error, CustomStringConvertible {
   let diagnostics: [Diagnostic]
+  
+  var description: String {
+    switch diagnostics.count {
+    case 0:
+      return "Unknown Error"
+    case 1:
+      return diagnostics[0].message
+    default:
+      return """
+        \(diagnostics.count) errors:
+        \(diagnostics.map { "  - \($0.message)" }.joined(separator: "\n"))
+        """
+    }
+  }
 }
