@@ -17,6 +17,5 @@ public extension RegisteredDialect where MLIR: ProvidesStandardDialect {
 
 private let dialect = Dialect(
   register: mlirContextRegisterStandardDialect,
-  load: mlirContextLoadStandardDialect,
   getNamespace: mlirStandardDialectGetNamespace)
 
