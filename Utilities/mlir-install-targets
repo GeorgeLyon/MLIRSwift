@@ -3,24 +3,35 @@
 PROJECT_ROOT=$(dirname "$(dirname "${0:A}")")
 
 function linked_libraries() {
-  cat "$PROJECT_ROOT/Sources/$1/module.modulemap" |
-    sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p'
+  cat "$1" | sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p'
 }
 
 INSTALL_TARGETS=install-mlir-headers
 
-INSTALL_TARGETS+="\n$(linked_libraries CMLIR)"
+INSTALL_TARGETS+="\n$(linked_libraries "$PROJECT_ROOT/Sources/CMLIR/module.modulemap")"
 
-case $1; in
-"")
-  ;;
-"--include-standard-dialect")
-  INSTALL_TARGETS+="\n$(linked_libraries CMLIRStandard)"
-  ;;
-*)
-  echo "Unknown argument $1" >&2
-  exit
-  ;;
-esac
+while test ${#} -gt 0
+do
+  case $1; in
+  "")
+    ;;
+  "--include-standard-dialect")
+    INSTALL_TARGETS+="\n$(linked_libraries "$PROJECT_ROOT/Sources/CMLIRStandard/module.modulemap")"
+    ;;
+  "--include-modulemap")
+    if test ${#} -eq 1; then
+      echo "--include-modulemap requires a path"
+      exit 1
+    fi
+    shift
+    INSTALL_TARGETS+="\n$(linked_libraries "$1")"
+    ;;
+  *)
+    echo "Unknown argument $1" >&2
+    exit
+    ;;
+  esac
+  shift
+done
 
-echo $INSTALL_TARGETS | xargs
+echo $INSTALL_TARGETS | sort | uniq | xargs
