@@ -6,9 +6,7 @@ function linked_libraries() {
   cat "$1" | sed -n 's/[^"]*link "\([^"]*\)",*/install-\1/p'
 }
 
-INSTALL_TARGETS=install-mlir-headers
-
-INSTALL_TARGETS+=""
+INSTALL_TARGETS=$(echo install-{mlir,llvm}-headers)
 
 while test ${#} -gt 0
 do
