@@ -27,8 +27,6 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
 }
 
 extension MlirModule: Bridged, Destroyable {
-  /// Modules do not implement equality
-  static let areEqual: (MlirModule, MlirModule) -> Int32 = { _, _ in fatalError() }
   static let isNull = mlirModuleIsNull
   static let destroy = mlirModuleDestroy
 }

@@ -9,4 +9,22 @@ extension Type {
       }
     }
   }
+  
+  public enum Signedness {
+    case signed, unsigned
+  }
+  public static func integer(_ signedness: Signedness? = nil, bitWidth: Int) -> Self {
+    precondition(bitWidth > 0)
+    let c: MlirType
+    switch signedness {
+    case .signed:
+      c = mlirIntegerTypeSignedGet(ctx, UInt32(bitWidth))
+    case .unsigned:
+      c = mlirIntegerTypeUnsignedGet(ctx, UInt32(bitWidth))
+    case .none:
+      c = mlirIntegerTypeGet(ctx, UInt32(bitWidth))
+    }
+    return .borrow(c)!
+  }
+  
 }
