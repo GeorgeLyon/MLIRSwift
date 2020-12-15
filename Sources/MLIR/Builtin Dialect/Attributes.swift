@@ -11,9 +11,9 @@ public extension Attribute {
     .borrow(mlirTypeAttrGet(.borrow(type)))!
   }
   static func string(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(ctx, $0) })!
+    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(ctx, $0.length, $0.data) })!
   }
   static func flatSymbolReference(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(ctx, $0) })!
+    .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(ctx, $0.length, $0.data) })!
   }
 }

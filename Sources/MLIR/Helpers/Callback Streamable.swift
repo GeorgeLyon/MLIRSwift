@@ -59,7 +59,7 @@ public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
 public extension Operation {
   typealias DebugInfoStyle = _OperationDebugInfoStyle
   func withPrintingOptions(
-    elideElementsAttributesLargerThan: Bool? = nil,
+    elideElementsAttributesLargerThan: Int32? = nil,
     debugInformationStyle: DebugInfoStyle = nil,
     alwaysPrintInGenericForm: Bool = false,
     useLocalScope: Bool = false) -> TextOutputStreamable & CustomStringConvertible
@@ -77,7 +77,7 @@ public extension Operation {
 private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringConvertible, StringCallbackStreamable {
   
   struct PrintingOptions {
-    var elideElementsAttributesLargerThan: Bool? = nil
+    var elideElementsAttributesLargerThan: Int32? = nil
     var debugInformationStyle: _OperationDebugInfoStyle = nil
     var alwaysPrintInGenericForm: Bool = false
     var useLocalScope: Bool = false
@@ -91,9 +91,9 @@ private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringC
       case .none:
         break
       case .standard:
-        mlirOpPrintingFlagsEnableDebugInfo(c, false)
+        mlirOpPrintingFlagsEnableDebugInfo(c, 0)
       case .pretty:
-        mlirOpPrintingFlagsEnableDebugInfo(c, true)
+        mlirOpPrintingFlagsEnableDebugInfo(c, 1)
       }
       if alwaysPrintInGenericForm {
         mlirOpPrintingFlagsPrintGenericOpForm(c)

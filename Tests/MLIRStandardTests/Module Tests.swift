@@ -14,7 +14,6 @@ final class ModuleTests: XCTestCase {
           return
         }
       }
-
       """
     let parsed: Test.Module = try  .parse(input)
     XCTAssertEqual(parsed.body.operations.count, 2)
@@ -34,7 +33,6 @@ final class ModuleTests: XCTestCase {
         }) {sym_name = "add", type = (memref<?xf32>, memref<?xf32>) -> ()} : () -> ()
         "module_terminator"() : () -> ()
       }) : () -> ()
-
       """)
     let memref = Type<Test>.memref(shape: [.dynamic], element: .f32)
     let constructed = try Test.Module {

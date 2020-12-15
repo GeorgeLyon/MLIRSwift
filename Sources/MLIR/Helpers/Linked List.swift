@@ -8,7 +8,7 @@ protocol LinkedList {
   associatedtype BridgedElement: Bridged
   where
     BridgedElement: Equatable,
-    BridgedElement.IsNull == (BridgedElement) -> Bool
+    BridgedElement.IsNull == (BridgedElement) -> Int32
   associatedtype Element
   where
     Element: OpaqueStorageRepresentable,
