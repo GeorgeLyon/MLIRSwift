@@ -6,7 +6,7 @@ public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opaque
     self = .assumeOwnership(of: mlirRegionCreate())!
     blocks.forEach(self.blocks.append)
   }
-  public init(@Block<MLIR, OwnedBySwift>.Builder blocks: () -> [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
+  public init(@BlockBuilder<MLIR> blocks: () -> [BlockBuilder<MLIR>.Block]) where Ownership == OwnedBySwift {
     self.init(blocks: blocks())
   }
   
@@ -29,6 +29,14 @@ public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opaque
   
   init(storage: BridgingStorage<MlirRegion, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirRegion, Ownership>
+}
+
+// MARK: - Building Regions
+
+@_functionBuilder
+public struct RegionBuilder<MLIR: MLIRConfiguration> {
+  public typealias Region = MLIR.Region<OwnedBySwift>
+  public static func buildBlock(_ components: Region...) -> [Region] { components }
 }
 
 // MARK: - Bridging
