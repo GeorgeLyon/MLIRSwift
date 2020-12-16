@@ -14,7 +14,7 @@ public extension OperationBuilder {
       "func",
       attributes: attributes + [
         .symbolName: .string(name),
-        .type: .type(.function(of: entryBlock.arguments.map(\.type), to: returnTypes))
+        .type: .type(.function(of: entryBlock.arguments.map{ $0.type }, to: returnTypes))
       ],
       operands: [],
       resultTypes: [],
