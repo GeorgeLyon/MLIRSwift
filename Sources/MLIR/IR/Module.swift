@@ -6,13 +6,13 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   public init(
-    @Operation<MLIR, OwnedBySwift>.Builder _ operations: () throws -> [MLIR.Operation<OwnedBySwift>],
+    _ operations: (inout OperationBuilder<MLIR>) throws -> Void,
     file: StaticString = #file, line: Int = #line, column: Int = #column) rethrows
   {
-    let location = MLIR.location(file: file, line: line, column: column)
+    let location = Location(MLIR.ctx, file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
     /// Ensure that the module terminator is at the end
-    try operations().reversed().forEach(body.operations.prepend)
+    try OperationBuilder.build(operations).reversed().forEach(body.operations.prepend)
   }
   
   public var body: MLIR.Block<OwnedByMLIR> {

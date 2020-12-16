@@ -35,15 +35,15 @@ final class ModuleTests: XCTestCase {
       }) : () -> ()
       """)
     let memref = Type<Test>.memref(shape: [.dynamic], element: .f32)
-    let constructed = try Test.Module {
-      Func(
-        "add",
-        entryBlock: try Block(memref, memref) { op, arg0, arg1 in
-          let c0 = op.build(Constant(value: try .parse("0 : index"), type: .index))
-          let _ = op.build(Dim(of: arg0, c0))
-          let _ = op.build(Constant(value: try .parse("1 : index"), type: .index))
-          op.build(Return())
-        })
+    let constructed = try Test.Module { op in
+      try op.buildFunc("add") {
+        try Block(memref, memref) { op, arg0, arg1 in
+          let c0 = op.buildConstant(try .parse("0 : index"), ofType: .index)
+          _ = op.buildDim(of: arg0, i: c0)
+          _ = op.buildConstant(try .parse("1 : index"), ofType: .index)
+          op.buildReturn()
+        }
+      }
     }
     XCTAssertEqual(input, "\(constructed.operation)")
   }

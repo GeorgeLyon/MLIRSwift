@@ -13,9 +13,11 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
     self.names = elements.map(\.0.value)
     self.attributes = elements.map(\.1)
   }
-  public mutating func append(_ name: AttributeName, _ attribute: MLIR.Attribute) {
-    names.append(name.value)
-    attributes.append(attribute)
+  public static func +(lhs: Self, rhs: Self) -> Self {
+    var result = lhs
+    result.names.append(contentsOf: rhs.names)
+    result.attributes.append(contentsOf: rhs.attributes)
+    return result
   }
   func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T) rethrows -> T {
     return try names.withUnsafeMlirStringRefs { names in

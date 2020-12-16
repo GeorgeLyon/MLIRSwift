@@ -45,6 +45,14 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
   let storage: BridgingStorage<MlirBlock, Ownership>
 }
 
+// MARK: - Building Blocks
+
+@_functionBuilder
+public struct BlockBuilder<MLIR: MLIRConfiguration> {
+  public typealias Block = MLIR.Block<OwnedBySwift>
+  public static func buildBlock(_ components: Block...) -> [Block] { components }
+}
+
 // MARK: - Bridging
 
 extension MlirBlock: Bridged, Destroyable, CEquatable {
