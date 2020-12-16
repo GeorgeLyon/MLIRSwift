@@ -17,7 +17,7 @@ public extension MLIRConfiguration {
   typealias Operation<Ownership: MLIR.Ownership> = MLIR.Operation<Self, Ownership>
   typealias Region<Ownership: MLIR.Ownership> = MLIR.Region<Self, Ownership>
   typealias `Type` = MLIR.`Type`<Self>
-  typealias Value = MLIR.Value<Self>
+  typealias Value = MLIR.Value
 }
 
 protocol MLIRConfigurable {
