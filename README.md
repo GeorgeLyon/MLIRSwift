@@ -25,7 +25,7 @@ In the meantime, you can manually install MLIR using the following steps:
 ```
 $ git clone https://github.com/llvm/llvm-project
 $ mkdir llvm-project/build
-$ cd llvm-project build
+$ cd llvm-project/build
 $ cmake -G Ninja ../llvm \
   -DCMAKE_INSTALL_PREFIX=<where-you-want-to-install-MLIR> \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
@@ -34,7 +34,7 @@ $ cmake -G Ninja ../llvm \
   -DLLVM_ENABLE_PROJECTS=mlir \
   -DLLVM_TARGETS_TO_BUILD=host
 $ ninja check-mlir
-$ ninja $(<path-to-this-repo>/Utilities/mlir-install-target \
+$ ninja $(<path-to-this-repo>/Utilities/mlir-install-targets \
   --include-mlir-core \
   --include-standard-dialect)
 ```
