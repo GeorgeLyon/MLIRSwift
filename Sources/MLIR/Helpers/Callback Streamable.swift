@@ -2,6 +2,23 @@
 import CMLIR
 import Foundation
 
+// MARK: - Utilities
+
+/**
+ This type can be used to bridge callback-streamable style types in C bindings
+ */
+public struct MLIRTextOutputStreamableAdapter: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+  public init(_ body: @escaping (MlirStringCallback?, UnsafeMutableRawPointer) -> Void) {
+    self.body = body
+  }
+  func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
+    body(unsafeCallback, userData)
+  }
+  private let body: (MlirStringCallback?, UnsafeMutableRawPointer) -> Void
+}
+
+// MARK: - Extensions
+
 extension Attribute: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirAttributePrint(.borrow(self), unsafeCallback, userData)
@@ -121,7 +138,7 @@ private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringC
 /**
  This protocol bridges MLIR's callback-style printing API and Swift's `TextOutputStreamable` protocol
  */
-private protocol StringCallbackStreamable: TextOutputStreamable, CustomDebugStringConvertible {
+private protocol StringCallbackStreamable: TextOutputStreamable {
   /**
    - parameter unsafeCallback: The callback with a callback-based C printing API such as `mlirOperationPrint`. While this callback _looks_ like it is `@escaping`, it is very much not safe to have it escape the function scope.
    */

@@ -12,6 +12,7 @@ module CMLIRStandard [system] {
   link "MLIRSideEffectInterfaces"
   link "MLIRVectorInterfaces"
   link "MLIRViewLikeInterface"
+  link "MLIRTensor"
   
   export *
 }

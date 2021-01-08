@@ -9,33 +9,20 @@ public struct Attribute<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorag
 }
 
 public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryLiteral {
-  public init(dictionaryLiteral elements: (AttributeName, MLIR.Attribute)...) {
-    self.names = elements.map(\.0.value)
-    self.attributes = elements.map(\.1)
+  public init(dictionaryLiteral elements: (MLIR.Identifier, MLIR.Attribute)...) {
+    self.elements = elements.map {
+      mlirNamedAttributeGet(.borrow($0.0), .borrow($0.1))
+    }
   }
   public static func +(lhs: Self, rhs: Self) -> Self {
     var result = lhs
-    result.names.append(contentsOf: rhs.names)
-    result.attributes.append(contentsOf: rhs.attributes)
+    result.elements.append(contentsOf: rhs.elements)
     return result
   }
   func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T) rethrows -> T {
-    return try names.withUnsafeMlirStringRefs { names in
-      precondition(names.count == attributes.count)
-      let namedAttributes = zip(names, attributes.map(\.bridgedValue)).map(mlirNamedAttributeGet)
-      return try namedAttributes.withUnsafeBufferPointer(body)
-    }
+    try elements.withUnsafeBufferPointer(body)
   }
-  private var names: [String]
-  private var attributes: [MLIR.Attribute]
-}
-
-public struct AttributeName: CustomStringConvertible, ExpressibleByStringLiteral {
-  public init(stringLiteral value: String) {
-    self.value = value
-  }
-  public var description: String { value }
-  fileprivate let value: String
+  private var elements: [MlirNamedAttribute]
 }
 
 // MARK: - Bridging

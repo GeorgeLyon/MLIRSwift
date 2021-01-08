@@ -17,7 +17,7 @@ At a high level, you start by creating an `MLIRConfiguration` (lets call it `MyM
 
 ## Installing MLIR
 
-**NOTE:** This project does not currently pin a specific LLVM version, the last tested commit was **347e1f62135**
+**NOTE:** This project does not currently pin a specific LLVM version, the last tested commit was **7d246cb19db9**
 
 MLIR is build using the LLVM build infrastructure which uses `cmake`. This is incompatible with Swift Package Manager, so for now developers will need to install MLIR separately in order for this project to work. Once the MLIR C API settles and Swift Package Manager get better support for binary targets on Linux, we will likely make this dependency available as a precompiled binary. 
 

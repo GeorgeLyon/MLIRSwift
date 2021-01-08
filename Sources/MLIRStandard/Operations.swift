@@ -21,7 +21,7 @@ public extension OperationBuilder where MLIR: ProvidesStandardDialect {
     return results[0]
   }
   mutating func buildReturn(
-    _ values: [MLIR.Value] = [],
+    _ values: MLIR.Value...,
     file: StaticString = #file, line: Int = #line, column: Int = #column)
   {
     buildGenericOperation(file: file, line: line, column: column) { op in

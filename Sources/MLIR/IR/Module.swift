@@ -26,6 +26,12 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
   let storage: BridgingStorage<MlirModule, OwnedBySwift>
 }
 
+// MARK: - Bridging
+
+extension Module {
+  public var bridgedValue: MlirModule { .borrow(self) }
+}
+
 extension MlirModule: Bridged, Destroyable {
   static let isNull = mlirModuleIsNull
   static let destroy = mlirModuleDestroy

@@ -12,6 +12,7 @@ public extension MLIRConfiguration {
   typealias Attribute = MLIR.Attribute<Self>
   typealias Block<Ownership: MLIR.Ownership> = MLIR.Block<Self, Ownership>
   typealias BlockBuilder = MLIR.BlockBuilder<Self>
+  typealias Identifier = MLIR.Identifier<Self>
   typealias Module = MLIR.Module<Self>
   typealias NamedAttributes = MLIR.NamedAttributes<Self>
   typealias Operation<Ownership: MLIR.Ownership> = MLIR.Operation<Self, Ownership>

@@ -1,9 +1,9 @@
 
 import CMLIR
 
-public extension AttributeName {
-  static let symbolName: AttributeName = "sym_name"
-  static let type: AttributeName = "type"
+public extension Identifier {
+  static var symbolName: Identifier { "sym_name" }
+  static var type: Identifier { "type" }
 }
 
 public extension Attribute {
