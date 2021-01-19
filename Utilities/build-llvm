@@ -1,15 +1,22 @@
 #!/bin/bash
 
 set -e
+set -x
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
 LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
 LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$DEPENDENCIES_ROOT/build}
-LLVM_INSTALL_ROOT=${LLVM_INSTALL_ROOT:-$DEPENDENCIES_ROOT/install}
+INSTALL_PREFIX=${INSTALL_PREFIX:-$DEPENDENCIES_ROOT/install}
 
-PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
-PKG_CONFIG_FILE="$PKG_CONFIG_PATH/LLVM-for-Swift.pc"
+PKG_CONFIG_NAME="LLVM-for-Swift.pc"
+if [[ -z "$CI" ]]; then
+  # On MacOS/Linux we install a system-wide pkg-config file
+  PKG_CONFIG_PATH="/usr/local/lib/pkgconfig/$PKG_CONFIG_NAME"
+else
+  # On CI, we can manually point to the pkg-config file using the PKG_CONFIG_PATH environment variable (which is different from $PKG_CONFIG_PATH in this script)
+  PKG_CONFIG_PATH="$INSTALL_PREFIX/$PKG_CONFIG_NAME"
+fi
 PKG_CONFIG=$(cat << EOF
 prefix=$LLVM_INSTALL_ROOT
 
@@ -21,32 +28,41 @@ Libs: -lc++ -lcurses -L\${prefix}/lib
 EOF
 )
 
-echo "This script will perform the following tasks:"
-echo " - Build LLVM from ${LLVM_ROOT}"
-echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
-echo " - Install all available LLVM projects to ${LLVM_INSTALL_ROOT}"
-echo " - Update ${PKG_CONFIG_FILE} to point to ${LLVM_INSTALL_ROOT}"
-echo ""
-echo "Press enter to continue."
-read
+if [ -z "$CI" ]; then
+  echo "This script will perform the following tasks:"
+  echo " - Build LLVM from ${LLVM_ROOT}"
+  echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
+  echo " - Install all available LLVM projects to ${INSTALL_PREFIX}"
+  echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PREFIX}"
+  echo ""
+  echo "Press enter to continue."
+  read
+fi
 
-#mkdir -p "$LLVM_BUILD_ROOT"
-#pushd "$LLVM_BUILD_ROOT"
-#
-#  CMAKE_ARGS=$(echo \
-#    -G Ninja $LLVM_ROOT/llvm \
-#    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
-#    -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_ROOT \
-#    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-#    -DCMAKE_BUILD_TYPE=DEBUG \
-#    -DLLVM_ENABLE_ASSERTIONS=ON \
-#    -DLLVM_ENABLE_PROJECTS=mlir \
-#    $LLVM_ADDITIONAL_CMAKE_ARGS)
-#  echo $CMAKE_ARGS | xargs cmake
-#
-#  ninja install
-#
-#popd
+mkdir -p "$LLVM_BUILD_ROOT"
+pushd "$LLVM_BUILD_ROOT"
 
-mkdir -p $PKG_CONFIG_PATH
-echo "$PKG_CONFIG" > $PKG_CONFIG_FILE
+  cmake \
+    -G Ninja $LLVM_ROOT/llvm \
+    -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
+    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+    -DLLVM_BUILD_EXAMPLES=OFF \
+    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    -DLLVM_TARGETS_TO_BUILD="host" \
+    -DLLVM_ENABLE_PROJECTS='mlir' \
+    -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_ENABLE_BINDINGS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
+    $LLVM_ADDITIONAL_CMAKE_ARGS
+  
+  ninja install
+
+popd
+
+if ! echo "$PKG_CONFIG" > $PKG_CONFIG_PATH; then
+  echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
+  exit 1
+fi
