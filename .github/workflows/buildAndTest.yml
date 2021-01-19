@@ -9,8 +9,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build the LLVM submodule then cache it, do not rebuild it on a cache hit
-  build-and-test:
+  # Build the LLVM module
+  # This job is necessary so that LLVM is cached even if dependent jobs fail
+  # Dependent jobs should duplicate this logic so as to properly handle cache misses
+  build-llvm:
     name: Build LLVM
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +43,41 @@ jobs:
         run: |
           git submodule update --init
           LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
-                  
+          
+  # Build and test this repo
+  build-and-test:
+    name: Build and Test
+    needs: build-llvm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      # Extract the LLVM submodule hash for use in the cache key.
+      - name: Get LLVM Hash
+        id: get-llvm-hash
+        run: echo "::set-output name=hash::$(git ls-tree HEAD .dependencies/llvm | awk '{ print $3 }')"
+        shell: bash
+
+      # Try to fetch LLVM from the cache.
+      - name: Cache LLVM
+        id: cache-llvm
+        uses: actions/cache@v2
+        with:
+          path: .dependencies/installed
+          key: ${{ runner.os }}-llvm-v1-${{ steps.get-llvm-hash.outputs.hash }}
+
+      - name: Install Ninja
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        uses: seanmiddleditch/gha-setup-ninja@master
+
+      # Build LLVM if we didn't hit in the cache.
+      - name: Rebuild and Install LLVM
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        run: |
+          git submodule update --init
+          LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
+          
       - name: Build Repo
         run: |
           PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
