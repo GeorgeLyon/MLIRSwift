@@ -16,9 +16,6 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-          submodules: "false"
 
       # Extract the LLVM submodule hash for use in the cache key.
       - name: Get LLVM Hash
@@ -32,7 +29,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/install
-          key: ${{ runner.os }}-llvm-install-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v0-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -41,12 +38,23 @@ jobs:
       # Build LLVM if we didn't hit in the cache.
       - name: Rebuild and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
-        env:
-          CI: true
         run: |
           git submodule update --init
-          Utilities/build-llvm
+          LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
 
     # Installing the results into the cache is an action which is automatically added by the cache action above.
 
   # --- end of build-llvm job.
+
+  # Build this repo and run its tests
+  build-and-test:
+    name: Build and Test
+    needs: build-llvm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Repo
+        run: |
+          echo $PWD
+          ls
+          ls $PWD/.dependencies/installed
+          PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
