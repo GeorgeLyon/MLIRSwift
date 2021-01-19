@@ -27,7 +27,7 @@ let package = Package(
     
     .systemLibrary(
       name: "CMLIRStandard",
-      pkgConfig: "MLIR"),
+      pkgConfig: "LLVM-for-Swift"),
     .target(
       name: "MLIRStandard",
       dependencies: ["CMLIRStandard", "MLIR"]),

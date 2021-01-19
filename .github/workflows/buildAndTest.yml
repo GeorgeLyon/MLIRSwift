@@ -10,7 +10,7 @@ on:
 
 jobs:
   # Build the LLVM submodule then cache it, do not rebuild it on a cache hit
-  build-llvm:
+  build-and-test:
     name: Build LLVM
     runs-on: ubuntu-latest
     steps:
@@ -28,8 +28,8 @@ jobs:
         id: cache-llvm
         uses: actions/cache@v2
         with:
-          path: .dependencies/install
-          key: ${{ runner.os }}-llvm-v0-${{ steps.get-llvm-hash.outputs.hash }}
+          path: .dependencies/installed
+          key: ${{ runner.os }}-llvm-v1-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -41,20 +41,7 @@ jobs:
         run: |
           git submodule update --init
           LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
-
-    # Installing the results into the cache is an action which is automatically added by the cache action above.
-
-  # --- end of build-llvm job.
-
-  # Build this repo and run its tests
-  build-and-test:
-    name: Build and Test
-    needs: build-llvm
-    runs-on: ubuntu-latest
-    steps:
+                  
       - name: Build Repo
         run: |
-          echo $PWD
-          ls
-          ls $PWD/.dependencies/installed
           PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
