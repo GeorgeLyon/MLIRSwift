@@ -1,0 +1,3 @@
+[submodule ".dependencies/llvm"]
+	path = .dependencies/llvm
+	url = https://github.com/llvm/llvm-project

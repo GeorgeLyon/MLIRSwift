@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e
+
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
+LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
+LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$DEPENDENCIES_ROOT/build}
+LLVM_INSTALL_ROOT=${LLVM_INSTALL_ROOT:-$DEPENDENCIES_ROOT/install}
+
+PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+PKG_CONFIG_FILE="$PKG_CONFIG_PATH/LLVM-for-Swift.pc"
+PKG_CONFIG=$(cat << EOF
+prefix=$LLVM_INSTALL_ROOT
+
+Name: LLVM for Swift
+Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
+Version: local
+Cflags: -I\${prefix}/include
+Libs: -lc++ -lcurses -L\${prefix}/lib
+EOF
+)
+
+echo "This script will perform the following tasks:"
+echo " - Build LLVM from ${LLVM_ROOT}"
+echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
+echo " - Install all available LLVM projects to ${LLVM_INSTALL_ROOT}"
+echo " - Update ${PKG_CONFIG_FILE} to point to ${LLVM_INSTALL_ROOT}"
+echo ""
+echo "Press enter to continue."
+read
+
+#mkdir -p "$LLVM_BUILD_ROOT"
+#pushd "$LLVM_BUILD_ROOT"
+#
+#  CMAKE_ARGS=$(echo \
+#    -G Ninja $LLVM_ROOT/llvm \
+#    -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+#    -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_ROOT \
+#    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+#    -DCMAKE_BUILD_TYPE=DEBUG \
+#    -DLLVM_ENABLE_ASSERTIONS=ON \
+#    -DLLVM_ENABLE_PROJECTS=mlir \
+#    $LLVM_ADDITIONAL_CMAKE_ARGS)
+#  echo $CMAKE_ARGS | xargs cmake
+#
+#  ninja install
+#
+#popd
+
+mkdir -p $PKG_CONFIG_PATH
+echo "$PKG_CONFIG" > $PKG_CONFIG_FILE
