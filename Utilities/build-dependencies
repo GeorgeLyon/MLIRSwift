@@ -55,7 +55,7 @@ cmake \
   $LLVM_ADDITIONAL_CMAKE_ARGS
 cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target install-llvm-libraries
+  --target install
 
 echo "Writing pkg-config file to $PKG_CONFIG_PATH"
 if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
