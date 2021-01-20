@@ -13,7 +13,7 @@ jobs:
   # This job is necessary so that LLVM is cached even if dependent jobs fail
   # Dependent jobs should duplicate this logic so as to properly handle cache misses
   build-llvm:
-    name: Build LLVM
+    name: Build and Cache Dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v1-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v2-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -42,11 +42,11 @@ jobs:
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
           git submodule update --init
-          LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
           
   # Build and test this repo
   build-and-test:
-    name: Build and Test
+    name: Build and Test Repo
     needs: build-llvm
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +65,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v1-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v2-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -76,7 +76,7 @@ jobs:
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
           git submodule update --init
-          LLVM_PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
           
       - name: Build Repo
         run: |
