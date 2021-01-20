@@ -10,6 +10,8 @@ INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
 LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
 LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$LLVM_ROOT/build}
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
+# For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
+LLVM_ADDITIONAL_LINKER_FLAGS= $([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
 PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
@@ -17,7 +19,7 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lc++ -lcurses -L\${prefix}/lib
+Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
 EOF
 )
 
