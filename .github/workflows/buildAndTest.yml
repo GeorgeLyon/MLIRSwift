@@ -8,42 +8,31 @@ on:
     types: [assigned, opened, synchronize, reopened]
   workflow_dispatch:
 
+# This workflow has two jobs: `build-dependencies` and `build-and-test`. `build-dependencies` is a subset of `build-and-test`. This allows us to cache the LLVM build (which took almost 1.5 hours at the time of writing) even if the subsequent tests fail, which is helpful when trying to get a new version of llvm through CI.
+# WARNING: Edit this file with caution. If the two sections that build LLVM end up out of sync it might cause some nasty bugs.
+# See also:
+#  -  https://stackoverflow.com/questions/60491837/saving-cache-on-job-failure-in-github-actions
 jobs:
-  # Build the LLVM module
-  # This job is necessary so that LLVM is cached even if dependent jobs fail
-  # Dependent jobs should duplicate this logic so as to properly handle cache misses
-  build-llvm:
+  build-dependencies:
     name: Build and Cache Dependencies
     runs-on: ubuntu-latest
     steps:
-      - name: Build Environment
-        run: |
-          clang --version
-          clang++ --version
-          swift --version
-    
+      # This sequence of steps must match the sequence below in build-and-test
       - name: Checkout Repo
         uses: actions/checkout@v2
-
-      # Extract the LLVM submodule hash for use in the cache key.
       - name: Get LLVM Hash
         id: get-llvm-hash
         run: echo "::set-output name=hash::$(git ls-tree HEAD .dependencies/llvm | awk '{ print $3 }')"
         shell: bash
-
-      # Try to fetch LLVM from the cache.
       - name: Cache LLVM
         id: cache-llvm
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
           key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
-
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
-
-      # Build LLVM if we didn't hit in the cache.
       - name: Rebuild and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
@@ -53,37 +42,32 @@ jobs:
   # Build and test this repo
   build-and-test:
     name: Build and Test Repo
-    needs: build-llvm
+    needs: build-dependencies
     runs-on: ubuntu-latest
     steps:
+      # The following sequence of steps must match the sequence above in build-dependencies
       - name: Checkout Repo
         uses: actions/checkout@v2
-
-      # Extract the LLVM submodule hash for use in the cache key.
       - name: Get LLVM Hash
         id: get-llvm-hash
         run: echo "::set-output name=hash::$(git ls-tree HEAD .dependencies/llvm | awk '{ print $3 }')"
         shell: bash
-
-      # Try to fetch LLVM from the cache.
       - name: Cache LLVM
         id: cache-llvm
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
           key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
-
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
-
-      # Build LLVM if we didn't hit in the cache.
       - name: Rebuild and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
           git submodule update --init
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-llvm
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
           
-      - name: Build Repo
+      # Actually build and run the tests in this repo
+      - name: Run tests
         run: |
           PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
