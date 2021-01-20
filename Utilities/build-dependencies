@@ -50,6 +50,7 @@ cmake \
   $([[ "$OSTYPE" == "darwin"* ]] || echo "-DLLVM_ENABLE_LLD=ON") \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
   $LLVM_ADDITIONAL_CMAKE_ARGS
 cmake \
