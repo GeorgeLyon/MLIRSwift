@@ -4,14 +4,14 @@ set -e
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
+PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
+INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
+
 LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
 LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$LLVM_ROOT/build}
-LLVM_PKG_CONFIG_ROOT=${LLVM_PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
-LLVM_INSTALL_PREFIX=${LLVM_INSTALL_PREFIX:-$DEPENDENCIES_ROOT/installed}
-
-LLVM_PKG_CONFIG_PATH="$LLVM_PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
-LLVM_PKG_CONFIG=$(cat << EOF
-prefix=$LLVM_INSTALL_PREFIX
+PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
+PKG_CONFIG=$(cat << EOF
+prefix=$INSTALL_PATH
 
 Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
@@ -26,8 +26,8 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   echo "This script will perform the following tasks:"
   echo " - Build LLVM from ${LLVM_ROOT}"
   echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
-  echo " - Install all available LLVM projects to ${LLVM_INSTALL_PREFIX}"
-  echo " - Update ${LLVM_PKG_CONFIG_PATH} to point to ${LLVM_INSTALL_PREFIX}"
+  echo " - Install all available LLVM projects to ${INSTALL_PATH}"
+  echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
   echo ""
   echo "Press enter to continue."
   read
@@ -37,15 +37,16 @@ cmake \
   -S "$LLVM_ROOT/llvm" \
   -B "$LLVM_BUILD_ROOT" \
   -G Ninja \
-  -DCMAKE_INSTALL_PREFIX=$LLVM_INSTALL_PREFIX \
+  -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
   -DLLVM_BUILD_EXAMPLES=OFF \
-  -DLLVM_OPTIMIZED_TABLEGEN=ON \
-  -DLLVM_TARGETS_TO_BUILD="host" \
-  -DLLVM_ENABLE_PROJECTS='mlir' \
+  -DLLVM_INSTALL_UTILS=OFF \
+  -DLLVM_TARGETS_TO_BUILD=host \
+  -DLLVM_ENABLE_PROJECTS=mlir \
   -DLLVM_ENABLE_OCAMLDOC=OFF \
   -DLLVM_ENABLE_BINDINGS=OFF \
-  -DLLVM_INSTALL_UTILS=ON \
+  -DLLVM_ENABLE_ASSERTIONS=ON \
+  $([[ "$OSTYPE" == "darwin"* ]] || echo "-DLLVM_ENABLE_LLD=ON") \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
@@ -54,8 +55,8 @@ cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target install
 
-echo "Writing pkg-config file to $LLVM_PKG_CONFIG_PATH"
-if ! echo "$LLVM_PKG_CONFIG" > $LLVM_PKG_CONFIG_PATH; then
-  echo "Could not create pkg-config file, please ensure $LLVM_PKG_CONFIG_PATH is writable."
+echo "Writing pkg-config file to $PKG_CONFIG_PATH"
+if ! echo "$PKG_CONFIG" > $PKG_CONFIG_PATH; then
+  echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
   exit 1
 fi
