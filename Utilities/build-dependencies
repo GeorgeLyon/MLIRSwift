@@ -11,7 +11,7 @@ LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
 LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$LLVM_ROOT/build}
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
-LLVM_ADDITIONAL_LINKER_FLAGS= $([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
+LLVM_ADDITIONAL_LINKER_FLAGS=$([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
 PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
@@ -56,9 +56,6 @@ cmake \
 cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target install-llvm-libraries
-  
-# We don't actually use `bin` and its contents make up 1GB of the 1.3GB install size
-rm -rf "$INSTALL_PATH/bin"
 
 echo "Writing pkg-config file to $PKG_CONFIG_PATH"
 if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
