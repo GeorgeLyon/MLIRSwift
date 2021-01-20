@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-set -x
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
@@ -18,7 +17,7 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lc++ -lcurses -L\${prefix}/lib
+Libs: -lc++ -lstdc++ -lcurses -L\${prefix}/lib
 EOF
 )
 
@@ -39,7 +38,7 @@ cmake \
   -B "$LLVM_BUILD_ROOT" \
   -G Ninja \
   -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+  $([[ "$OSTYPE" == "darwin"* ]] && echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15") \
   -DLLVM_BUILD_EXAMPLES=OFF \
   -DLLVM_INSTALL_UTILS=OFF \
   -DLLVM_TARGETS_TO_BUILD=host \
@@ -47,10 +46,8 @@ cmake \
   -DLLVM_ENABLE_OCAMLDOC=OFF \
   -DLLVM_ENABLE_BINDINGS=OFF \
   -DLLVM_ENABLE_ASSERTIONS=ON \
-  $([[ "$OSTYPE" == "darwin"* ]] || echo "-DLLVM_ENABLE_LLD=ON") \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
   $LLVM_ADDITIONAL_CMAKE_ARGS
 cmake \

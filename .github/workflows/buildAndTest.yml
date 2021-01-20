@@ -16,6 +16,12 @@ jobs:
     name: Build and Cache Dependencies
     runs-on: ubuntu-latest
     steps:
+      - name: Build Environment
+        run: |
+          clang --version
+          clang++ --version
+          swift --version
+    
       - name: Checkout Repo
         uses: actions/checkout@v2
 
@@ -31,7 +37,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v3-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -65,7 +71,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v3-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
 
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
