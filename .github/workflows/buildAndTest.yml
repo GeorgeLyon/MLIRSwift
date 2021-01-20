@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v5-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -48,7 +48,12 @@ jobs:
     needs: build-dependencies
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            additional-swift-flags: ""
+          - os: ubuntu-latest
+            # For some reason, stdc++ is auto-linked on macOS, but not on Linux
+            additional-swift-flags: "-Xlinker -lstdc++"
     runs-on: ${{ matrix.os }}
     steps:
       # The following sequence of steps must match the sequence above in build-dependencies
@@ -63,7 +68,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v4-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-v5-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -75,5 +80,7 @@ jobs:
           
       # Actually build and run the tests in this repo
       - name: Run tests
+        env:
+           ADDITIONAL_SWIFT_FLAGS: ${{ matrix.additional-swift-flags }}
         run: |
-          PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
+          PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test $ADDITIONAL_SWIFT_FLAGS --enable-test-discovery

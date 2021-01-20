@@ -17,7 +17,7 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lc++ -lstdc++ -lcurses -L\${prefix}/lib
+Libs: -lc++ -lcurses -L\${prefix}/lib
 EOF
 )
 
@@ -37,10 +37,11 @@ cmake \
   -S "$LLVM_ROOT/llvm" \
   -B "$LLVM_BUILD_ROOT" \
   -G Ninja \
-  -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH \
+  -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
   $([[ "$OSTYPE" == "darwin"* ]] && echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15") \
   -DLLVM_BUILD_EXAMPLES=OFF \
   -DLLVM_INSTALL_UTILS=OFF \
+  -DLLVM_BUILD_TOOLS=OFF \
   -DLLVM_TARGETS_TO_BUILD=host \
   -DLLVM_ENABLE_PROJECTS=mlir \
   -DLLVM_ENABLE_OCAMLDOC=OFF \
@@ -52,10 +53,13 @@ cmake \
   $LLVM_ADDITIONAL_CMAKE_ARGS
 cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target install
+  --target install-llvm-libraries
+  
+# We don't actually use `bin` and its contents make up 1GB of the 1.3GB install size
+rm -rf "$INSTALL_PATH/bin"
 
 echo "Writing pkg-config file to $PKG_CONFIG_PATH"
-if ! echo "$PKG_CONFIG" > $PKG_CONFIG_PATH; then
+if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
   echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
   exit 1
 fi
