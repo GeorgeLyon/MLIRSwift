@@ -54,11 +54,11 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
 fi
 
 if [[ -n "$LLVM_REPO" ]]; then
-  if [[ ! -d "$LLVM_REPO_PATH" ]]; then
+  if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
     # Set up repo without cloning
     mkdir -p "$LLVM_REPO_PATH"
     pushd "$LLVM_REPO_PATH" > /dev/null
-      [[ -d .git ]] || git init
+      git init
       git remote add origin "$LLVM_REPO"
     popd > /dev/null
   fi
