@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 
@@ -55,6 +56,7 @@ fi
 
 if [[ -n "$LLVM_REPO" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
+    echo "Setting up \"$LLVM_REPO\""
     # Set up repo without cloning
     mkdir -p "$LLVM_REPO_PATH"
     pushd "$LLVM_REPO_PATH" > /dev/null
