@@ -67,6 +67,7 @@ if [[ -n "$LLVM_REPO" ]]; then
   pushd "$LLVM_REPO_PATH" > /dev/null
     git fetch origin "$LLVM_COMMIT"
     git checkout -f "$LLVM_COMMIT"
+    git submodule update --init
   popd > /dev/null
 fi
 
