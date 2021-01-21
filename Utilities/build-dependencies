@@ -33,7 +33,10 @@ EOF
 if [[ "$NO_INTERACTION" != "true" ]]; then
   # If shell is interactive, prompt for comfirmation
   echo "This script will perform the following tasks:"
-  echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
+  if [[ -n "$LLVM_REPO" ]]; then
+    # Invoke with LLVM_REPO="" to skip any repo-management logic
+    echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
+  fi
   echo " - Build LLVM from ${LLVM_ROOT}"
   if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
     echo "   - Additional cmake arguments:"
@@ -49,20 +52,21 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   read
 fi
 
-if [[ ! -d "$LLVM_REPO_PATH" ]]; then
-  # Set up repo without cloning
-  mkdir -p "$LLVM_REPO_PATH"
+if [[ -n "$LLVM_REPO" ]]; then
+  if [[ ! -d "$LLVM_REPO_PATH" ]]; then
+    # Set up repo without cloning
+    mkdir -p "$LLVM_REPO_PATH"
+    pushd "$LLVM_REPO_PATH" > /dev/null
+      git init
+      git remote add origin "$LLVM_REPO"
+    popd > /dev/null
+  fi
+  # Checkout specified commit
   pushd "$LLVM_REPO_PATH" > /dev/null
-    git init
-    git remote add origin "$LLVM_REPO"
+    git fetch origin "$LLVM_COMMIT"
+    git checkout -f "$LLVM_COMMIT"
   popd > /dev/null
 fi
-  
-# Checkout specified commit
-pushd "$LLVM_REPO_PATH" > /dev/null
-  git fetch origin "$LLVM_COMMIT"
-  git checkout -f "$LLVM_COMMIT"
-popd > /dev/null
 
 # Build LLVM
 cmake \
