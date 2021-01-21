@@ -32,7 +32,6 @@ Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
 EOF
 )
 
-if [[ "$NO_INTERACTION" != "true" ]]; then
   # If shell is interactive, prompt for comfirmation
   echo "This script will perform the following tasks:"
   if [[ -n "$LLVM_REPO" ]]; then
@@ -50,6 +49,8 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   echo " - Install all available LLVM projects to ${INSTALL_PATH}"
   echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
   echo ""
+
+if [[ "$NO_INTERACTION" != "true" ]]; then
   echo "Press enter to continue."
   read
 fi
@@ -65,6 +66,7 @@ if [[ -n "$LLVM_REPO" ]]; then
     popd > /dev/null
   fi
   # Checkout specified commit
+  echo "Checking out \"$LLVM_COMMIT\""
   pushd "$LLVM_REPO_PATH" > /dev/null
     git fetch origin "$LLVM_COMMIT"
     git checkout -f "$LLVM_COMMIT"
