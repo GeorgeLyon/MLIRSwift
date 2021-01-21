@@ -3,12 +3,19 @@
 set -e
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
-DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
+
+# Arguments
+DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
 PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
-
-LLVM_ROOT=${LLVM_ROOT:-$DEPENDENCIES_ROOT/llvm}
+LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
+LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
+LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/repo}
+LLVM_ROOT=${LLVM_ROOT:-$LLVM_REPO_PATH}
 LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$LLVM_ROOT/build}
+LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
+
+# Derived Values
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
 LLVM_ADDITIONAL_LINKER_FLAGS=$([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
@@ -16,7 +23,7 @@ PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
 Name: LLVM for Swift
-Description: LLVM, potentially with additional projects. Installed using Utilities/build-llvm in MLIRSwift.
+Description: LLVM, potentially with additional projects. Installed using Utilities/build-dependencies in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
 Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
@@ -26,7 +33,14 @@ EOF
 if [[ "$NO_INTERACTION" != "true" ]]; then
   # If shell is interactive, prompt for comfirmation
   echo "This script will perform the following tasks:"
+  echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
   echo " - Build LLVM from ${LLVM_ROOT}"
+  if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
+    echo "   - Additional cmake arguments:"
+    for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
+      echo "       $ARG"
+    done
+  fi
   echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
   echo " - Install all available LLVM projects to ${INSTALL_PATH}"
   echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
@@ -35,6 +49,22 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   read
 fi
 
+if [[ ! -d "$LLVM_REPO_PATH" ]]; then
+  # Set up repo without cloning
+  mkdir -p "$LLVM_REPO_PATH"
+  pushd "$LLVM_REPO_PATH" > /dev/null
+    git init
+    git remote add origin "$LLVM_REPO"
+  popd > /dev/null
+fi
+  
+# Checkout specified commit
+pushd "$LLVM_REPO_PATH" > /dev/null
+  git fetch origin "$LLVM_COMMIT"
+  git checkout -f "$LLVM_COMMIT"
+popd > /dev/null
+
+# Build LLVM
 cmake \
   -S "$LLVM_ROOT/llvm" \
   -B "$LLVM_BUILD_ROOT" \
@@ -52,13 +82,15 @@ cmake \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
-  $LLVM_ADDITIONAL_CMAKE_ARGS
+  $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
 cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target install
 
-echo "Writing pkg-config file to $PKG_CONFIG_PATH"
-if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
-  echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
-  exit 1
+if [[ -n "$PKG_CONFIG_ROOT" ]]; then
+  echo "Writing pkg-config file to $PKG_CONFIG_PATH"
+  if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
+    echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
+    exit 1
+  fi
 fi
