@@ -19,7 +19,7 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    steps:
+    steps: &build-llvm-steps
       # This sequence of steps must match the sequence below in build-and-test
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Rebuild and Install LLVM
+      - name: Build and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
           git submodule update --init
@@ -57,33 +57,7 @@ jobs:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      # The following sequence of steps must match the sequence above in build-dependencies
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      - name: Get LLVM Hash
-        id: get-llvm-hash
-        run: echo "::set-output name=hash::$(git ls-tree HEAD .dependencies/llvm | awk '{ print $3 }')"
-        shell: bash
-      - name: Cache LLVM
-        id: cache-llvm
-        uses: actions/cache@v2
-        with:
-          path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-${{ steps.get-llvm-hash.outputs.hash }}
-      - name: Install Ninja
-        if: steps.cache-llvm.outputs.cache-hit != 'true'
-        uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Rebuild and Install LLVM
-        if: steps.cache-llvm.outputs.cache-hit != 'true'
-        run: |
-          git submodule update --init
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
-      - name: Delete binaries
-        if: steps.cache-llvm.outputs.cache-hit != 'true'
-        # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
-        run: |
-          du -sh .dependencies/installed/*
-          rm -rf .dependencies/installed/bin
+      <<: *build-llvm-steps
           
       # Actually build and run the tests in this repo
       - name: Run tests
