@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v7-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -42,9 +42,11 @@ jobs:
           git submodule update --init
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
       - name: Delete binaries
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
         # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
         run: |
-          rm -rf ".dependencies/installed/bin"
+          du -sh .dependencies/installed/*
+          rm -rf .dependencies/installed/bin
           
   # Build and test this repo
   build-and-test:
@@ -67,7 +69,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v7-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-llvm-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -77,9 +79,11 @@ jobs:
           git submodule update --init
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
       - name: Delete binaries
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
         # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
         run: |
-          rm -rf ".dependencies/installed/bin"
+          du -sh .dependencies/installed/*
+          rm -rf .dependencies/installed/bin
           
       # Actually build and run the tests in this repo
       - name: Run tests
