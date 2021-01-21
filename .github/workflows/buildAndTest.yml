@@ -36,10 +36,9 @@ jobs:
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Build and Install LLVM
+      - name: Clone, Build and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
-          git submodule update --init
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
       - name: Delete binaries
         if: steps.cache-llvm.outputs.cache-hit != 'true'
@@ -73,10 +72,9 @@ jobs:
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Build and Install LLVM
+      - name: Clone, Build and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
-          git submodule update --init
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
       - name: Delete binaries
         if: steps.cache-llvm.outputs.cache-hit != 'true'
