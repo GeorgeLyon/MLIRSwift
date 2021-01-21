@@ -84,4 +84,4 @@ jobs:
       # Actually build and run the tests in this repo
       - name: Run tests
         run: |
-          PKG_CONFIG_PATH=.dependencies/installed swift test --enable-test-discovery
+          PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
