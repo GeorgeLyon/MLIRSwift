@@ -12,13 +12,13 @@ LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
 LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
 LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/repo}
 LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
-LLVM_BUILD_ROOT=${LLVM_BUILD_ROOT:-$LLVM_ROOT/build}
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 
 # Derived Values
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
+LLVM_BUILD_ROOT="$LLVM_ROOT/build"
 LLVM_ADDITIONAL_LINKER_FLAGS=$([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
 PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
