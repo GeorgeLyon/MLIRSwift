@@ -3,6 +3,7 @@
 set -e
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" && pwd )"
+DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
 
 # Arguments
 PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
@@ -14,7 +15,6 @@ LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 
 # Derived Values
-DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
