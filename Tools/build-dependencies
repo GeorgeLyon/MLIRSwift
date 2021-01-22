@@ -2,10 +2,9 @@
 
 set -e
 
-PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" && pwd )"
 
 # Arguments
-DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
 PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
 LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
@@ -15,6 +14,7 @@ LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 
 # Derived Values
+DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
@@ -31,23 +31,27 @@ Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
 EOF
 )
 
-  # If shell is interactive, prompt for comfirmation
-  echo "This script will perform the following tasks:"
-  if [[ -n "$LLVM_REPO" ]]; then
-    # Invoke with LLVM_REPO="" to skip any repo-management logic
-    echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
-  fi
-  echo " - Build LLVM from ${LLVM_ROOT}"
-  if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
-    echo "   - Additional cmake arguments:"
-    for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
-      echo "       $ARG"
-    done
-  fi
-  echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
-  echo " - Install all available LLVM projects to ${INSTALL_PATH}"
-  echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
-  echo ""
+# This value is used but the `swift-format` installation script
+export TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/tools"
+
+# If shell is interactive, prompt for comfirmation
+echo "This script will perform the following tasks:"
+if [[ -n "$LLVM_REPO" ]]; then
+  # Invoke with LLVM_REPO="" to skip any repo-management logic
+  echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
+fi
+echo " - Build LLVM from ${LLVM_ROOT}"
+if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
+  echo "   - Additional cmake arguments:"
+  for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
+    echo "       $ARG"
+  done
+fi
+echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
+echo " - Install all available LLVM projects to ${INSTALL_PATH}"
+echo " - Install necessary tools to ${TOOLS_INSTALL_PATH}"
+echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
+echo ""
 
 if [[ "$NO_INTERACTION" != "true" ]]; then
   echo "Press enter to continue."

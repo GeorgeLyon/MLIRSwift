@@ -47,9 +47,9 @@ jobs:
           du -sh .dependencies/installed/*
           rm -rf .dependencies/installed/bin
           
-  # Build and test this repo
-  build-and-test:
-    name: Build and Test Repo
+  # Validate this commit
+  validate:
+    name: Validate Commit
     needs: build-dependencies
     strategy:
       matrix:
@@ -83,7 +83,11 @@ jobs:
           du -sh .dependencies/installed/*
           rm -rf .dependencies/installed/bin
           
-      # Actually build and run the tests in this repo
+      # Actually validate this commit
+      - name: Lint
+        run: |
+          Tools/swift-format -m 
+        
       - name: Run tests
         run: |
           PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
