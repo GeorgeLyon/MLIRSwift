@@ -54,6 +54,10 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   read
 fi
 
+# Install swift-format'
+"$PROJECT_ROOT/Tools/SwiftFormat/Scripts/install"
+
+# Clone/checkout LLVM or other another project that includes LLVM
 if [[ -n "$LLVM_REPO" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
     echo "Setting up \"$LLVM_REPO\""
@@ -97,6 +101,7 @@ cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target install
 
+# Install the LLVM package config
 if [[ -n "$PKG_CONFIG_ROOT" ]]; then
   echo "Writing pkg-config file to $PKG_CONFIG_PATH"
   if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
