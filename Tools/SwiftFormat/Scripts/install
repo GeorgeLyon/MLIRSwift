@@ -6,10 +6,7 @@ PACKAGE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd
 PROJECT_ROOT="$( cd "$PACKAGE_PATH/../.." > /dev/null 2>&1 && pwd)"
 TOOLS_INSTALL_PATH=${INSTALL_PATH:-"$PROJECT_ROOT/.dependencies/installed/tools/"}
 
-function swift-build() {
-  swift build --package-path "$PACKAGE_PATH" -c release --target swift-format $@
-}
-
-swift-build
+# `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`.
+swift run --package-path "$PACKAGE_PATH" -c release swift-format --version
 mkdir -p "$TOOLS_INSTALL_PATH"
-cp $(swift-build --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
+cp $(swift build --package-path "$PACKAGE_PATH" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
