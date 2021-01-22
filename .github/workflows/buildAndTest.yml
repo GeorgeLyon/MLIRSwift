@@ -14,7 +14,7 @@ on:
 #  -  https://stackoverflow.com/questions/60491837/saving-cache-on-job-failure-in-github-actions
 jobs:
   build-dependencies:
-    name: Build and Cache Dependencies
+    name: Commit Validation
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles(llvm-commit, Tools/build-dependencies, Tools/SwiftFormat/**) }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/**') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -60,7 +60,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles(llvm-commit, Tools/build-dependencies, Tools/SwiftFormat/**) }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/**') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
