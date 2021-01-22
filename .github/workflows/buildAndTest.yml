@@ -39,7 +39,7 @@ jobs:
       - name: Clone, Build and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
       - name: Delete binaries
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
@@ -75,7 +75,7 @@ jobs:
       - name: Clone, Build and Install LLVM
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
       - name: Delete binaries
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
