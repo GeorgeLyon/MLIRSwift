@@ -1,8 +1,7 @@
-
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias Context = MLIR.Context<Self>
+extension MLIRConfiguration {
+  public typealias Context = MLIR.Context<Self>
 }
 
 public struct Context<MLIR: MLIRConfiguration>: OpaqueStorageRepresentable {
@@ -16,7 +15,7 @@ public struct Context<MLIR: MLIRConfiguration>: OpaqueStorageRepresentable {
   let storage: BridgingStorage<MlirContext, OwnedBySwift>
 }
 
-extension MLIRConfiguration  {
+extension MLIRConfiguration {
   /// Convenient shorthand for writing `context.bridgedValue()`
   static var ctx: MlirContext { .borrow(context) }
 }
