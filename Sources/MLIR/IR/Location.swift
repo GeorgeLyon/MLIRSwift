@@ -1,11 +1,11 @@
+
 import CMLIR
 
 public struct Location: OpaqueStorageRepresentable {
   init(_ ctx: MlirContext, file: StaticString, line: Int, column: Int) {
-    self = .borrow(
-      file.withUnsafeMlirStringRef {
-        mlirLocationFileLineColGet(ctx, $0, UInt32(line), UInt32(column))
-      })
+    self = .borrow(file.withUnsafeMlirStringRef {
+      mlirLocationFileLineColGet(ctx, $0, UInt32(line), UInt32(column))
+    })
   }
   /**
    Creates a call site location
@@ -19,5 +19,5 @@ public struct Location: OpaqueStorageRepresentable {
 }
 
 extension MlirLocation: Bridged {
-
+  
 }

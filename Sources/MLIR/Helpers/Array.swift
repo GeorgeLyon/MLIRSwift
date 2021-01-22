@@ -1,5 +1,7 @@
-extension Array {
 
+
+extension Array {
+  
   /**
    When a Swift representation of a bridged MLIR type is `OwnedByMLIR`, their memory layouts are identical, so we can access the underlying bridge types without allocating a new array.
    */
@@ -15,5 +17,6 @@ extension Array {
       try buffer.withMemoryRebound(to: T.self, body)
     }
   }
-
+  
 }
+
