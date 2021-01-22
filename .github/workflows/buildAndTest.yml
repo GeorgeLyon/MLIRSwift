@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v1.1-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-dependencies-v1-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-llvm-v1.1-${{ steps.get-llvm-hash.outputs.hash }}
+          key: ${{ runner.os }}-dependencies-v1-${{ steps.get-llvm-hash.outputs.hash }}
       - name: Install Ninja
         if: steps.cache-llvm.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
