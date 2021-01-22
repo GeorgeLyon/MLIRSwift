@@ -86,7 +86,7 @@ jobs:
       # Actually validate this commit
       - name: Lint
         run: |
-          Tools/swift-format -m 
+          Tools/swift-format -m lint
         
       - name: Run tests
         run: |
