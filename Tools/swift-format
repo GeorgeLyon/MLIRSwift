@@ -6,7 +6,7 @@ PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(
 
 function swift-format() {
   # TODO: Add --parallel once Swift 5.4 is released
-  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --recursive Sources
+  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --recursive Sources $@
 }
 
 if [[ $# == 0 ]]; then

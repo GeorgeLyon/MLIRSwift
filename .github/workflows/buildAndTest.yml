@@ -76,9 +76,12 @@ jobs:
           rm -rf .dependencies/installed/bin
           
       # Actually validate this commit
+      
       - name: Lint
         run: |
-          Tools/swift-format -m lint
+          Tools/swift-format
+          git diff
+          git diff-index --quiet HEAD --
         
       - name: Run tests
         run: |
