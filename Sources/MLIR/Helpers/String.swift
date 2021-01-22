@@ -1,4 +1,3 @@
-
 import CMLIR
 import Foundation
 
@@ -26,7 +25,7 @@ extension String {
       }
     }
   }
-  
+
 }
 
 extension StaticString {

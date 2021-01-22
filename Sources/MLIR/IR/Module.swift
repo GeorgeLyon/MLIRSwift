@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
@@ -7,21 +6,21 @@ public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRe
   }
   public init(
     _ operations: (inout OperationBuilder<MLIR>) throws -> Void,
-    file: StaticString = #file, line: Int = #line, column: Int = #column) rethrows
-  {
+    file: StaticString = #file, line: Int = #line, column: Int = #column
+  ) rethrows {
     let location = Location(MLIR.ctx, file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
     /// Ensure that the module terminator is at the end
     try OperationBuilder.build(operations).reversed().forEach(body.operations.prepend)
   }
-  
+
   public var body: MLIR.Block<OwnedByMLIR> {
     .borrow(mlirModuleGetBody(.borrow(self)))!
   }
   public var operation: MLIR.Operation<OwnedByMLIR> {
     .borrow(mlirModuleGetOperation(.borrow(self)))!
   }
-  
+
   init(storage: BridgingStorage<MlirModule, OwnedBySwift>) { self.storage = storage }
   let storage: BridgingStorage<MlirModule, OwnedBySwift>
 }

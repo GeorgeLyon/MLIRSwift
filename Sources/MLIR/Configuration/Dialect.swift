@@ -1,9 +1,8 @@
-
 import CMLIR
 
-public extension MLIRConfiguration {
-  typealias RegisteredDialect = MLIR.RegisteredDialect<Self>
-  typealias RegisteredDialects = _RegisteredDialects<Self>
+extension MLIRConfiguration {
+  public typealias RegisteredDialect = MLIR.RegisteredDialect<Self>
+  public typealias RegisteredDialects = _RegisteredDialects<Self>
 }
 
 public struct RegisteredDialect<MLIR: MLIRConfiguration> {
@@ -35,8 +34,8 @@ public struct Dialect {
    */
   public init(
     register: @escaping (MlirContext) -> Void,
-    getNamespace: @escaping () -> MlirStringRef)
-  {
+    getNamespace: @escaping () -> MlirStringRef
+  ) {
     self.register = register
     self.getNamespace = getNamespace
   }

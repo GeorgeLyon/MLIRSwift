@@ -39,14 +39,14 @@ extension LinkedList {
 }
 
 struct LinkedListIndexStorage<Element: Bridged & Equatable>: Comparable {
-  static func <(lhs: Self, rhs: Self) -> Bool {
+  static func < (lhs: Self, rhs: Self) -> Bool {
     switch (lhs.value?.offset, rhs.value?.offset) {
     case let (lhs?, rhs?): return lhs < rhs
     case (.some, .none): return true
     default: return false
     }
   }
-  static func ==(lhs: Self, rhs: Self) -> Bool {
+  static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.value?.element == rhs.value?.element
   }
   fileprivate let value: (offset: Int, element: Element)?

@@ -1,7 +1,8 @@
-
 import CMLIR
 
-public struct Identifier<MLIR: MLIRConfiguration>: ExpressibleByStringLiteral, OpaqueStorageRepresentable {
+public struct Identifier<MLIR: MLIRConfiguration>: ExpressibleByStringLiteral,
+  OpaqueStorageRepresentable
+{
   public init(stringLiteral value: String) {
     self = .borrow(value.withUnsafeMlirStringRef { mlirIdentifierGet(MLIR.ctx, $0) })
   }
@@ -11,4 +12,4 @@ public struct Identifier<MLIR: MLIRConfiguration>: ExpressibleByStringLiteral, O
   let storage: BridgingStorage<MlirIdentifier, OwnedByMLIR>
 }
 
-extension MlirIdentifier: Bridged { }
+extension MlirIdentifier: Bridged {}

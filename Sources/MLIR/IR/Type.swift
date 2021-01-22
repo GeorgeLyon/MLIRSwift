@@ -1,14 +1,14 @@
-
 import CMLIR
 
-public struct Type<MLIR: MLIRConfiguration>: Equatable, MLIRConfigurable, OpaqueStorageRepresentable {
+public struct Type<MLIR: MLIRConfiguration>: Equatable, MLIRConfigurable, OpaqueStorageRepresentable
+{
   public static func parse(_ source: String) throws -> Self {
     try parse(borrow, mlirTypeParseGet, source)
   }
-  public static func ==(lhs: Self, rhs: Self) -> Bool {
+  public static func == (lhs: Self, rhs: Self) -> Bool {
     lhs.bridgedValue == rhs.bridgedValue
   }
-  
+
   init(storage: BridgingStorage<MlirType, OwnedByMLIR>) { self.storage = storage }
   let storage: BridgingStorage<MlirType, OwnedByMLIR>
 }
@@ -21,7 +21,7 @@ extension Type {
     self = type
   }
   public var bridgedValue: MlirType { .borrow(self) }
-  
+
   /**
    Convenience accessor for getting the `MlirContext`
    */

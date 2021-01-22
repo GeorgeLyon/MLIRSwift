@@ -1,19 +1,18 @@
-
 import CMLIR
 
-public extension Identifier {
-  static var symbolName: Identifier { "sym_name" }
-  static var type: Identifier { "type" }
+extension Identifier {
+  public static var symbolName: Identifier { "sym_name" }
+  public static var type: Identifier { "type" }
 }
 
-public extension Attribute {
-  static func type(_ type: MLIR.`Type`) -> Self {
+extension Attribute {
+  public static func type(_ type: MLIR.`Type`) -> Self {
     .borrow(mlirTypeAttrGet(.borrow(type)))!
   }
-  static func string(_ value: String) -> Self {
+  public static func string(_ value: String) -> Self {
     .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(ctx, $0) })!
   }
-  static func flatSymbolReference(_ value: String) -> Self {
+  public static func flatSymbolReference(_ value: String) -> Self {
     .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(ctx, $0) })!
   }
 }

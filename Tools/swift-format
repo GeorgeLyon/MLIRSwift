@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This script requires that `swift-format` is installed using `build-dependendencies`. It also standardizes which files are processed for formatting.
+
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" && pwd )"
+
+function swift-format() {
+  # TODO: Add --parallel once Swift 5.4 is released
+  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --recursive Sources $@
+}
+
+if [[ $# == 0 ]]; then
+  # The default is to format in-place
+  swift-format --mode format --in-place
+else
+  swift-format $@
+fi

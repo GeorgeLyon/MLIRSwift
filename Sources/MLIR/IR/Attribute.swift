@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Attribute<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
@@ -14,12 +13,14 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
       mlirNamedAttributeGet(.borrow($0.0), .borrow($0.1))
     }
   }
-  public static func +(lhs: Self, rhs: Self) -> Self {
+  public static func + (lhs: Self, rhs: Self) -> Self {
     var result = lhs
     result.elements.append(contentsOf: rhs.elements)
     return result
   }
-  func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T) rethrows -> T {
+  func withUnsafeBorrowedValues<T>(_ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> T)
+    rethrows -> T
+  {
     try elements.withUnsafeBufferPointer(body)
   }
   private var elements: [MlirNamedAttribute]
@@ -27,17 +28,17 @@ public struct NamedAttributes<MLIR: MLIRConfiguration>: ExpressibleByDictionaryL
 
 // MARK: - Bridging
 
-public extension Attribute {
-  init?(_ bridgedValue: MlirAttribute) {
+extension Attribute {
+  public init?(_ bridgedValue: MlirAttribute) {
     guard let type = Self.borrow(bridgedValue) else { return nil }
     self = type
   }
-  var bridgedValue: MlirAttribute { .borrow(self) }
-  
+  public var bridgedValue: MlirAttribute { .borrow(self) }
+
   /**
    Convenience accessor for getting the `MlirContext`
    */
-  static var ctx: MlirContext { MLIR.ctx }
+  public static var ctx: MlirContext { MLIR.ctx }
 }
 
 extension MlirAttribute: Bridged {

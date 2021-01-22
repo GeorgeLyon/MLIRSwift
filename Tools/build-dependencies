@@ -2,10 +2,10 @@
 
 set -e
 
-PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" && pwd )"
+DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
 
 # Arguments
-DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
 PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
 LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
@@ -31,29 +31,37 @@ Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
 EOF
 )
 
-  # If shell is interactive, prompt for comfirmation
-  echo "This script will perform the following tasks:"
-  if [[ -n "$LLVM_REPO" ]]; then
-    # Invoke with LLVM_REPO="" to skip any repo-management logic
-    echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
-  fi
-  echo " - Build LLVM from ${LLVM_ROOT}"
-  if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
-    echo "   - Additional cmake arguments:"
-    for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
-      echo "       $ARG"
-    done
-  fi
-  echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
-  echo " - Install all available LLVM projects to ${INSTALL_PATH}"
-  echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
-  echo ""
+# This value is used but the `swift-format` installation script
+export TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/tools"
+
+# If shell is interactive, prompt for comfirmation
+echo "This script will perform the following tasks:"
+if [[ -n "$LLVM_REPO" ]]; then
+  # Invoke with LLVM_REPO="" to skip any repo-management logic
+  echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
+fi
+echo " - Build LLVM from ${LLVM_ROOT}"
+if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
+  echo "   - Additional cmake arguments:"
+  for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
+    echo "       $ARG"
+  done
+fi
+echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
+echo " - Install all available LLVM projects to ${INSTALL_PATH}"
+echo " - Install necessary tools to ${TOOLS_INSTALL_PATH}"
+echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
+echo ""
 
 if [[ "$NO_INTERACTION" != "true" ]]; then
   echo "Press enter to continue."
   read
 fi
 
+# Install swift-format'
+"$PROJECT_ROOT/Tools/SwiftFormat/Scripts/install"
+
+# Clone/checkout LLVM or other another project that includes LLVM
 if [[ -n "$LLVM_REPO" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
     echo "Setting up \"$LLVM_REPO\""
@@ -97,6 +105,7 @@ cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target install
 
+# Install the LLVM package config
 if [[ -n "$PKG_CONFIG_ROOT" ]]; then
   echo "Writing pkg-config file to $PKG_CONFIG_PATH"
   if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
