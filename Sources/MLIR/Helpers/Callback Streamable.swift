@@ -1,13 +1,12 @@
-
 import CMLIR
 import Foundation
 
 // MARK: - Utilities
 
-/**
- This type can be used to bridge callback-streamable style types in C bindings
- */
-public struct MLIRTextOutputStreamableAdapter: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+/// This type can be used to bridge callback-streamable style types in C bindings
+public struct MLIRTextOutputStreamableAdapter: TextOutputStreamable, CustomStringConvertible,
+  CustomDebugStringConvertible, StringCallbackStreamable
+{
   public init(_ body: @escaping (MlirStringCallback?, UnsafeMutableRawPointer) -> Void) {
     self.body = body
   }
@@ -19,43 +18,57 @@ public struct MLIRTextOutputStreamableAdapter: TextOutputStreamable, CustomStrin
 
 // MARK: - Extensions
 
-extension Attribute: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Attribute: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirAttributePrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension Block: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Block: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirBlockPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension Location: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Location: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirLocationPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension Operation: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Operation: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirOperationPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension Type: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Type: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirTypePrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension UnsafeDiagnostic: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension UnsafeDiagnostic: TextOutputStreamable, CustomStringConvertible,
+  CustomDebugStringConvertible, StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirDiagnosticPrint(.borrow(self), unsafeCallback, userData)
   }
 }
 
-extension Value: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible, StringCallbackStreamable {
+extension Value: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible,
+  StringCallbackStreamable
+{
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     mlirValuePrint(.borrow(self), unsafeCallback, userData)
   }
@@ -67,20 +80,20 @@ public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
   case none
   case standard
   case pretty
-  
+
   public init(nilLiteral: ()) {
     self = .none
   }
 }
 
-public extension Operation {
-  typealias DebugInfoStyle = _OperationDebugInfoStyle
-  func withPrintingOptions(
+extension Operation {
+  public typealias DebugInfoStyle = _OperationDebugInfoStyle
+  public func withPrintingOptions(
     elideElementsAttributesLargerThan: Bool? = nil,
     debugInformationStyle: DebugInfoStyle = nil,
     alwaysPrintInGenericForm: Bool = false,
-    useLocalScope: Bool = false) -> TextOutputStreamable & CustomStringConvertible
-  {
+    useLocalScope: Bool = false
+  ) -> TextOutputStreamable & CustomStringConvertible {
     return OperationWithPrintingOptions(
       operation: .borrow(self),
       options: .init(
@@ -91,14 +104,16 @@ public extension Operation {
   }
 }
 
-private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringConvertible, StringCallbackStreamable {
-  
+private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringConvertible,
+  StringCallbackStreamable
+{
+
   struct PrintingOptions {
     var elideElementsAttributesLargerThan: Bool? = nil
     var debugInformationStyle: _OperationDebugInfoStyle = nil
     var alwaysPrintInGenericForm: Bool = false
     var useLocalScope: Bool = false
-    
+
     func withUnsafeMlirOpPrintingFlags(_ body: (MlirOpPrintingFlags) -> Void) {
       let c = mlirOpPrintingFlagsCreate()
       if let value = elideElementsAttributesLargerThan {
@@ -122,22 +137,20 @@ private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringC
       mlirOpPrintingFlagsDestroy(c)
     }
   }
-  
+
   func print(with unsafeCallback: MlirStringCallback!, userData: UnsafeMutableRawPointer) {
     options.withUnsafeMlirOpPrintingFlags { flags in
       mlirOperationPrintWithFlags(operation, flags, unsafeCallback, userData)
     }
   }
-  
+
   fileprivate let operation: MlirOperation
   fileprivate let options: PrintingOptions
 }
 
 // MARK: - Implementation Details
 
-/**
- This protocol bridges MLIR's callback-style printing API and Swift's `TextOutputStreamable` protocol
- */
+/// This protocol bridges MLIR's callback-style printing API and Swift's `TextOutputStreamable` protocol
 private protocol StringCallbackStreamable: TextOutputStreamable {
   /**
    - parameter unsafeCallback: The callback with a callback-based C printing API such as `mlirOperationPrint`. While this callback _looks_ like it is `@escaping`, it is very much not safe to have it escape the function scope.
@@ -172,4 +185,3 @@ extension StringCallbackStreamable {
 
 /// This typealias is only needed  to allow writing `assumingMemoryBound(to: StringCallback.self)`
 private typealias StringCallback = (MlirStringRef) -> Void
-

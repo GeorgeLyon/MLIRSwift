@@ -1,11 +1,11 @@
-
 import CMLIR
 
 extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
   static func parse<T: Bridged, Ownership: MLIR.Ownership>(
     _ bridge: (T) -> Self?,
     _ body: (MlirContext, MlirStringRef) -> T,
-    _ source: String) throws -> Self
+    _ source: String
+  ) throws -> Self
   where
     Storage == BridgingStorage<T, Ownership>
   {
@@ -24,7 +24,7 @@ extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
 
 struct ParsingError: Swift.Error, CustomStringConvertible {
   let diagnostics: [Diagnostic]
-  
+
   var description: String {
     switch diagnostics.count {
     case 0:

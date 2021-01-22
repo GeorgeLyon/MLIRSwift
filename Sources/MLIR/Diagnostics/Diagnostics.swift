@@ -1,4 +1,3 @@
-
 import CMLIR
 
 // MARK: - Public
@@ -7,12 +6,12 @@ public struct Diagnostic: Swift.Error {
   public enum Severity: Comparable {
     case remark, note, warning, error
   }
-  
+
   public let location: Location
   public let severity: Severity
   public let notes: [Diagnostic]
   public let message: String
-  
+
   init(_ unsafeDiagnostic: UnsafeDiagnostic) {
     self.location = unsafeDiagnostic.location
     self.severity = unsafeDiagnostic.severity
@@ -24,7 +23,7 @@ public struct Diagnostic: Swift.Error {
 // MARK: - Internal
 
 struct UnsafeDiagnostic: OpaqueStorageRepresentable {
-  
+
   struct Notes: Sequence {
     func makeIterator() -> Iterator {
       return Iterator(parent: parent)
@@ -46,20 +45,22 @@ struct UnsafeDiagnostic: OpaqueStorageRepresentable {
     }
     fileprivate let parent: UnsafeDiagnostic
   }
-  
+
   var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(.borrow(self))) }
-  var severity: MLIR.Diagnostic.Severity { Diagnostic.Severity(c: mlirDiagnosticGetSeverity(.borrow(self))) }
+  var severity: MLIR.Diagnostic.Severity {
+    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(.borrow(self)))
+  }
   var notes: Notes { Notes(parent: self) }
-  
+
   let storage: BridgingStorage<MlirDiagnostic, OwnedByMLIR>
 }
 
-extension MlirDiagnostic: Bridged { }
+extension MlirDiagnostic: Bridged {}
 
 enum DiagnosticHandlingDirective {
   case stop
   case `continue`
-  
+
   fileprivate var logicalResult: MlirLogicalResult {
     switch self {
     case .stop:
@@ -70,9 +71,7 @@ enum DiagnosticHandlingDirective {
   }
 }
 
-/**
- - note: This type is named `Registration`, unlike the wrapped C type, so it would be more consistent with other Swift APIs and not be confused with `ID` from the `Identifiable` protocol (which means something different).
- */
+/// - note: This type is named `Registration`, unlike the wrapped C type, so it would be more consistent with other Swift APIs and not be confused with `ID` from the `Identifiable` protocol (which means something different).
 struct DiagnosticHandlerRegistration {
   fileprivate let id: MlirDiagnosticHandlerID
 }
@@ -101,8 +100,8 @@ extension Context {
 
 // MARK: - Private
 
-private extension Diagnostic.Severity {
-  var c: MlirDiagnosticSeverity {
+extension Diagnostic.Severity {
+  fileprivate var c: MlirDiagnosticSeverity {
     switch self {
     case .error: return MlirDiagnosticError
     case .warning: return MlirDiagnosticWarning
@@ -110,21 +109,24 @@ private extension Diagnostic.Severity {
     case .remark: return MlirDiagnosticRemark
     }
   }
-  init(c: MlirDiagnosticSeverity) {
+  fileprivate init(c: MlirDiagnosticSeverity) {
     switch c {
     case MlirDiagnosticError: self = .error
     case MlirDiagnosticWarning: self = .warning
     case MlirDiagnosticNote: self = .note
     case MlirDiagnosticRemark: self = .remark
-      
+
     /// We do not expect MLIR to return us diagnostics with invalid severities
     default: fatalError()
     }
   }
 }
 
-private func mlirDiagnosticHandler(mlirDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!) -> MlirLogicalResult {
-  let handler = Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
+private func mlirDiagnosticHandler(
+  mlirDiagnostic: MlirDiagnostic, userData: UnsafeMutableRawPointer!
+) -> MlirLogicalResult {
+  let handler =
+    Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
   return handler.handle(.borrow(mlirDiagnostic)).logicalResult
 }
 

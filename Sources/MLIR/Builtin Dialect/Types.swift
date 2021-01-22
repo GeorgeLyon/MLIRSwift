@@ -1,15 +1,16 @@
-
 import CMLIR
 
 extension Type {
   public static func function(of inputs: [Self], to results: [Self]) -> Self {
     inputs.withUnsafeBorrowedValues { inputs in
       results.withUnsafeBorrowedValues { results in
-        .borrow(mlirFunctionTypeGet(ctx, inputs.count, inputs.baseAddress, results.count, results.baseAddress))!
+        .borrow(
+          mlirFunctionTypeGet(
+            ctx, inputs.count, inputs.baseAddress, results.count, results.baseAddress))!
       }
     }
   }
-  
+
   public enum Signedness {
     case signed, unsigned
   }
@@ -26,5 +27,5 @@ extension Type {
     }
     return .borrow(c)!
   }
-  
+
 }
