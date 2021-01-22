@@ -1,0 +1,106 @@
+#!/bin/bash
+
+set -e
+
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+
+# Arguments
+DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
+PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
+INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
+LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
+LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
+LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/repo}
+LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
+LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
+
+# Derived Values
+PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
+# For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
+LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
+LLVM_BUILD_ROOT="$LLVM_ROOT/build"
+LLVM_ADDITIONAL_LINKER_FLAGS=$([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
+PKG_CONFIG=$(cat << EOF
+prefix=$INSTALL_PATH
+
+Name: LLVM for Swift
+Description: LLVM, potentially with additional projects. Installed using Utilities/build-dependencies in MLIRSwift.
+Version: local
+Cflags: -I\${prefix}/include
+Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
+EOF
+)
+
+  # If shell is interactive, prompt for comfirmation
+  echo "This script will perform the following tasks:"
+  if [[ -n "$LLVM_REPO" ]]; then
+    # Invoke with LLVM_REPO="" to skip any repo-management logic
+    echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
+  fi
+  echo " - Build LLVM from ${LLVM_ROOT}"
+  if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
+    echo "   - Additional cmake arguments:"
+    for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
+      echo "       $ARG"
+    done
+  fi
+  echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
+  echo " - Install all available LLVM projects to ${INSTALL_PATH}"
+  echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
+  echo ""
+
+if [[ "$NO_INTERACTION" != "true" ]]; then
+  echo "Press enter to continue."
+  read
+fi
+
+if [[ -n "$LLVM_REPO" ]]; then
+  if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
+    echo "Setting up \"$LLVM_REPO\""
+    # Set up repo without cloning
+    mkdir -p "$LLVM_REPO_PATH"
+    pushd "$LLVM_REPO_PATH" > /dev/null
+      git init
+      git remote add origin "$LLVM_REPO"
+    popd > /dev/null
+  fi
+  # Checkout specified commit
+  echo "Checking out \"$LLVM_COMMIT\""
+  pushd "$LLVM_REPO_PATH" > /dev/null
+    git fetch origin "$LLVM_COMMIT"
+    git checkout -f "$LLVM_COMMIT"
+    # This tool is meant to support repos which include LLVM as a submodule
+    git submodule update --init
+  popd > /dev/null
+fi
+
+# Build LLVM
+cmake \
+  -S "$LLVM_ROOT/llvm" \
+  -B "$LLVM_BUILD_ROOT" \
+  -G Ninja \
+  -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
+  $([[ "$OSTYPE" == "darwin"* ]] && echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15") \
+  -DLLVM_BUILD_EXAMPLES=OFF \
+  -DLLVM_INSTALL_UTILS=OFF \
+  -DLLVM_BUILD_TOOLS=OFF \
+  -DLLVM_TARGETS_TO_BUILD=host \
+  -DLLVM_ENABLE_PROJECTS=mlir \
+  -DLLVM_ENABLE_OCAMLDOC=OFF \
+  -DLLVM_ENABLE_BINDINGS=OFF \
+  -DLLVM_ENABLE_ASSERTIONS=ON \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
+  $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
+cmake \
+  --build "$LLVM_BUILD_ROOT" \
+  --target install
+
+if [[ -n "$PKG_CONFIG_ROOT" ]]; then
+  echo "Writing pkg-config file to $PKG_CONFIG_PATH"
+  if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
+    echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
+    exit 1
+  fi
+fi

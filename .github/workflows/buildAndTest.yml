@@ -1,0 +1,89 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
+  workflow_dispatch:
+
+# This workflow has two jobs: `build-dependencies` and `build-and-test`. `build-dependencies` is a subset of `build-and-test`. This allows us to cache the LLVM build (which took almost 1.5 hours at the time of writing) even if the subsequent tests fail, which is helpful when trying to get a new version of llvm through CI.
+# WARNING: Edit this file with caution. If the two sections that build LLVM end up out of sync it might cause some nasty bugs.
+# See also:
+#  -  https://stackoverflow.com/questions/60491837/saving-cache-on-job-failure-in-github-actions
+jobs:
+  build-dependencies:
+    name: Build and Cache Dependencies
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # This sequence of steps must match the sequence below in build-and-test
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Get LLVM Hash
+        id: get-llvm-hash
+        run: echo "::set-output name=hash::$(cat llvm-commit)"
+        shell: bash
+      - name: Cache LLVM
+        id: cache-llvm
+        uses: actions/cache@v2
+        with:
+          path: .dependencies/installed
+          key: ${{ runner.os }}-llvm-v1.1-${{ steps.get-llvm-hash.outputs.hash }}
+      - name: Install Ninja
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Clone, Build and Install LLVM
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        run: |
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
+      - name: Delete binaries
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
+        run: |
+          du -sh .dependencies/installed/*
+          rm -rf .dependencies/installed/bin
+          
+  # Build and test this repo
+  build-and-test:
+    name: Build and Test Repo
+    needs: build-dependencies
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      # The following sequence of steps must match the sequence above in build-dependencies
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Get LLVM Hash
+        id: get-llvm-hash
+        run: echo "::set-output name=hash::$(cat llvm-commit)"
+        shell: bash
+      - name: Cache LLVM
+        id: cache-llvm
+        uses: actions/cache@v2
+        with:
+          path: .dependencies/installed
+          key: ${{ runner.os }}-llvm-v1.1-${{ steps.get-llvm-hash.outputs.hash }}
+      - name: Install Ninja
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Clone, Build and Install LLVM
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        run: |
+          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Utilities/build-dependencies
+      - name: Delete binaries
+        if: steps.cache-llvm.outputs.cache-hit != 'true'
+        # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
+        run: |
+          du -sh .dependencies/installed/*
+          rm -rf .dependencies/installed/bin
+          
+      # Actually build and run the tests in this repo
+      - name: Run tests
+        run: |
+          PKG_CONFIG_PATH=$PWD/.dependencies/installed swift test --enable-test-discovery
