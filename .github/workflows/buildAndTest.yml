@@ -20,7 +20,7 @@ jobs:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      # This sequence of steps must match the sequence below in build-and-test
+      # This sequence of steps must match the sequence below in the validate job
       - name: Checkout Repo
         uses: actions/checkout@v2
       - name: Cache Dependencies

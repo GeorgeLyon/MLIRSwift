@@ -58,8 +58,9 @@ fi
 # Install swift-format'
 if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
   echo "Installing swift-format"
-  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`.
-  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
+  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
+  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
+    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
   mkdir -p "$TOOLS_INSTALL_PATH"
   cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
 fi
