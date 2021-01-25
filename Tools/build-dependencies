@@ -2,24 +2,33 @@
 
 set -e
 
-PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(git rev-parse --show-toplevel)" && pwd )"
-DEPENDENCIES_ROOT="$PROJECT_ROOT/.dependencies"
+if [[ "$VERBOSE" == "true" ]]; then
+  set -x
+fi
 
-# Arguments
+# Configuration
+TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
+DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
 PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
-LLVM_COMMIT=${LLVM_COMMIT:-$(cat $PROJECT_ROOT/llvm-commit)}
+LLVM_COMMIT=${LLVM_COMMIT:-$(cat $TOOLS_ROOT/llvm-commit)}
 LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
-LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/repo}
+LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/llvm-repo}
 LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
-LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
-
-# Derived Values
-PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
-# For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
-LLVM_BUILD_ROOT="$LLVM_ROOT/build"
-LLVM_ADDITIONAL_LINKER_FLAGS=$([[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++")
+LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
+LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
+LLVM_SYSTEM_LIBRARY_TARGETS="
+  $PROJECT_ROOT/Sources/CMLIR
+  $PROJECT_ROOT/Sources/CMLIRStandard
+  $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
+LLVM_HEADER_TARGETS="
+  install-llvm-headers
+  install-mlir-headers
+  $LLVM_ADDITIONAL_HEADER_TARGETS"
+TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/installed/tools"
+PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
@@ -27,12 +36,19 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-dependencies in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lc++ -lcurses $LLVM_ADDITIONAL_LINKER_FLAGS -L\${prefix}/lib
+Libs: -lc++ -lcurses $(
+  # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
+  [[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++"
+) -L\${prefix}/lib
 EOF
 )
 
-# This value is used but the `swift-format` installation script
-export TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/tools"
+LLVM_INSTALL_TARGETS=$(echo $(
+  for SYSTEM_LIBRARY_TARGET in $(echo $LLVM_SYSTEM_LIBRARY_TARGETS); do
+    cat $SYSTEM_LIBRARY_TARGET/module.modulemap | sed -n 's/link "\(.*\)"/install-\1/p'
+  done;
+  echo $LLVM_HEADER_TARGETS
+  ) | xargs | tr ' ' '\n' | sort | uniq)
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
@@ -41,6 +57,10 @@ if [[ -n "$LLVM_REPO" ]]; then
   echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
 fi
 echo " - Build LLVM from ${LLVM_ROOT}"
+echo "   - The following targets will be built:"
+for TARGET in $(echo $LLVM_INSTALL_TARGETS); do
+  echo "       $TARGET"
+done
 if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
   echo "   - Additional cmake arguments:"
   for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
@@ -59,7 +79,14 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
 fi
 
 # Install swift-format'
-"$PROJECT_ROOT/Tools/SwiftFormat/Scripts/install"
+if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
+  echo "Installing swift-format"
+  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
+  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
+    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
+  mkdir -p "$TOOLS_INSTALL_PATH"
+  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
+fi
 
 # Clone/checkout LLVM or other another project that includes LLVM
 if [[ -n "$LLVM_REPO" ]]; then
@@ -99,11 +126,11 @@ cmake \
   -DLLVM_ENABLE_ASSERTIONS=ON \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release} \
+  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Debug} \
   $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
 cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target install
+  --target $(echo $LLVM_INSTALL_TARGETS)
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_ROOT" ]]; then
