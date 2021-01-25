@@ -12,9 +12,17 @@ LLVM_COMMIT=${LLVM_COMMIT:-$(cat $TOOLS_ROOT/llvm-commit)}
 LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
 LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/llvm-repo}
 LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
-LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
 LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
+LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
+LLVM_SYSTEM_LIBRARY_TARGETS="
+  $PROJECT_ROOT/Sources/CMLIR
+  $PROJECT_ROOT/Sources/CMLIRStandard
+  $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
+LLVM_HEADER_TARGETS="
+  install-llvm-headers
+  install-mlir-headers
+  $LLVM_ADDITIONAL_HEADER_TARGETS"
 TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/installed/tools"
 PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
 PKG_CONFIG=$(cat << EOF
@@ -30,6 +38,13 @@ Libs: -lc++ -lcurses $(
 ) -L\${prefix}/lib
 EOF
 )
+
+LLVM_INSTALL_TARGETS=$(
+  for SYSTEM_LIBRARY_TARGET in $(echo $LLVM_SYSTEM_LIBRARY_TARGETS); do
+    cat $SYSTEM_LIBRARY_TARGET/module.modulemap | sed -n 's/link "\(.*\)"/install-\1/p'
+  done;
+  echo $LLVM_HEADER_TARGETS
+  )
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
@@ -107,7 +122,7 @@ cmake \
   $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
 cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target install
+  --target $(echo $LLVM_INSTALL_TARGETS)
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_ROOT" ]]; then
