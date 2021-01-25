@@ -42,7 +42,7 @@ jobs:
         run: |
           du -sh .dependencies/installed/*
           rm -rf .dependencies/installed/bin
-          
+  
   # Validate this commit
   validate:
     name: Validate Commit
