@@ -43,12 +43,12 @@ Libs: -lc++ -lcurses $(
 EOF
 )
 
-LLVM_INSTALL_TARGETS=$(
+LLVM_INSTALL_TARGETS=$(echo $(
   for SYSTEM_LIBRARY_TARGET in $(echo $LLVM_SYSTEM_LIBRARY_TARGETS); do
     cat $SYSTEM_LIBRARY_TARGET/module.modulemap | sed -n 's/link "\(.*\)"/install-\1/p'
   done;
   echo $LLVM_HEADER_TARGETS
-  )
+  ) xargs | sort | uniq)
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
@@ -57,6 +57,10 @@ if [[ -n "$LLVM_REPO" ]]; then
   echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
 fi
 echo " - Build LLVM from ${LLVM_ROOT}"
+echo "   - The following targets will be built:"
+for TARGET in $(echo $LLVM_INSTALL_TARGETS); do
+  echo "       $TARGET"
+done
 if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
   echo "   - Additional cmake arguments:"
   for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
