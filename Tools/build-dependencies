@@ -48,7 +48,7 @@ LLVM_INSTALL_TARGETS=$(echo $(
     cat $SYSTEM_LIBRARY_TARGET/module.modulemap | sed -n 's/link "\(.*\)"/install-\1/p'
   done;
   echo $LLVM_HEADER_TARGETS
-  ) | xargs | sort | uniq)
+  ) | xargs | tr ' ' '\n' | sort | uniq)
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
