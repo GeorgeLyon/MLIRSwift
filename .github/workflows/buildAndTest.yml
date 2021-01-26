@@ -14,7 +14,7 @@ on:
 #  -  https://stackoverflow.com/questions/60491837/saving-cache-on-job-failure-in-github-actions
 jobs:
   build-dependencies:
-    name: Commit Validation
+    name: Build Dependencies
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
@@ -68,7 +68,7 @@ jobs:
       - name: Validate Generated Code
         run: |
           Tools/generate-boilerplate
-          get diff
+          git diff
           git diff-index --quiet HEAD --
       
       - name: Format
