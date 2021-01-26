@@ -36,12 +36,6 @@ jobs:
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
-      - name: Delete binaries
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
-        run: |
-          du -sh .dependencies/installed/*
-          rm -rf .dependencies/installed/bin
   
   # Validate this commit
   validate:
@@ -68,16 +62,10 @@ jobs:
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
-      - name: Delete binaries
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        # We don't use binaries, and they take up alot of cache space. Eventually, we hope to only install the packages we need.
-        run: |
-          du -sh .dependencies/installed/*
-          rm -rf .dependencies/installed/bin
           
       # Actually validate this commit
       
-      - name: Lint
+      - name: Format
         run: |
           Tools/swift-format
           git diff
