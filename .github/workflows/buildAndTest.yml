@@ -65,6 +65,12 @@ jobs:
           
       # Actually validate this commit
       
+      - name: Validate Generated Code
+        run: |
+          Tools/generate-boilerplate
+          get diff
+          git diff-index --quiet HEAD --
+      
       - name: Format
         run: |
           Tools/swift-format

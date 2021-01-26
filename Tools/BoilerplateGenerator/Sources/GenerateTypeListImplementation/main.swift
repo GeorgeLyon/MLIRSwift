@@ -26,7 +26,9 @@ for numArguments in 0...maxNumArguments {
     )
   {
     public init(
-      \(names.map { "_ \($0): MLIR.`Type`" }.joined(separator: ", "))
+  \(names.map { """
+      _ \($0): MLIR.`Type`
+  """ }.joined(separator: ",\n"))
     ) {
       types = [\(names.joined(separator: ", "))]
       valuesRepresentationFromArray = { values in

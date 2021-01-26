@@ -1,0 +1,14 @@
+#!/bin/bash
+
+TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
+
+function swift-format() {
+  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --mode format $@
+}
+
+swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateTypeListImplementation |
+ swift-format > "$PROJECT_ROOT/Sources/MLIR/Helpers/Type List (Generated).swift"
+
+swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateBlockInitializers |
+ swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/Block (Generated).swift"
