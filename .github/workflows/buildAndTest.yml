@@ -14,7 +14,7 @@ on:
 #  -  https://stackoverflow.com/questions/60491837/saving-cache-on-job-failure-in-github-actions
 jobs:
   build-dependencies:
-    name: Commit Validation
+    name: Build Dependencies
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
@@ -64,6 +64,12 @@ jobs:
           PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
           
       # Actually validate this commit
+      
+      - name: Validate Generated Code
+        run: |
+          Tools/generate-boilerplate
+          git diff
+          git diff-index --quiet HEAD --
       
       - name: Format
         run: |
