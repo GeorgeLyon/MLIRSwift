@@ -1,7 +1,6 @@
 import CMLIR
 
-public struct Region<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
-{
+public struct Region<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(blocks: [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
     self = .assumeOwnership(of: mlirRegionCreate())!
     blocks.forEach(self.blocks.append)

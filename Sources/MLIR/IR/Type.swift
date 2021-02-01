@@ -1,7 +1,6 @@
 import CMLIR
 
-public struct Type: Equatable, OpaqueStorageRepresentable
-{
+public struct Type: Equatable, OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
     try parse(borrow, mlirTypeParseGet, source)
   }

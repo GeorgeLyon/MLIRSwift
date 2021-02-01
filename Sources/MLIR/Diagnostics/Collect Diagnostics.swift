@@ -1,4 +1,3 @@
-
 extension MLIR {
   /**
    This method captures diagnostics of at least a certain severity level emitted during `body` (and stops them from being forwarded to other registered handlers).

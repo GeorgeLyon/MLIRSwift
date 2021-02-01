@@ -1,7 +1,6 @@
 import CMLIR
 
-public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
-{
+public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(argumentTypes: [MLIR.`Type`] = [], operations: [MLIR.Operation<OwnedBySwift>] = [])
   where Ownership == OwnedBySwift {
     self = argumentTypes.withUnsafeBorrowedValues {

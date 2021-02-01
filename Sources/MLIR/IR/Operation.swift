@@ -1,7 +1,6 @@
 import CMLIR
 
-public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
-{
+public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
 
   public typealias Results = OperationResults
   public var results: Results { Results(c: .borrow(self)) }

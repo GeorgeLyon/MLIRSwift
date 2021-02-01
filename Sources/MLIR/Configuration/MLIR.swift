@@ -1,10 +1,9 @@
-
 import CMLIR
 
 public struct MLIR {
   public static var context: MlirContext { shared.context }
   public static func resetContext() { shared.resetContext() }
-  
+
   private mutating func resetContext() {
     mlirContextDestroy(context)
     context = mlirContextCreate()

@@ -1,7 +1,7 @@
 import CMLIR
 
-public extension MLIR {
-  static func register(_ dialects: Dialect...) {
+extension MLIR {
+  public static func register(_ dialects: Dialect...) {
     for dialect in dialects {
       dialect.register(context)
     }
