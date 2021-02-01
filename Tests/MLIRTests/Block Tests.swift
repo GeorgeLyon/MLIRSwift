@@ -5,7 +5,9 @@ import CMLIR
 
 final class BlockTests: XCTestCase {
   func testLayout() {
-    XCTAssertEqual(MemoryLayout<Test.Block<OwnedByMLIR>>.size, MemoryLayout<MlirBlock>.size)
-    XCTAssertEqual(MemoryLayout<Test.Block<OwnedByMLIR>>.stride, MemoryLayout<MlirBlock>.stride)
+    let mlirLayout = MemoryLayout<Block<OwnedByMLIR>>.self
+    let swiftLayout = MemoryLayout<Block<OwnedBySwift>>.self
+    XCTAssertEqual(mlirLayout.size, swiftLayout.size)
+    XCTAssertEqual(mlirLayout.stride, swiftLayout.stride)
   }
 }

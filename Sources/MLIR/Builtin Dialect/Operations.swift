@@ -3,7 +3,7 @@ extension OperationBuilder {
     _ name: String,
     returning returnTypes: [MLIR.`Type`] = [],
     attributes: MLIR.NamedAttributes = [:],
-    @BlockBuilder<MLIR> blocks: () throws -> [MLIR.BlockBuilder.Block],
+    @BlockBuilder blocks: () throws -> [MLIR.BlockBuilder.Block],
     file: StaticString = #file, line: Int = #line, column: Int = #column
   ) rethrows {
     let blocks = try blocks()
@@ -13,7 +13,7 @@ extension OperationBuilder {
       "func",
       attributes: attributes + [
         .symbolName: .string(name),
-        .type: .type(.function(of: entryBlock.arguments.map { $0.type }, to: returnTypes)),
+        .type: .type(.function(of: entryBlock.arguments.map(\.type), to: returnTypes)),
       ],
       operands: [],
       resultTypes: [],

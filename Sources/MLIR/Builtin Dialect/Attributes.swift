@@ -10,9 +10,9 @@ extension Attribute {
     .borrow(mlirTypeAttrGet(.borrow(type)))!
   }
   public static func string(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(ctx, $0) })!
+    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(MLIR.context, $0) })!
   }
   public static func flatSymbolReference(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(ctx, $0) })!
+    .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(MLIR.context, $0) })!
   }
 }

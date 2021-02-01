@@ -6,7 +6,7 @@ let maxNumArguments = 10
 <<"""
 extension Block {
   public init(
-    operations: (inout OperationBuilder<MLIR>) throws -> Void) rethrows
+    operations: (inout OperationBuilder) throws -> Void) rethrows
   where
     Ownership == OwnedBySwift
   {
@@ -21,8 +21,8 @@ for numArguments in 0...maxNumArguments {
   let names = range.map { "t\($0)" }
   <<"""
   public init(
-    \(names.map { "_ \($0): Type<MLIR>" }.joined(separator: ", ")),
-    operations: (inout OperationBuilder<MLIR>, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) throws -> Void) rethrows
+    \(names.map { "_ \($0): Type" }.joined(separator: ", ")),
+    operations: (inout OperationBuilder, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) throws -> Void) rethrows
   where
     Ownership == OwnedBySwift
   {

@@ -5,11 +5,14 @@ import XCTest
 import MLIR
 
 final class TypeTests: XCTestCase {
+  override class func setUp() {
+    MLIR.register(.std)
+  }
   func testMemRef() throws {
     let input = "memref<?xf32>"
-    let parsed = try Type<Test>.parse(input)
+    let parsed = try Type.parse(input)
     XCTAssertEqual(input, "\(parsed)")
-    let constructed = Type<Test>.memref(shape: [.dynamic], element: .f32)
+    let constructed = Type.memref(shape: [.dynamic], element: .f32)
     XCTAssertEqual(input, "\(constructed)")
   }
 }

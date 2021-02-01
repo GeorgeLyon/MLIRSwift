@@ -1,14 +1,14 @@
 import CMLIR
 
-public struct Module<MLIR: MLIRConfiguration>: MLIRConfigurable, OpaqueStorageRepresentable {
+public struct Module: OpaqueStorageRepresentable {
   public static func parse(_ source: String) throws -> Self {
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   public init(
-    _ operations: (inout OperationBuilder<MLIR>) throws -> Void,
+    _ operations: (inout OperationBuilder) throws -> Void,
     file: StaticString = #file, line: Int = #line, column: Int = #column
   ) rethrows {
-    let location = Location(MLIR.ctx, file: file, line: line, column: column)
+    let location = Location(file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
     /// Ensure that the module terminator is at the end
     try OperationBuilder.build(operations).reversed().forEach(body.operations.prepend)

@@ -1,6 +1,6 @@
 import CMLIR
 
-public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
+public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
 {
   public init(argumentTypes: [MLIR.`Type`] = [], operations: [MLIR.Operation<OwnedBySwift>] = [])
   where Ownership == OwnedBySwift {
@@ -49,7 +49,7 @@ public struct Block<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueS
 // MARK: - Building Blocks
 
 @_functionBuilder
-public struct BlockBuilder<MLIR: MLIRConfiguration> {
+public struct BlockBuilder {
   public typealias Block = MLIR.Block<OwnedBySwift>
   public static func buildBlock(_ components: Block...) -> [Block] { components }
 }

@@ -2,7 +2,7 @@
 
 extension Block {
   public init(
-    operations: (inout OperationBuilder<MLIR>) throws -> Void
+    operations: (inout OperationBuilder) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -12,8 +12,8 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value) throws -> Void
+    _ t0: Type,
+    operations: (inout OperationBuilder, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -26,8 +26,8 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value) throws -> Void
+    _ t0: Type, _ t1: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -40,8 +40,8 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value) throws -> Void
+    _ t0: Type, _ t1: Type, _ t2: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -54,9 +54,9 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value)
-      throws -> Void
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) throws ->
+      Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -69,10 +69,9 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
-    ) throws -> Void
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value)
+      throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
@@ -85,11 +84,9 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
-      MLIR.Value
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
@@ -105,10 +102,9 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
@@ -125,10 +121,9 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
@@ -145,10 +140,10 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
@@ -165,10 +160,10 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>, _ t9: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type, _ t9: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
@@ -185,11 +180,10 @@ extension Block {
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>, _ t9: Type<MLIR>,
-    _ t10: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type, _ t9: Type, _ t10: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows

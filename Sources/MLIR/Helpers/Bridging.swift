@@ -194,13 +194,6 @@ extension Bridged where IsNull == (Self) -> Bool {
   }
 }
 
-/**
- This extension allows us to write generic arguments as `<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>` since calling the configuration `MLIR` make us unable to refer to the Swift module, and we cannot both have the generic argument be `Ownership` and refer to the protocol `Ownership` without going through the module.
- */
-extension MLIRConfiguration {
-  public typealias Ownership = MLIR.Ownership
-}
-
 // MARK: - Implementation Details
 
 /**

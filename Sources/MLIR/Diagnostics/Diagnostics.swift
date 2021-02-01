@@ -85,18 +85,18 @@ protocol DiagnosticHandler: AnyObject {
   func handle(_ unsafeDiagnostic: UnsafeDiagnostic) -> DiagnosticHandlingDirective
 }
 
-extension Context {
-  func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
+extension MLIR {
+  static func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
-      .borrow(self),
+      context,
       mlirDiagnosticHandler,
       userData,
       mlirDeleteUserData)
     return DiagnosticHandlerRegistration(id: id)
   }
-  func unregister(_ registration: DiagnosticHandlerRegistration) {
-    mlirContextDetachDiagnosticHandler(.borrow(self), registration.id)
+  static func unregister(_ registration: DiagnosticHandlerRegistration) {
+    mlirContextDetachDiagnosticHandler(context, registration.id)
   }
 }
 

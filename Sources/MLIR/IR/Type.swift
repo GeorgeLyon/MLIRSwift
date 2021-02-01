@@ -1,12 +1,12 @@
 import CMLIR
 
-public struct Type<MLIR: MLIRConfiguration>: Equatable, MLIRConfigurable, OpaqueStorageRepresentable
+public struct Type: Equatable, OpaqueStorageRepresentable
 {
   public static func parse(_ source: String) throws -> Self {
     try parse(borrow, mlirTypeParseGet, source)
   }
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.bridgedValue == rhs.bridgedValue
+    MlirType.borrow(lhs) == MlirType.borrow(rhs)
   }
 
   init(storage: BridgingStorage<MlirType, OwnedByMLIR>) { self.storage = storage }
@@ -15,17 +15,13 @@ public struct Type<MLIR: MLIRConfiguration>: Equatable, MLIRConfigurable, Opaque
 
 // MARK: - Bridging
 
-extension Type {
-  public init?(_ bridgedValue: MlirType) {
-    guard let type = Self.borrow(bridgedValue) else { return nil }
-    self = type
+extension MLIR {
+  public static func bridge(_ value: MlirType) -> Type? {
+    .borrow(value)
   }
-  public var bridgedValue: MlirType { .borrow(self) }
-
-  /**
-   Convenience accessor for getting the `MlirContext`
-   */
-  public static var ctx: MlirContext { MLIR.ctx }
+  public static func bridge(_ value: Type) -> MlirType {
+    .borrow(value)
+  }
 }
 
 extension MlirType: Bridged, CEquatable {

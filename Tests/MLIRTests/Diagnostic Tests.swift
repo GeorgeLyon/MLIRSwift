@@ -14,9 +14,9 @@ final class DiagnosticTests: XCTestCase {
   }
   func testDiagnosticHandling() {
     let message = "Test Diagnostic"
-    let diagnostics = Test.collectDiagnostics {
+    let diagnostics = MLIR.collectDiagnostics {
       message.withCString {
-        mlirEmitError(mlirLocationUnknownGet(Test.ctx), $0)
+        mlirEmitError(mlirLocationUnknownGet(MLIR.context), $0)
       }
     }
     XCTAssertEqual(diagnostics.count, 1)
