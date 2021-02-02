@@ -2,27 +2,17 @@
 
 extension Block {
   public init(
-    operations: (inout OperationBuilder) throws -> Void
-  ) rethrows
-  where
-    Ownership == OwnedBySwift
-  {
-    self = Block(argumentTypes: [])
-    try OperationBuilder.build(operations).forEach(self.operations.append)
-  }
-
-  public init(
     _ t0: Type,
     operations: (inout OperationBuilder, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0])
+      })
   }
 
   public init(
@@ -32,11 +22,11 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1])
+      })
   }
 
   public init(
@@ -46,11 +36,11 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1], arguments[2])
+      })
   }
 
   public init(
@@ -61,11 +51,11 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3])
+      })
   }
 
   public init(
@@ -76,11 +66,12 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+      })
   }
 
   public init(
@@ -92,13 +83,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]
-      )
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5])
+      })
   }
 
   public init(
@@ -111,13 +102,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6])
+      })
   }
 
   public init(
@@ -130,13 +121,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7])
+      })
   }
 
   public init(
@@ -150,13 +141,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8])
+      })
   }
 
   public init(
@@ -170,13 +161,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8], arguments[9])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8], arguments[9])
+      })
   }
 
   public init(
@@ -190,13 +181,13 @@ extension Block {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10])
+      })
   }
 
 }

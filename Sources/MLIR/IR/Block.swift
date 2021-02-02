@@ -1,12 +1,16 @@
 import CMLIR
 
 public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
-  public init(argumentTypes: [MLIR.`Type`] = [], operations: [MLIR.Operation<OwnedBySwift>] = [])
+  public init(
+    argumentTypes: [MLIR.`Type`] = [],
+    operations: (inout OperationBuilder, Arguments) throws -> ()) rethrows
   where Ownership == OwnedBySwift {
     self = argumentTypes.withUnsafeBorrowedValues {
       .assumeOwnership(of: mlirBlockCreate($0.count, $0.baseAddress))!
     }
-    operations.forEach(self.operations.append)
+    try OperationBuilder
+      .build { try operations(&$0, arguments) }
+      .forEach(self.operations.append)
   }
 
   public struct Arguments: RandomAccessCollection {

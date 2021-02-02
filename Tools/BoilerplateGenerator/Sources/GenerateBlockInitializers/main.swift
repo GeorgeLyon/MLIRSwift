@@ -5,15 +5,6 @@ let maxNumArguments = 10
 
 <<"""
 extension Block {
-  public init(
-    operations: (inout OperationBuilder) throws -> Void) rethrows
-  where
-    Ownership == OwnedBySwift
-  {
-    self = Block(argumentTypes: [])
-    try OperationBuilder.build(operations).forEach(self.operations.append)
-  }
-
 """
 increaseIndentation()
 for numArguments in 0...maxNumArguments {
@@ -26,11 +17,9 @@ for numArguments in 0...maxNumArguments {
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [\(names.joined(separator: ", "))])
-    try OperationBuilder.build { builder in
+    try self.init(argumentTypes: [\(names.joined(separator: ", "))], operations: { builder, arguments in
       try operations(&builder, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
-    }
-    .forEach(self.operations.append)
+    })
   }
 
   """
