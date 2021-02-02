@@ -1,6 +1,8 @@
 import CMLIR
 
-public struct Identifier: ExpressibleByStringLiteral,
+public struct Identifier:
+  ExpressibleByStringLiteral,
+  ExpressibleByStringInterpolation,
   OpaqueStorageRepresentable
 {
   public init(stringLiteral value: String) {
