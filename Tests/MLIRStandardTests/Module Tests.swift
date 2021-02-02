@@ -7,6 +7,9 @@ final class ModuleTests: XCTestCase {
   override class func setUp() {
     MLIR.register(.std)
   }
+  override class func tearDown() {
+    MLIR.resetContext()
+  }
   func testModule() throws {
     let input = """
       module  {

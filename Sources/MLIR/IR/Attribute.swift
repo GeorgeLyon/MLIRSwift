@@ -13,6 +13,9 @@ public struct NamedAttributes: ExpressibleByDictionaryLiteral {
       mlirNamedAttributeGet(.borrow($0.0), .borrow($0.1))
     }
   }
+  public mutating func append(_ identifier: MLIR.Identifier, _ attribute: MLIR.Attribute) {
+    elements.append(mlirNamedAttributeGet(.borrow(identifier), .borrow(attribute)))
+  }
   public static func + (lhs: Self, rhs: Self) -> Self {
     var result = lhs
     result.elements.append(contentsOf: rhs.elements)
