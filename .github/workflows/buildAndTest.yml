@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('Tools/llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -54,7 +54,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('Tools/llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
