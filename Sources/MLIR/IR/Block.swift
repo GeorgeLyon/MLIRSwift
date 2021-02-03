@@ -3,7 +3,8 @@ import CMLIR
 public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(
     argumentTypes: [MLIR.`Type`] = [],
-    operations: (inout OperationBuilder, Arguments) throws -> ()) rethrows
+    operations: (inout OperationBuilder, Arguments) throws -> Void
+  ) rethrows
   where Ownership == OwnedBySwift {
     self = argumentTypes.withUnsafeBorrowedValues {
       .assumeOwnership(of: mlirBlockCreate($0.count, $0.baseAddress))!

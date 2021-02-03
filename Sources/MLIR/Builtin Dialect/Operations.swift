@@ -9,7 +9,7 @@ extension OperationBuilder {
     let blocks = try blocks()
     /// `buildFunc` requires at least one `Block`. For external functions use `externalFunc` instead.
     let entryBlock = blocks.first!
-    buildBuiltinOp(
+    _ = buildBuiltinOp(
       "func",
       attributes: attributes + [
         .symbolName: .string(name),

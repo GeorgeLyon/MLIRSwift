@@ -15,7 +15,8 @@ extension Attribute: ExpressibleByArrayLiteral {
 
 extension Attribute: ExpressibleByDictionaryLiteral {
   public init(dictionaryLiteral elements: (MLIR.Identifier, MLIR.Attribute)...) {
-    self = elements
+    self =
+      elements
       .map {
         mlirNamedAttributeGet(.borrow($0.0), .borrow($0.1))
       }
@@ -36,4 +37,3 @@ extension Attribute {
     .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(MLIR.context, $0) })!
   }
 }
-

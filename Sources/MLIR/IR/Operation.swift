@@ -65,13 +65,13 @@ public struct OperationResults: RandomAccessCollection {
 public struct OperationBuilder {
 
   public struct GenericBuilder {
-    @discardableResult
+
     public mutating func build(
       _ dialect: Dialect,
       _ name: String,
       attributes: MLIR.NamedAttributes = [:],
       operands: [MLIR.Value] = [],
-      resultTypes: [MLIR.`Type`] = [],
+      resultTypes: [MLIR.`Type`],
       @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
       file: StaticString = #file, line: Int = #line, column: Int = #column
     ) -> OperationResults {
@@ -87,14 +87,27 @@ public struct OperationBuilder {
       operations.append(operation)
       return operation.results
     }
+
+    public mutating func build(
+      _ dialect: Dialect,
+      _ name: String,
+      attributes: MLIR.NamedAttributes = [:],
+      operands: [MLIR.Value] = [],
+      @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
+      file: StaticString = #file, line: Int = #line, column: Int = #column
+    ) {
+      build(
+        dialect, name,
+        attributes: attributes,
+        operands: operands,
+        resultTypes: [],
+        regions: regions)
+    }
+
     fileprivate let caller: Location
     fileprivate var operations: [Operation<OwnedBySwift>] = []
   }
 
-  /**
-   - precondition: `body` must build at least one operation
-   */
-  @discardableResult
   public mutating func buildGenericOperation<T>(
     file: StaticString, line: Int, column: Int,
     _ body: (inout GenericBuilder) throws -> T
@@ -106,7 +119,6 @@ public struct OperationBuilder {
     return result
   }
 
-  @discardableResult
   mutating func buildBuiltinOp(
     _ name: String,
     attributes: MLIR.NamedAttributes = [:],
