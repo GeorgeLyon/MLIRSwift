@@ -73,7 +73,7 @@ public struct OperationBuilder {
       operands: [MLIR.Value] = [],
       resultTypes: [MLIR.`Type`],
       @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-      file: StaticString = #file, line: Int = #line, column: Int = #column
+      file: StaticString = #fileID, line: Int = #line, column: Int = #column
     ) -> OperationResults {
       let location = Location(file: file, line: line, column: column)
       let operation = Operation(
@@ -94,7 +94,7 @@ public struct OperationBuilder {
       attributes: MLIR.NamedAttributes = [:],
       operands: [MLIR.Value] = [],
       @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-      file: StaticString = #file, line: Int = #line, column: Int = #column
+      file: StaticString = #fileID, line: Int = #line, column: Int = #column
     ) {
       build(
         dialect, name,

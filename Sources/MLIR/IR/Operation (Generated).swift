@@ -9,14 +9,15 @@ extension OperationBuilder.GenericBuilder {
     operands: [MLIR.Value] = [],
     resultTypes t0: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0])
   }
 
@@ -27,14 +28,15 @@ extension OperationBuilder.GenericBuilder {
     operands: [MLIR.Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1])
   }
 
@@ -45,14 +47,15 @@ extension OperationBuilder.GenericBuilder {
     operands: [MLIR.Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1], results[2])
   }
 
@@ -63,14 +66,15 @@ extension OperationBuilder.GenericBuilder {
     operands: [MLIR.Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1], results[2], results[3])
   }
 
@@ -82,14 +86,15 @@ extension OperationBuilder.GenericBuilder {
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1], results[2], results[3], results[4])
   }
 
@@ -101,14 +106,15 @@ extension OperationBuilder.GenericBuilder {
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1], results[2], results[3], results[4], results[5])
   }
 
@@ -120,14 +126,15 @@ extension OperationBuilder.GenericBuilder {
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) {
     let results = build(
       dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (results[0], results[1], results[2], results[3], results[4], results[5], results[6])
   }
 
@@ -139,7 +146,7 @@ extension OperationBuilder.GenericBuilder {
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (
     MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
   ) {
@@ -148,7 +155,8 @@ extension OperationBuilder.GenericBuilder {
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (
       results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7]
     )
@@ -162,7 +170,7 @@ extension OperationBuilder.GenericBuilder {
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`, _ t8: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (
     MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
     MLIR.Value
@@ -172,7 +180,8 @@ extension OperationBuilder.GenericBuilder {
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (
       results[0], results[1], results[2], results[3], results[4], results[5], results[6],
       results[7], results[8]
@@ -188,7 +197,7 @@ extension OperationBuilder.GenericBuilder {
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`, _ t8: MLIR.`Type`,
     _ t9: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (
     MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
     MLIR.Value, MLIR.Value
@@ -198,7 +207,8 @@ extension OperationBuilder.GenericBuilder {
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (
       results[0], results[1], results[2], results[3], results[4], results[5], results[6],
       results[7], results[8], results[9]
@@ -214,7 +224,7 @@ extension OperationBuilder.GenericBuilder {
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`, _ t8: MLIR.`Type`,
     _ t9: MLIR.`Type`, _ t10: MLIR.`Type`,
     @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> (
     MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
     MLIR.Value, MLIR.Value, MLIR.Value
@@ -224,7 +234,8 @@ extension OperationBuilder.GenericBuilder {
       attributes: attributes,
       operands: operands,
       resultTypes: [t0],
-      regions: regions)
+      regions: regions,
+      file: file, line: line, column: column)
     return (
       results[0], results[1], results[2], results[3], results[4], results[5], results[6],
       results[7], results[8], results[9], results[10]
