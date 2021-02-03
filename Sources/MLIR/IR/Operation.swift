@@ -1,10 +1,8 @@
 import CMLIR
 
-public struct Operation<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>:
-  OpaqueStorageRepresentable
-{
+public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
 
-  public typealias Results = OperationResults<MLIR>
+  public typealias Results = OperationResults
   public var results: Results { Results(c: .borrow(self)) }
 
   public struct Regions: RandomAccessCollection {
@@ -21,7 +19,7 @@ public struct Operation<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>:
   let storage: BridgingStorage<MlirOperation, Ownership>
 
   fileprivate init(
-    dialect: MLIR.RegisteredDialect?,
+    dialect: MLIR.Dialect?,
     name: String,
     attributes: MLIR.NamedAttributes,
     operands: [MLIR.Value],
@@ -53,7 +51,7 @@ public struct Operation<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>:
   }
 }
 
-public struct OperationResults<MLIR: MLIRConfiguration>: RandomAccessCollection {
+public struct OperationResults: RandomAccessCollection {
   public let startIndex = 0
   public var endIndex: Int { mlirOperationGetNumResults(c) }
   public subscript(position: Int) -> MLIR.Value {
@@ -64,20 +62,20 @@ public struct OperationResults<MLIR: MLIRConfiguration>: RandomAccessCollection 
 
 // MARK: - Building Operations
 
-public struct OperationBuilder<MLIR: MLIRConfiguration> {
+public struct OperationBuilder {
 
   public struct GenericBuilder {
-    @discardableResult
+
     public mutating func build(
-      _ dialect: MLIR.RegisteredDialect,
+      _ dialect: Dialect,
       _ name: String,
       attributes: MLIR.NamedAttributes = [:],
       operands: [MLIR.Value] = [],
-      resultTypes: [MLIR.`Type`] = [],
-      @RegionBuilder<MLIR> regions: () -> [RegionBuilder<MLIR>.Region] = { [] },
+      resultTypes: [MLIR.`Type`],
+      @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
       file: StaticString = #file, line: Int = #line, column: Int = #column
-    ) -> OperationResults<MLIR> {
-      let location = Location(MLIR.ctx, file: file, line: line, column: column)
+    ) -> OperationResults {
+      let location = Location(file: file, line: line, column: column)
       let operation = Operation(
         dialect: dialect,
         name: name,
@@ -89,35 +87,47 @@ public struct OperationBuilder<MLIR: MLIRConfiguration> {
       operations.append(operation)
       return operation.results
     }
+
+    public mutating func build(
+      _ dialect: Dialect,
+      _ name: String,
+      attributes: MLIR.NamedAttributes = [:],
+      operands: [MLIR.Value] = [],
+      @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
+      file: StaticString = #file, line: Int = #line, column: Int = #column
+    ) {
+      build(
+        dialect, name,
+        attributes: attributes,
+        operands: operands,
+        resultTypes: [],
+        regions: regions)
+    }
+
     fileprivate let caller: Location
-    fileprivate var operations: [Operation<MLIR, OwnedBySwift>] = []
+    fileprivate var operations: [Operation<OwnedBySwift>] = []
   }
 
-  /**
-   - precondition: `body` must build at least one operation
-   */
-  @discardableResult
   public mutating func buildGenericOperation<T>(
     file: StaticString, line: Int, column: Int,
     _ body: (inout GenericBuilder) throws -> T
   ) rethrows -> T {
-    let location = Location(MLIR.ctx, file: file, line: line, column: column)
+    let location = Location(file: file, line: line, column: column)
     var builder = GenericBuilder(caller: location)
     let result = try body(&builder)
     operations.append(contentsOf: builder.operations)
     return result
   }
 
-  @discardableResult
   mutating func buildBuiltinOp(
     _ name: String,
     attributes: MLIR.NamedAttributes = [:],
     operands: [MLIR.Value] = [],
     resultTypes: [MLIR.`Type`] = [],
-    regions: [RegionBuilder<MLIR>.Region] = [],
+    regions: [RegionBuilder.Region] = [],
     file: StaticString, line: Int, column: Int
-  ) -> OperationResults<MLIR> {
-    let location = Location(MLIR.ctx, file: file, line: line, column: column)
+  ) -> OperationResults {
+    let location = Location(file: file, line: line, column: column)
     let operation = Operation(
       dialect: nil,
       name: name,
@@ -133,12 +143,12 @@ public struct OperationBuilder<MLIR: MLIRConfiguration> {
   static func build(
     caller: Location? = nil,
     _ body: (inout Self) throws -> Void
-  ) rethrows -> [Operation<MLIR, OwnedBySwift>] {
+  ) rethrows -> [Operation<OwnedBySwift>] {
     var builder = Self()
     try body(&builder)
     return builder.operations
   }
-  private var operations: [Operation<MLIR, OwnedBySwift>] = []
+  private var operations: [Operation<OwnedBySwift>] = []
 }
 
 // MARK: - Bridging

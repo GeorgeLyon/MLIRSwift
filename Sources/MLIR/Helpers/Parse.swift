@@ -1,6 +1,6 @@
 import CMLIR
 
-extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
+extension OpaqueStorageRepresentable {
   static func parse<T: Bridged, Ownership: MLIR.Ownership>(
     _ bridge: (T) -> Self?,
     _ body: (MlirContext, MlirStringRef) -> T,
@@ -10,7 +10,7 @@ extension OpaqueStorageRepresentable where Self: MLIRConfigurable {
     Storage == BridgingStorage<T, Ownership>
   {
     let pair = MLIR.collectDiagnostics(minimumSeverity: .error) {
-      source.withUnsafeMlirStringRef { bridge(body(MLIR.ctx, $0)) }
+      source.withUnsafeMlirStringRef { bridge(body(MLIR.context, $0)) }
     }
     guard pair.diagnostics.isEmpty else {
       throw ParsingError(diagnostics: pair.diagnostics)

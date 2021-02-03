@@ -1,8 +1,8 @@
 import MLIR
 
-extension OperationBuilder where MLIR: ProvidesStandardDialect {
+extension OperationBuilder {
   public mutating func buildConstant(
-    _ value: MLIR.Attribute, ofType type: Type<MLIR>,
+    _ value: MLIR.Attribute, ofType type: Type,
     file: StaticString = #file, line: Int = #line, column: Int = #column
   ) -> MLIR.Value {
     let results = buildGenericOperation(file: file, line: line, column: column) { op in

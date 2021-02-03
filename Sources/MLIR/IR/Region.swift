@@ -1,12 +1,11 @@
 import CMLIR
 
-public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: OpaqueStorageRepresentable
-{
+public struct Region<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   public init(blocks: [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
     self = .assumeOwnership(of: mlirRegionCreate())!
     blocks.forEach(self.blocks.append)
   }
-  public init(@BlockBuilder<MLIR> blocks: () -> [BlockBuilder<MLIR>.Block])
+  public init(@BlockBuilder blocks: () -> [BlockBuilder.Block])
   where Ownership == OwnedBySwift {
     self.init(blocks: blocks())
   }
@@ -35,7 +34,7 @@ public struct Region<MLIR: MLIRConfiguration, Ownership: MLIR.Ownership>: Opaque
 // MARK: - Building Regions
 
 @_functionBuilder
-public struct RegionBuilder<MLIR: MLIRConfiguration> {
+public struct RegionBuilder {
   public typealias Region = MLIR.Region<OwnedBySwift>
   public static func buildBlock(_ components: Region...) -> [Region] { components }
 }

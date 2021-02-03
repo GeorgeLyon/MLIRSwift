@@ -1,10 +1,10 @@
 import CMLIR
 
 public struct Location: OpaqueStorageRepresentable {
-  init(_ ctx: MlirContext, file: StaticString, line: Int, column: Int) {
+  init(file: StaticString, line: Int, column: Int) {
     self = .borrow(
       file.withUnsafeMlirStringRef {
-        mlirLocationFileLineColGet(ctx, $0, UInt32(line), UInt32(column))
+        mlirLocationFileLineColGet(MLIR.context, $0, UInt32(line), UInt32(column))
       })
   }
   /**

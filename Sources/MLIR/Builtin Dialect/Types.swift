@@ -1,12 +1,18 @@
 import CMLIR
 
 extension Type {
-  public static func function(of inputs: [Self], to results: [Self]) -> Self {
-    inputs.withUnsafeBorrowedValues { inputs in
-      results.withUnsafeBorrowedValues { results in
+  public static func function<Inputs, Results>(of inputs: Inputs, to results: Results) -> Self
+  where
+    Inputs: Sequence,
+    Inputs.Element == Self,
+    Results: Sequence,
+    Results.Element == Self
+  {
+    Array(inputs).withUnsafeBorrowedValues { inputs in
+      Array(results).withUnsafeBorrowedValues { results in
         .borrow(
           mlirFunctionTypeGet(
-            ctx, inputs.count, inputs.baseAddress, results.count, results.baseAddress))!
+            MLIR.context, inputs.count, inputs.baseAddress, results.count, results.baseAddress))!
       }
     }
   }
@@ -19,11 +25,11 @@ extension Type {
     let c: MlirType
     switch signedness {
     case .signed:
-      c = mlirIntegerTypeSignedGet(ctx, UInt32(bitWidth))
+      c = mlirIntegerTypeSignedGet(MLIR.context, UInt32(bitWidth))
     case .unsigned:
-      c = mlirIntegerTypeUnsignedGet(ctx, UInt32(bitWidth))
+      c = mlirIntegerTypeUnsignedGet(MLIR.context, UInt32(bitWidth))
     case .none:
-      c = mlirIntegerTypeGet(ctx, UInt32(bitWidth))
+      c = mlirIntegerTypeGet(MLIR.context, UInt32(bitWidth))
     }
     return .borrow(c)!
   }

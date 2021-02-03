@@ -2,207 +2,192 @@
 
 extension Block {
   public init(
-    operations: (inout OperationBuilder<MLIR>) throws -> Void
+    _ t0: Type,
+    operations: (inout OperationBuilder, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [])
-    try OperationBuilder.build(operations).forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value) throws -> Void
+    _ t0: Type, _ t1: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value) throws -> Void
+    _ t0: Type, _ t1: Type, _ t2: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1], arguments[2])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value) throws -> Void
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value) throws ->
+      Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3],
+      operations: { builder, arguments in
+        try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>,
-    operations: (inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value)
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type,
+    operations: (inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value)
       throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4])
-    try OperationBuilder.build { builder in
-      try operations(&builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
-      MLIR.Value
-    ) throws -> Void
-  ) rethrows
-  where
-    Ownership == OwnedBySwift
-  {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]
-      )
-    }
-    .forEach(self.operations.append)
-  }
-
-  public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>,
-    operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>, _ t9: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type, _ t9: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8], arguments[9])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8], arguments[9])
+      })
   }
 
   public init(
-    _ t0: Type<MLIR>, _ t1: Type<MLIR>, _ t2: Type<MLIR>, _ t3: Type<MLIR>, _ t4: Type<MLIR>,
-    _ t5: Type<MLIR>, _ t6: Type<MLIR>, _ t7: Type<MLIR>, _ t8: Type<MLIR>, _ t9: Type<MLIR>,
-    _ t10: Type<MLIR>,
+    _ t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type, _ t7: Type,
+    _ t8: Type, _ t9: Type, _ t10: Type,
     operations: (
-      inout OperationBuilder<MLIR>, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
+      inout OperationBuilder, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value,
       MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value, MLIR.Value
     ) throws -> Void
   ) rethrows
   where
     Ownership == OwnedBySwift
   {
-    self = Block(argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10])
-    try OperationBuilder.build { builder in
-      try operations(
-        &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
-        arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10])
-    }
-    .forEach(self.operations.append)
+    try self.init(
+      argumentTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10],
+      operations: { builder, arguments in
+        try operations(
+          &builder, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4],
+          arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], arguments[10])
+      })
   }
 
 }

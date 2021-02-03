@@ -1,4 +1,4 @@
-extension MLIRConfiguration {
+extension MLIR {
   /**
    This method captures diagnostics of at least a certain severity level emitted during `body` (and stops them from being forwarded to other registered handlers).
    - parameter minimumSeverity: Diagnostics with severity lower than this value will not be collected and instead be forwarded to the existing handler chain
@@ -23,9 +23,9 @@ extension MLIRConfiguration {
     -> (value: T, diagnostics: [Diagnostic])
   {
     let collector = DiagnosticCollector(minimumSeverity: minimumSeverity)
-    let registration = context.register(collector)
+    let registration = MLIR.register(collector)
     let value = body()
-    context.unregister(registration)
+    MLIR.unregister(registration)
     return (value, collector.diagnostics)
   }
 }

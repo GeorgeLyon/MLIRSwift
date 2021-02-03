@@ -9,3 +9,6 @@ function swift-format() {
 
 swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateBlockInitializers |
  swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/Block (Generated).swift"
+
+swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateGenericOperationBuilders |
+ swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/Operation (Generated).swift"

@@ -4,6 +4,12 @@ import XCTest
 import MLIR
 
 final class ModuleTests: XCTestCase {
+  override class func setUp() {
+    MLIR.register(.std)
+  }
+  override class func tearDown() {
+    MLIR.resetContext()
+  }
   func testModule() throws {
     let input = """
       module  {
@@ -16,7 +22,7 @@ final class ModuleTests: XCTestCase {
       }
 
       """
-    let parsed: Test.Module = try  .parse(input)
+    let parsed: Module = try .parse(input)
     XCTAssertEqual(parsed.body.operations.count, 2)
     XCTAssertEqual(parsed.operation.regions.count, 1)
     XCTAssertEqual(parsed.operation.regions.first?.blocks.count, 1)
@@ -36,8 +42,8 @@ final class ModuleTests: XCTestCase {
       }) : () -> ()
 
       """)
-    let memref = Type<Test>.memref(shape: [.dynamic], element: .f32)
-    let constructed = try Test.Module { op in
+    let memref = Type.memref(shape: [.dynamic], element: .f32)
+    let constructed = try Module { op in
       try op.buildFunc("add") {
         try Block(memref, memref) { op, arg0, arg1 in
           let c0 = op.buildConstant(try .parse("0 : index"), ofType: .index)
