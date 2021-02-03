@@ -20,6 +20,9 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
     public subscript(position: Int) -> MLIR.Value {
       .borrow(mlirBlockGetArgument(c, position))
     }
+    public mutating func addArgument(ofType type: MLIR.`Type`) -> MLIR.Value {
+      .borrow(mlirBlockAddArgument(c, .borrow(type)))
+    }
     fileprivate let c: MlirBlock
   }
   public var arguments: Arguments { Arguments(c: .borrow(self)) }

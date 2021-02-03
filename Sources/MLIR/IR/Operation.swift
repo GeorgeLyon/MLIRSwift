@@ -96,7 +96,7 @@ public struct OperationBuilder {
       @RegionBuilder regions: () -> [RegionBuilder.Region] = { [] },
       file: StaticString = #fileID, line: Int = #line, column: Int = #column
     ) {
-      build(
+      _ = build(
         dialect, name,
         attributes: attributes,
         operands: operands,
