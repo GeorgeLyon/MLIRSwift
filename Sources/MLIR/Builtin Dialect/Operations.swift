@@ -4,7 +4,7 @@ extension OperationBuilder {
     returning returnTypes: [MLIR.`Type`] = [],
     attributes: MLIR.NamedAttributes = [:],
     @BlockBuilder blocks: () throws -> [MLIR.BlockBuilder.Block],
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) rethrows {
     let blocks = try blocks()
     /// `buildFunc` requires at least one `Block`. For external functions use `externalFunc` instead.

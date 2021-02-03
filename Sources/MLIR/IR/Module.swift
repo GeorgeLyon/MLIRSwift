@@ -6,7 +6,7 @@ public struct Module: OpaqueStorageRepresentable {
   }
   public init(
     _ operations: (inout OperationBuilder) throws -> Void,
-    file: StaticString = #file, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) rethrows {
     let location = Location(file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
