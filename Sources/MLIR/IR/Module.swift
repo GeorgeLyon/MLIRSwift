@@ -5,10 +5,9 @@ public struct Module: OpaqueStorageRepresentable {
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   public init(
-    _ operations: [Operation<OwnedBySwift>],
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
+    _ operations: [Operation<OwnedBySwift>] = [],
+    location: Location
   ) {
-    let location = Location(file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
     /// Ensure that the module terminator is at the end
     operations.reversed().forEach(body.operations.prepend)

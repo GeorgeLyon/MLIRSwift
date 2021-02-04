@@ -43,6 +43,15 @@ final class ModuleTests: XCTestCase {
 
       """)
     let memref = Type.memref(shape: [.dynamic], element: .f32)
+    let constructed: Module
+    do {
+      let module = Module(location: Location())
+      body.append(.func("add")) { body in
+        body.append(.contant()
+      }
+      let add = Operation(
+      module.body.operations.append(<#T##operation: Operation<OwnedBySwift>##Operation<OwnedBySwift>#>)
+    }
     let constructed = try Module { op in
       try op.buildFunc("add") {
         try Block(memref, memref) { op, arg0, arg1 in

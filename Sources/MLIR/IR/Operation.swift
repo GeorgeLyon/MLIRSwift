@@ -1,6 +1,6 @@
 import CMLIR
 
-public struct Operation<Ownership: MLIR.Ownership, ResultStyle>: OpaqueStorageRepresentable {
+public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
 
   public init(
     _ dialect: MLIR.Dialect,
