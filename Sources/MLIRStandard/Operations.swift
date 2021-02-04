@@ -1,30 +1,33 @@
 import MLIR
 
-extension OperationBuilder {
-  public mutating func buildConstant(
+extension Operation where Ownership == OwnedBySwift {
+  public static func constant(
     _ value: MLIR.Attribute, ofType type: Type,
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
-  ) -> MLIR.Value {
-    let results = buildGenericOperation(file: file, line: line, column: column) { op in
-      op.build(.std, "constant", attributes: ["value": value], resultTypes: [type])
-    }
-    return results[0]
+    location: Location
+  ) -> Operation {
+    Operation(
+      .std, "constant",
+      attributes: ["value": value],
+      resultTypes: [type],
+      location: location)
   }
-  public mutating func buildDim(
+  public mutating func dimension(
     of value: MLIR.Value, i: MLIR.Value,
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
-  ) -> MLIR.Value {
-    let results = buildGenericOperation(file: file, line: line, column: column) { op in
-      op.build(.std, "dim", operands: [value, i], resultTypes: [.index])
-    }
-    return results[0]
+    location: Location
+  ) -> Operation {
+    Operation(
+      .std, "dim",
+      operands: [value, i],
+      resultTypes: [.index],
+      location: location)
   }
-  public mutating func buildReturn(
+  public mutating func `return`(
     _ values: MLIR.Value...,
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
-  ) {
-    buildGenericOperation(file: file, line: line, column: column) { op in
-      op.build(.std, "return", operands: values)
-    }
+    location: Location
+  ) -> Operation {
+    Operation(
+      .std, "return",
+      operands: values,
+      location: location)
   }
 }

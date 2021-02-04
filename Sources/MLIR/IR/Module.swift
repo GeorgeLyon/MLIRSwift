@@ -5,13 +5,13 @@ public struct Module: OpaqueStorageRepresentable {
     try parse(assumeOwnership, mlirModuleCreateParse, source)
   }
   public init(
-    _ operations: (inout OperationBuilder) throws -> Void,
+    _ operations: [Operation<OwnedBySwift>],
     file: StaticString = #fileID, line: Int = #line, column: Int = #column
-  ) rethrows {
+  ) {
     let location = Location(file: file, line: line, column: column)
     self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
     /// Ensure that the module terminator is at the end
-    try OperationBuilder.build(operations).reversed().forEach(body.operations.prepend)
+    operations.reversed().forEach(body.operations.prepend)
   }
 
   public var body: MLIR.Block<OwnedByMLIR> {

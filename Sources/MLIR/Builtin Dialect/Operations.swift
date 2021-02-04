@@ -1,15 +1,14 @@
-extension OperationBuilder {
-  public mutating func buildFunc(
+extension Operation where Ownership == OwnedBySwift {
+  public static func function(
     _ name: String,
     returning returnTypes: [MLIR.`Type`] = [],
     attributes: MLIR.NamedAttributes = [:],
-    @BlockBuilder blocks: () throws -> [MLIR.BlockBuilder.Block],
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
-  ) rethrows {
-    let blocks = try blocks()
+    blocks: [Block<OwnedBySwift>],
+    location: Location
+  ) -> Self {
     /// `buildFunc` requires at least one `Block`. For external functions use `externalFunc` instead.
     let entryBlock = blocks.first!
-    _ = buildBuiltinOp(
+    return Operation(
       "func",
       attributes: attributes + [
         .symbolName: .string(name),
@@ -18,6 +17,6 @@ extension OperationBuilder {
       operands: [],
       resultTypes: [],
       regions: [Region(blocks: blocks)],
-      file: file, line: line, column: column)
+      location: location)
   }
 }
