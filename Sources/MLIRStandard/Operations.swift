@@ -1,33 +1,28 @@
 import MLIR
 
-extension Operation where Ownership == OwnedBySwift {
+extension BuildableOperation{
+  
   public static func constant(
-    _ value: MLIR.Attribute, ofType type: Type,
-    location: Location
-  ) -> Operation {
-    Operation(
+    _ value: MLIR.Attribute,
+    ofType type: MLIR.`Type`) -> Self
+  where
+    ResultTypes == (MLIR.`Type`)
+  {
+    Self(
       .std, "constant",
-      attributes: ["value": value],
-      resultTypes: [type],
-      location: location)
+      attributes: [
+        "value": value
+      ],
+      resultType: type)
   }
-  public mutating func dimension(
-    of value: MLIR.Value, i: MLIR.Value,
-    location: Location
-  ) -> Operation {
-    Operation(
-      .std, "dim",
-      operands: [value, i],
-      resultTypes: [.index],
-      location: location)
-  }
-  public mutating func `return`(
-    _ values: MLIR.Value...,
-    location: Location
-  ) -> Operation {
-    Operation(
+  
+  public static func `return`(_ values: MLIR.Value...) -> Self
+  where
+    ResultTypes == ()
+  {
+    Self(
       .std, "return",
-      operands: values,
-      location: location)
+      operands: values)
   }
+  
 }

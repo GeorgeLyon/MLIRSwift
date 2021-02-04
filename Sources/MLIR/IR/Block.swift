@@ -23,7 +23,6 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   }
   public var arguments: Arguments { Arguments(c: .borrow(self)) }
 
-  public typealias Operation = MLIR.Operation
   public struct Operations: Collection, LinkedList {
     public typealias Element = MLIR.Operation<OwnedByMLIR>
     public struct Index: Comparable, OpaqueStorageRepresentable {
@@ -31,11 +30,18 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
       public static func < (lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
     }
 
-    public func prepend(_ operation: MLIR.Operation<OwnedBySwift>) {
-      mlirBlockInsertOwnedOperation(c, 0, .assumeOwnership(of: operation))
-    }
-    public func append(_ operation: MLIR.Operation<OwnedBySwift>) {
-      mlirBlockAppendOwnedOperation(c, .assumeOwnership(of: operation))
+    /**
+     Returns a representation of this operation which is owned by MLIR, since the passed in value will be invalidated.
+     */
+    @discardableResult
+    public func append(_ operation: MLIR.Operation<OwnedBySwift>) -> MLIR.Operation<OwnedByMLIR> {
+      let ownedOperation: MlirOperation = .assumeOwnership(of: operation)
+      /**
+       The module terminator must always be at the end.
+       If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
+       */
+      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation)
+      return .borrow(ownedOperation)!
     }
 
     var first: MlirOperation { mlirBlockGetFirstOperation(c) }
