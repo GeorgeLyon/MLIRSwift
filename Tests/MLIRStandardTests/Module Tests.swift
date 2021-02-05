@@ -38,11 +38,13 @@ final class ModuleTests: XCTestCase {
           returning: [.integer(bitWidth: 1), .integer(bitWidth: 1)],
           blocks: [
             Block(.integer(bitWidth: 1), .integer(bitWidth: 1)) { ops, arg0, arg1 in
-              ops.append(.return(arg1, arg0), at: location)
+              ops.append(.return(arg1, arg0), at: location.viaCallsite())
             }
           ]),
-        at: location)
+        at: location.viaCallsite())
     }
+    
+    print(constructed.operation.withPrintingOptions(elideElementsAttributesLargerThan: nil, debugInformationStyle: .pretty, alwaysPrintInGenericForm: true))
     
     let parsed: Module = try .parse(reference)
     

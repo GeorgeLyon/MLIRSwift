@@ -11,7 +11,7 @@ public struct Location: OpaqueStorageRepresentable {
   public func called(from location: Location) -> Location {
     .borrow(mlirLocationCallSiteGet(.borrow(self), .borrow(location)))
   }
-  public func throughCallsite(
+  public func viaCallsite(
     file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> Location {
     Location(file: file, line: line, column: column).called(from: self)
