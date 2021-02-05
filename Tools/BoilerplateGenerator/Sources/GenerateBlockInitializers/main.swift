@@ -4,7 +4,7 @@ import Utilities
 let maxNumArguments = 10
 
 <<"""
-extension Block {
+extension Block where Ownership == OwnedBySwift {
 """
 increaseIndentation()
 for numArguments in 0...maxNumArguments {
@@ -13,13 +13,10 @@ for numArguments in 0...maxNumArguments {
   <<"""
   public init(
     \(names.map { "_ \($0): Type" }.joined(separator: ", ")),
-    operations: (inout OperationBuilder, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) throws -> Void) rethrows
-  where
-    Ownership == OwnedBySwift
+    buildOperations: (Block.Operations, \(range.map { _ in "MLIR.Value" }.joined(separator: ", "))) throws -> Void) rethrows
   {
-    try self.init(argumentTypes: [\(names.joined(separator: ", "))], operations: { builder, arguments in
-      try operations(&builder, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
-    })
+    self.init(argumentTypes: [\(names.joined(separator: ", "))])
+    try buildOperations(operations, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
   }
 
   """

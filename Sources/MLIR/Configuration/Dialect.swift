@@ -1,9 +1,9 @@
 import CMLIR
 
 extension MLIR {
-  public static func register(_ dialects: Dialect...) {
+  public static func load(_ dialects: Dialect...) {
     for dialect in dialects {
-      dialect.register(context)
+      _ = dialect.hooks.loadHook(context)
     }
   }
 }
@@ -12,18 +12,13 @@ public struct Dialect {
   /**
    In the future, we hope the C bindings will provide a type that encapsulates this data
    */
-  public init(
-    register: @escaping (MlirContext) -> Void,
-    getNamespace: @escaping () -> MlirStringRef
-  ) {
-    self.register = register
-    self.getNamespace = getNamespace
+  public init(_ fn: () -> UnsafePointer<MlirDialectRegistrationHooks>?) {
+    self.hooks = fn()!.pointee
   }
   public var namespace: String {
-    return getNamespace().string
+    hooks.getNamespaceHook().string
   }
-  private let getNamespace: () -> MlirStringRef
-  fileprivate let register: (MlirContext) -> Void
+  fileprivate let hooks: MlirDialectRegistrationHooks
 }
 
 extension MlirDialect: Bridged {

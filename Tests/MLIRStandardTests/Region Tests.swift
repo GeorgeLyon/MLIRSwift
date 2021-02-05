@@ -6,7 +6,7 @@ import MLIR
 
 final class RegionTests: XCTestCase {
   override class func setUp() {
-    MLIR.register(.std)
+    MLIR.load(.std)
   }
   override class func tearDown() {
     MLIR.resetContext()
