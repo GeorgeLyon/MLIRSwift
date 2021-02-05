@@ -36,6 +36,10 @@ public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   }
   public var regions: Regions { Regions(c: .borrow(self)) }
   
+  public func verify() -> Bool {
+    mlirOperationVerify(.borrow(self))
+  }
+  
   init(
     _ name: String,
     attributes: MLIR.NamedAttributes,

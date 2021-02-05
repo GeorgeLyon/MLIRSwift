@@ -5,7 +5,7 @@ import MLIR
 
 final class ModuleTests: XCTestCase {
   override class func setUp() {
-    MLIR.register(.std)
+    MLIR.load(.std)
   }
   override class func tearDown() {
     MLIR.resetContext()
@@ -38,18 +38,14 @@ final class ModuleTests: XCTestCase {
           returning: [.integer(bitWidth: 1), .integer(bitWidth: 1)],
           blocks: [
             Block(.integer(bitWidth: 1), .integer(bitWidth: 1)) { ops, arg0, arg1 in
-              ops.append(.return(arg1, arg0), at: location.throughCallsite())
+              ops.append(.return(arg1, arg0), at: location)
             }
-          ],
-          location: location.throughCallsite()))
+          ]),
+        at: location)
     }
-//    print(constructed.operation)
-//    print(constructed.operation.withPrintingOptions(alwaysPrintInGenericForm: true))
     
     let parsed: Module = try .parse(reference)
-//    print(parsed.operation)
-//    print(parsed.operation.withPrintingOptions(alwaysPrintInGenericForm: true))
-
+    
     XCTAssertEqual(parsed.body.operations.count, 2) /// Includes the module terminator
     XCTAssertEqual(parsed.operation.regions.count, 1)
     XCTAssertEqual(parsed.operation.regions.first?.blocks.count, 1)
@@ -61,17 +57,7 @@ final class ModuleTests: XCTestCase {
       generic,
       "\(parsed.operation.withPrintingOptions(alwaysPrintInGenericForm: true))")
     
-    /**
-     The following fails because the return operation isn't canonicalized. Instead we get:
-     ```
-     module  {
-       func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
-         "std.return"(%arg1, %arg0) : (i1, i1) -> ()
-       }
-     }
-     ```
-     */
-//    XCTAssertEqual(reference, "\(constructed.operation)")
+    XCTAssertEqual(reference, "\(constructed.operation)")
     XCTAssertEqual(reference, "\(parsed.operation)")
   }
 }

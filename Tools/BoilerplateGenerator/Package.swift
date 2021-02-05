@@ -5,14 +5,20 @@ import PackageDescription
 let package = Package(
   name: "BoilerplateGenerator",
   products: [
-    .executable(name: "GenerateBlockInitializers", targets: ["GenerateBlockInitializers"]),
-    .executable(name: "GenerateGenericOperationBuilders", targets: ["GenerateGenericOperationBuilders"]),
-    .executable(name: "GenerateTypeListImplementation", targets: ["GenerateTypeListImplementation"]),
+    .executable(
+      name: "GenerateBlockInitializers",
+      targets: ["GenerateBlockInitializers"]),
+    .executable(
+      name: "GenerateBuildableOperationInitializers",
+      targets: ["GenerateBuildableOperationInitializers"]),
+    .executable(
+      name: "GenerateBlockOperationsAppend",
+      targets: ["GenerateBlockOperationsAppend"]),
   ],
   targets: [
     .target(name: "Utilities"),
     .target(name: "GenerateBlockInitializers", dependencies: ["Utilities"]),
-    .target(name: "GenerateGenericOperationBuilders", dependencies: ["Utilities"]),
-    .target(name: "GenerateTypeListImplementation", dependencies: ["Utilities"]),
+    .target(name: "GenerateBuildableOperationInitializers", dependencies: ["Utilities"]),
+    .target(name: "GenerateBlockOperationsAppend", dependencies: ["Utilities"]),
   ]
 )

@@ -41,7 +41,8 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
        If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
        */
       mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation)
-      return .borrow(ownedOperation)!
+      let borrowedOperation: Operation = .borrow(ownedOperation)!
+      return borrowedOperation
     }
 
     var first: MlirOperation { mlirBlockGetFirstOperation(c) }
