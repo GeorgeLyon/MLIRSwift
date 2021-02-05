@@ -1,8 +1,8 @@
-import CMLIRStandard
+import CStandard
 import MLIR
 
 extension Dialect {
   public static let std = Dialect(
-    register: mlirContextRegisterStandardDialect,
+    load: mlirContextLoadStandardDialect,
     getNamespace: mlirStandardDialectGetNamespace)
 }

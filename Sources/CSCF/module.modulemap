@@ -1,9 +1,9 @@
-module CMLIRStandard [system] {
-  header "CMLIRStandard.h"
+module CSCF [system] {
+  header "CSCF.h"
 
   // Dialects
-  link "MLIRStandard"
-  link "MLIRCAPIStandard"
+  link "MLIRSCF"
+  link "MLIRCAPISCF"
   
   // Dependencies
   link "MLIRCallInterfaces"

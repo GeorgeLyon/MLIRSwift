@@ -21,7 +21,8 @@ LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 LLVM_SYSTEM_LIBRARY_TARGETS="
   $PROJECT_ROOT/Sources/CMLIR
-  $PROJECT_ROOT/Sources/CMLIRStandard
+  $PROJECT_ROOT/Sources/CStandard
+  $PROJECT_ROOT/Sources/CSCF
   $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
 LLVM_HEADER_TARGETS="
   install-llvm-headers
@@ -52,7 +53,7 @@ LLVM_INSTALL_TARGETS=$(echo $(
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
-if [[ -n "$LLVM_REPO" ]]; then
+if [[ "$LLVM_REPO" != "local" ]]; then
   # Invoke with LLVM_REPO="" to skip any repo-management logic
   echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
 fi
@@ -89,7 +90,7 @@ if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
 fi
 
 # Clone/checkout LLVM or other another project that includes LLVM
-if [[ -n "$LLVM_REPO" ]]; then
+if [[ "$LLVM_REPO" != "local" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
     echo "Setting up \"$LLVM_REPO\""
     # Set up repo without cloning

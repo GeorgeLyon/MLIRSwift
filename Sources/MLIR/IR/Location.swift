@@ -1,19 +1,22 @@
 import CMLIR
 
 public struct Location: OpaqueStorageRepresentable {
-  init(file: StaticString, line: Int, column: Int) {
+  public init(file: StaticString, line: Int, column: Int) {
     self = .borrow(
       file.withUnsafeMlirStringRef {
         mlirLocationFileLineColGet(MLIR.context, $0, UInt32(line), UInt32(column))
       })
   }
-  /**
-   Creates a call site location
-   - note: This currently just returns `self` but will eventually do something once `CallSiteLoc` is bridged
-   */
-  func called(by location: Location) -> Location {
-    return self
+
+  public func called(from location: Location) -> Location {
+    .borrow(mlirLocationCallSiteGet(.borrow(self), .borrow(location)))
   }
+  public func viaCallsite(
+    file: StaticString = #fileID, line: Int = #line, column: Int = #column
+  ) -> Location {
+    Location(file: file, line: line, column: column).called(from: self)
+  }
+
   init(storage: BridgingStorage<MlirLocation, OwnedByMLIR>) { self.storage = storage }
   let storage: BridgingStorage<MlirLocation, OwnedByMLIR>
 }

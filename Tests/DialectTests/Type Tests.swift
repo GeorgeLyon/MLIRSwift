@@ -1,12 +1,12 @@
 
 import XCTest
-@testable import MLIRStandard
+@testable import Standard
 
 import MLIR
 
-final class RegionTests: XCTestCase {
+final class TypeTests: XCTestCase {
   override class func setUp() {
-    MLIR.register(.std)
+    MLIR.load(.std)
   }
   override class func tearDown() {
     MLIR.resetContext()
