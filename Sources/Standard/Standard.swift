@@ -1,4 +1,4 @@
-import CMLIRStandard
+import CStandard
 import MLIR
 
 extension Dialect {

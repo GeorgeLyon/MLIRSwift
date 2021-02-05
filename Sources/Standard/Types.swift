@@ -1,5 +1,5 @@
 import CMLIR
-import CMLIRStandard
+import CStandard
 import MLIR
 
 extension Type {

@@ -1,11 +1,12 @@
 import XCTest
-@testable import MLIRStandard
+import Standard
+import SCF
 
 import MLIR
 
 final class ModuleTests: XCTestCase {
   override class func setUp() {
-    MLIR.load(.std)
+    MLIR.load(.std, .scf)
   }
   override class func tearDown() {
     MLIR.resetContext()
