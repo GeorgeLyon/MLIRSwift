@@ -1,4 +1,3 @@
-
 public struct BuildableOperation<ResultTypes> {
   let dialect: Dialect?
   let name: String
@@ -6,7 +5,7 @@ public struct BuildableOperation<ResultTypes> {
   let operands: [MLIR.Value]
   let resultTypes: [MLIR.`Type`]
   let regions: [MLIR.Region<OwnedBySwift>]
-  
+
   func makeOperation(at location: Location) -> Operation<OwnedBySwift> {
     let operation: Operation<OwnedBySwift>
     if let dialect = dialect {

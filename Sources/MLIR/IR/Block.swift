@@ -50,7 +50,7 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
     fileprivate let c: MlirBlock
   }
   public var operations: Operations { Operations(c: .borrow(self)) }
-  
+
   init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirBlock, Ownership>
 }

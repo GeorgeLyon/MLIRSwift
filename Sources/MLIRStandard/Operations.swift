@@ -1,10 +1,11 @@
 import MLIR
 
-extension BuildableOperation{
-  
+extension BuildableOperation {
+
   public static func constant(
     _ value: MLIR.Attribute,
-    ofType type: MLIR.`Type`) -> Self
+    ofType type: MLIR.`Type`
+  ) -> Self
   where
     ResultTypes == (MLIR.`Type`)
   {
@@ -15,7 +16,7 @@ extension BuildableOperation{
       ],
       resultType: type)
   }
-  
+
   public static func `return`(_ values: MLIR.Value...) -> Self
   where
     ResultTypes == ()
@@ -24,5 +25,5 @@ extension BuildableOperation{
       .std, "return",
       operands: values)
   }
-  
+
 }

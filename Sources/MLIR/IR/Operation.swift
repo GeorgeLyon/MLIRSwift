@@ -22,7 +22,7 @@ public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
       regions: regions,
       location: location)
   }
-  
+
   public typealias Results = OperationResults
   public var results: Results { Results(c: .borrow(self)) }
 
@@ -35,11 +35,11 @@ public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
     fileprivate let c: MlirOperation
   }
   public var regions: Regions { Regions(c: .borrow(self)) }
-  
+
   public func verify() -> Bool {
     mlirOperationVerify(.borrow(self))
   }
-  
+
   init(
     _ name: String,
     attributes: MLIR.NamedAttributes,
@@ -69,7 +69,7 @@ public struct Operation<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
         }
       })!
   }
-  
+
   init(storage: BridgingStorage<MlirOperation, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirOperation, Ownership>
 }

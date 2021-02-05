@@ -1,4 +1,3 @@
-
 extension BuildableOperation where ResultTypes == () {
   public static func function(
     _ name: String,
