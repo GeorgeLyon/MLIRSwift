@@ -6,6 +6,11 @@ if [[ "$VERBOSE" == "true" ]]; then
   set -x
 fi
 
+which git
+which md5
+which cmake
+which ninja
+
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
@@ -134,8 +139,13 @@ cmake \
   --target $(echo $LLVM_INSTALL_TARGETS)
   
 # (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
-rm "$INSTALL_PATH/include/mlir-c/Registration.h"
-cp "$TOOLS_ROOT/Registration.h" "$INSTALL_PATH/include/mlir-c/Registration.h"
+REGISTRATION_H_PATH="$INSTALL_PATH/include/mlir-c/Registration.h"
+if [[ "$(cat "$REGISTRATION_H_PATH" | md5)" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
+  echo "mlir-c/Registration.h has changed. Please verify the MlirDialectRegistrationHooks workaround is still valid."
+  exit 1
+fi
+rm "$REGISTRATION_H_PATH"
+cp "$TOOLS_ROOT/Registration.h" "$REGISTRATION_H_PATH"
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
