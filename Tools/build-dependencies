@@ -91,16 +91,6 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   read
 fi
 
-# Install swift-format'
-if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
-  echo "Installing swift-format"
-  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
-  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
-    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
-  mkdir -p "$TOOLS_INSTALL_PATH"
-  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
-fi
-
 # Clone/checkout LLVM or other another project that includes LLVM
 if [[ "$LLVM_REPO" != "local" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
@@ -147,8 +137,9 @@ cmake \
   
 # (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
 REGISTRATION_H_PATH="$INSTALL_PATH/include/mlir-c/Registration.h"
-if [[ "$(cat "$REGISTRATION_H_PATH" | calculate_md5)" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
-  echo "mlir-c/Registration.h has changed. Please verify the MlirDialectRegistrationHooks workaround is still valid."
+REGISTRATION_H_MD5="$(cat "$REGISTRATION_H_PATH" | calculate_md5)"
+if [[ "" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
+  echo "mlir-c/Registration.h has changed (new md5: $REGISTRATION_H_MD5) . Please verify the MlirDialectRegistrationHooks workaround is still valid."
   exit 1
 fi
 rm "$REGISTRATION_H_PATH"
@@ -161,4 +152,14 @@ if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
     echo "Could not create pkg-config file, please ensure $PKG_CONFIG_FILE_PATH is writable."
     exit 1
   fi
+fi
+
+# Install swift-format'
+if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
+  echo "Installing swift-format"
+  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
+  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
+    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
+  mkdir -p "$TOOLS_INSTALL_PATH"
+  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
 fi
