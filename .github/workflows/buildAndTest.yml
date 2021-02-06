@@ -35,7 +35,7 @@ jobs:
       - name: Clone, Build and Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
+          PKG_CONFIG_PATH=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
   
   # Validate this commit
   validate:
@@ -61,7 +61,7 @@ jobs:
       - name: Clone, Build and Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
+          PKG_CONFIG_PATH=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
           
       # Actually validate this commit
       

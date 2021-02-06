@@ -13,6 +13,4 @@ module CStandard [system] {
   link "MLIRVectorInterfaces"
   link "MLIRViewLikeInterface"
   link "MLIRTensor"
-  
-  export *
 }

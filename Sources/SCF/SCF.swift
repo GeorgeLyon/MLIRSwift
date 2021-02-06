@@ -2,5 +2,7 @@ import CSCF
 import MLIR
 
 extension Dialect {
-  public static let scf = Dialect(mlirGetDialectHooks__scf__)
+  public static let scf = Dialect(
+    loadHook: mlirContextLoadSCFDialect,
+    getNamespace: mlirSCFDialectGetNamespace)
 }

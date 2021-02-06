@@ -132,6 +132,10 @@ cmake \
 cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target $(echo $LLVM_INSTALL_TARGETS)
+  
+# (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
+rm "$INSTALL_PATH/include/mlir-c/Registration.h"
+cp "$TOOLS_ROOT/Registration.h" "$INSTALL_PATH/include/mlir-c/Registration.h"
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then

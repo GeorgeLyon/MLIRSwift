@@ -10,6 +10,4 @@ module CMLIR [system] {
   link "MLIRParser"
   link "MLIRIR"
   link "MLIRCAPIIR"
-
-  export *
 }

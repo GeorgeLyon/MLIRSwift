@@ -13,6 +13,4 @@ module CSCF [system] {
   link "MLIRVectorInterfaces"
   link "MLIRViewLikeInterface"
   link "MLIRTensor"
-  
-  export *
 }

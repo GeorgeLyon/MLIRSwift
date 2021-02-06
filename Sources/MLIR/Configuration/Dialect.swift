@@ -3,19 +3,21 @@ import CMLIR
 extension MLIR {
   public static func load(_ dialects: Dialect...) {
     for dialect in dialects {
-      _ = dialect.hooks.loadHook(context)
+      _ = dialect.loadHook(context)
     }
   }
 }
 
 public struct Dialect {
-  public init(_ fn: () -> UnsafePointer<MlirDialectRegistrationHooks>?) {
-    self.hooks = fn()!.pointee
+  public init(
+    loadHook: @escaping MlirContextLoadDialectHook,
+    getNamespace: MlirDialectGetNamespaceHook
+  ) {
+    self.loadHook = loadHook
+    namespace = getNamespace().string
   }
-  public var namespace: String {
-    hooks.getNamespaceHook().string
-  }
-  fileprivate let hooks: MlirDialectRegistrationHooks
+  public let namespace: String
+  fileprivate let loadHook: MlirContextLoadDialectHook
 }
 
 extension MlirDialect: Bridged {

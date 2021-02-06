@@ -14,5 +14,5 @@ RUN apt-get install -y clang libpython2.7 libpython2.7-dev wget
 RUN wget https://swift.org/builds/swift-5.3-release/ubuntu2004/swift-5.3-RELEASE/swift-5.3-RELEASE-ubuntu20.04.tar.gz
 RUN tar xzf swift-5.3-RELEASE-ubuntu20.04.tar.gz
 ENV PATH="/swift-5.3-RELEASE-ubuntu20.04/usr/bin:${PATH}"
-ENV PKG_CONFIG_PATH="/root/.dependencies/installed"
+ENV PKG_CONFIG_PATH="/wd/.dependencies/installed"
 RUN swift --version
