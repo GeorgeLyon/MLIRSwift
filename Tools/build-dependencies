@@ -7,9 +7,16 @@ if [[ "$VERBOSE" == "true" ]]; then
 fi
 
 which git
-which md5
 which cmake
 which ninja
+
+function calculate_md5() {
+  if which md5sum; then
+    md5sum | cut -f1 -d' '
+  else
+    md5
+  fi
+}
 
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -140,7 +147,7 @@ cmake \
   
 # (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
 REGISTRATION_H_PATH="$INSTALL_PATH/include/mlir-c/Registration.h"
-if [[ "$(cat "$REGISTRATION_H_PATH" | md5)" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
+if [[ "$(cat "$REGISTRATION_H_PATH" | calculate_md5)" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
   echo "mlir-c/Registration.h has changed. Please verify the MlirDialectRegistrationHooks workaround is still valid."
   exit 1
 fi
