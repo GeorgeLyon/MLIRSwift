@@ -11,12 +11,13 @@ which cmake
 which ninja
 
 function calculate_md5() {
-  if which md5sum; then
+  if which md5sum > /dev/null; then
     md5sum | cut -f1 -d' '
   else
     md5
   fi
 }
+echo "Foo" | calculate_md5
 
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -138,7 +139,7 @@ cmake \
 # (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
 REGISTRATION_H_PATH="$INSTALL_PATH/include/mlir-c/Registration.h"
 REGISTRATION_H_MD5="$(cat "$REGISTRATION_H_PATH" | calculate_md5)"
-if [[ "" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
+if [[ "$REGISTRATION_H_MD5" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
   echo "mlir-c/Registration.h has changed (new md5: $REGISTRATION_H_MD5) . Please verify the MlirDialectRegistrationHooks workaround is still valid."
   exit 1
 fi
@@ -154,7 +155,7 @@ if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
   fi
 fi
 
-# Install swift-format'
+# Install swift-format
 if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
   echo "Installing swift-format"
   # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
