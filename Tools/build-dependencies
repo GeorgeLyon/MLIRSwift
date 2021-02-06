@@ -17,7 +17,8 @@ function calculate_md5() {
     md5
   fi
 }
-echo "Foo" | calculate_md5
+# This will fail if we can't calculate MD5s
+echo "Test MD5" | calculate_md5 > /dev/null
 
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
