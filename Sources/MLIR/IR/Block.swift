@@ -1,17 +1,13 @@
 import CMLIR
 
 public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
-  public init(
-    argumentTypes: [MLIR.`Type`] = [],
-    operations: (inout OperationBuilder, Arguments) throws -> Void
-  ) rethrows
-  where Ownership == OwnedBySwift {
+  public init(argumentTypes: [MLIR.`Type`] = [])
+  where
+    Ownership == OwnedBySwift
+  {
     self = argumentTypes.withUnsafeBorrowedValues {
       .assumeOwnership(of: mlirBlockCreate($0.count, $0.baseAddress))!
     }
-    try OperationBuilder
-      .build { try operations(&$0, arguments) }
-      .forEach(self.operations.append)
   }
 
   public struct Arguments: RandomAccessCollection {
@@ -20,11 +16,13 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
     public subscript(position: Int) -> MLIR.Value {
       .borrow(mlirBlockGetArgument(c, position))
     }
+    public func add(_ type: MLIR.`Type`) -> MLIR.Value {
+      .borrow(mlirBlockAddArgument(c, .borrow(type)))
+    }
     fileprivate let c: MlirBlock
   }
   public var arguments: Arguments { Arguments(c: .borrow(self)) }
 
-  public typealias Operation = MLIR.Operation
   public struct Operations: Collection, LinkedList {
     public typealias Element = MLIR.Operation<OwnedByMLIR>
     public struct Index: Comparable, OpaqueStorageRepresentable {
@@ -32,11 +30,19 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
       public static func < (lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
     }
 
-    public func prepend(_ operation: MLIR.Operation<OwnedBySwift>) {
-      mlirBlockInsertOwnedOperation(c, 0, .assumeOwnership(of: operation))
-    }
-    public func append(_ operation: MLIR.Operation<OwnedBySwift>) {
-      mlirBlockAppendOwnedOperation(c, .assumeOwnership(of: operation))
+    /**
+     Returns a representation of this operation which is owned by MLIR, since the passed in value will be invalidated.
+     */
+    @discardableResult
+    public func append(_ operation: MLIR.Operation<OwnedBySwift>) -> MLIR.Operation<OwnedByMLIR> {
+      let ownedOperation: MlirOperation = .assumeOwnership(of: operation)
+      /**
+       The module terminator must always be at the end.
+       If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
+       */
+      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation)
+      let borrowedOperation: Operation = .borrow(ownedOperation)!
+      return borrowedOperation
     }
 
     var first: MlirOperation { mlirBlockGetFirstOperation(c) }
@@ -45,17 +51,8 @@ public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
   }
   public var operations: Operations { Operations(c: .borrow(self)) }
 
-  typealias MlirStruct = MlirBlock
   init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
   let storage: BridgingStorage<MlirBlock, Ownership>
-}
-
-// MARK: - Building Blocks
-
-@_functionBuilder
-public struct BlockBuilder {
-  public typealias Block = MLIR.Block<OwnedBySwift>
-  public static func buildBlock(_ components: Block...) -> [Block] { components }
 }
 
 // MARK: - Bridging

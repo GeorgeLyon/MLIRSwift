@@ -12,7 +12,7 @@ let package = Package(
       targets: ["MLIR"]),
     .library(
       name: "MLIRStandard",
-      targets: ["MLIRStandard"]),
+      targets: ["Standard"]),
   ],
   targets: [
     .systemLibrary(
@@ -26,13 +26,21 @@ let package = Package(
       dependencies: ["MLIR"]),
     
     .systemLibrary(
-      name: "CMLIRStandard",
+      name: "CStandard",
       pkgConfig: "LLVM-for-Swift"),
     .target(
-      name: "MLIRStandard",
-      dependencies: ["CMLIRStandard", "MLIR"]),
+      name: "Standard",
+      dependencies: ["CStandard", "MLIR"]),
+    
+    .systemLibrary(
+      name: "CSCF",
+      pkgConfig: "LLVM-for-Swift"),
+    .target(
+      name: "SCF",
+      dependencies: ["CSCF", "MLIR"]),
+    
     .testTarget(
-      name: "MLIRStandardTests",
-      dependencies: ["MLIRStandard"]),
+      name: "DialectTests",
+      dependencies: ["SCF", "Standard"]),
   ]
 )

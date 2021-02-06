@@ -1,0 +1,16 @@
+module CStandard [system] {
+  header "CStandard.h"
+
+  // Dialects
+  link "MLIRStandard"
+  link "MLIRCAPIStandard"
+  
+  // Dependencies
+  link "MLIRCallInterfaces"
+  link "MLIRControlFlowInterfaces"
+  link "MLIREDSC"
+  link "MLIRSideEffectInterfaces"
+  link "MLIRVectorInterfaces"
+  link "MLIRViewLikeInterface"
+  link "MLIRTensor"
+}

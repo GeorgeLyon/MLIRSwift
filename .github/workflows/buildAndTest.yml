@@ -28,14 +28,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('Tools/llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
       - name: Clone, Build and Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
+          PKG_CONFIG_PATH=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
   
   # Validate this commit
   validate:
@@ -54,14 +54,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .dependencies/installed
-          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
+          key: ${{ runner.os }}-dependencies-v1-${{ hashFiles('Tools/llvm-commit', 'Tools/build-dependencies', 'Tools/SwiftFormat/Package.swift') }}
       - name: Install Ninja
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         uses: seanmiddleditch/gha-setup-ninja@master
       - name: Clone, Build and Install Dependencies
         if: steps.cache-dependencies.outputs.cache-hit != 'true'
         run: |
-          PKG_CONFIG_ROOT=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
+          PKG_CONFIG_PATH=.dependencies/installed NO_INTERACTION=true Tools/build-dependencies
           
       # Actually validate this commit
       

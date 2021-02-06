@@ -6,11 +6,24 @@ if [[ "$VERBOSE" == "true" ]]; then
   set -x
 fi
 
+which git
+which cmake
+which ninja
+
+function calculate_md5() {
+  if which md5sum > /dev/null; then
+    md5sum | cut -f1 -d' '
+  else
+    md5
+  fi
+}
+# This will fail if we can't calculate MD5s
+echo "Test MD5" | calculate_md5 > /dev/null
+
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
 DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
-PKG_CONFIG_ROOT=${PKG_CONFIG_ROOT:-/usr/local/lib/pkgconfig}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
 LLVM_COMMIT=${LLVM_COMMIT:-$(cat $TOOLS_ROOT/llvm-commit)}
 LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
@@ -21,14 +34,16 @@ LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 LLVM_SYSTEM_LIBRARY_TARGETS="
   $PROJECT_ROOT/Sources/CMLIR
-  $PROJECT_ROOT/Sources/CMLIRStandard
+  $PROJECT_ROOT/Sources/CStandard
+  $PROJECT_ROOT/Sources/CSCF
   $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
 LLVM_HEADER_TARGETS="
   install-llvm-headers
   install-mlir-headers
   $LLVM_ADDITIONAL_HEADER_TARGETS"
 TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/installed/tools"
-PKG_CONFIG_PATH="$PKG_CONFIG_ROOT/LLVM-for-Swift.pc"
+PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-/usr/local/lib/pkgconfig}
+PKG_CONFIG_FILE_PATH="$PKG_CONFIG_PATH/LLVM-for-Swift.pc"
 PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
@@ -36,9 +51,9 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Utilities/build-dependencies in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lc++ -lcurses $(
+Libs: -lcurses $(
   # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
-  [[ "$OSTYPE" == "darwin"* ]] || echo "-lstdc++"
+  [[ "$OSTYPE" == "darwin"* ]] && echo "-lc++" || echo "-lstdc++"
 ) -L\${prefix}/lib
 EOF
 )
@@ -52,7 +67,7 @@ LLVM_INSTALL_TARGETS=$(echo $(
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
-if [[ -n "$LLVM_REPO" ]]; then
+if [[ "$LLVM_REPO" != "local" ]]; then
   # Invoke with LLVM_REPO="" to skip any repo-management logic
   echo " - Checkout commit ${LLVM_COMMIT} from ${LLVM_REPO} to ${LLVM_REPO_PATH}"
 fi
@@ -70,7 +85,7 @@ fi
 echo "   - Built products will be placed in ${LLVM_BUILD_ROOT}"
 echo " - Install all available LLVM projects to ${INSTALL_PATH}"
 echo " - Install necessary tools to ${TOOLS_INSTALL_PATH}"
-echo " - Update ${PKG_CONFIG_PATH} to point to ${INSTALL_PATH}"
+echo " - Update ${PKG_CONFIG_FILE_PATH} to point to ${INSTALL_PATH}"
 echo ""
 
 if [[ "$NO_INTERACTION" != "true" ]]; then
@@ -78,18 +93,8 @@ if [[ "$NO_INTERACTION" != "true" ]]; then
   read
 fi
 
-# Install swift-format'
-if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
-  echo "Installing swift-format"
-  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
-  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
-    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
-  mkdir -p "$TOOLS_INSTALL_PATH"
-  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
-fi
-
 # Clone/checkout LLVM or other another project that includes LLVM
-if [[ -n "$LLVM_REPO" ]]; then
+if [[ "$LLVM_REPO" != "local" ]]; then
   if [[ ! -d "$LLVM_REPO_PATH/.git" ]]; then
     echo "Setting up \"$LLVM_REPO\""
     # Set up repo without cloning
@@ -131,12 +136,32 @@ cmake \
 cmake \
   --build "$LLVM_BUILD_ROOT" \
   --target $(echo $LLVM_INSTALL_TARGETS)
+  
+# (Hopefully temporary) fix for this issue: https://llvm.discourse.group/t/strange-swift-issues-with-dialect-registration-hooks/2759
+REGISTRATION_H_PATH="$INSTALL_PATH/include/mlir-c/Registration.h"
+REGISTRATION_H_MD5="$(cat "$REGISTRATION_H_PATH" | calculate_md5)"
+if [[ "$REGISTRATION_H_MD5" != "c1bd249b0d5e5d01036abc0b374c15de" ]]; then
+  echo "mlir-c/Registration.h has changed (new md5: $REGISTRATION_H_MD5) . Please verify the MlirDialectRegistrationHooks workaround is still valid."
+  exit 1
+fi
+rm "$REGISTRATION_H_PATH"
+cp "$TOOLS_ROOT/Registration.h" "$REGISTRATION_H_PATH"
 
 # Install the LLVM package config
-if [[ -n "$PKG_CONFIG_ROOT" ]]; then
-  echo "Writing pkg-config file to $PKG_CONFIG_PATH"
-  if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_PATH"; then
-    echo "Could not create pkg-config file, please ensure $PKG_CONFIG_PATH is writable."
+if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
+  echo "Writing pkg-config file to $PKG_CONFIG_FILE_PATH"
+  if ! echo "$PKG_CONFIG" > "$PKG_CONFIG_FILE_PATH"; then
+    echo "Could not create pkg-config file, please ensure $PKG_CONFIG_FILE_PATH is writable."
     exit 1
   fi
+fi
+
+# Install swift-format
+if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
+  echo "Installing swift-format"
+  # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
+  swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
+    swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
+  mkdir -p "$TOOLS_INSTALL_PATH"
+  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
 fi

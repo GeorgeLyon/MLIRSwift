@@ -1,4 +1,6 @@
 
+#include <mlir-c/Registration.h>
+
 #include <mlir-c/IR.h>
 #include <mlir-c/Diagnostics.h>
 #include <mlir-c/BuiltinAttributes.h>

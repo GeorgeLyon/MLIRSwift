@@ -1,4 +1,5 @@
 
+#include <mlir-c/Registration.h>
 #include <mlir-c/Dialect/Standard.h>
 
 #include <mlir-c/BuiltinAttributes.h>
