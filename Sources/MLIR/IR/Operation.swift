@@ -38,7 +38,7 @@ extension Operation {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes: [MLIR.`Type`] = [],
       ownedRegions: [Region] = [])
@@ -55,7 +55,7 @@ extension Operation {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes: InferredResultType,
       ownedRegions: [Region] = [])
@@ -72,7 +72,7 @@ extension Operation {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       ownedRegions: [Region] = [])
     where
@@ -88,7 +88,7 @@ extension Operation {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultType: MLIR.`Type`,
       ownedRegions: [Region] = [])
@@ -105,7 +105,7 @@ extension Operation {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultType: InferredResultType,
       ownedRegions: [Region] = [])
@@ -122,12 +122,10 @@ extension Operation {
     
     init(
       builtin name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes: [MLIR.`Type`] = [],
       ownedRegions: [Region] = [])
-    where
-      Results == Operation.Results
     {
       self.dialect = nil
       self.name = name
@@ -140,7 +138,7 @@ extension Operation {
     /// `nil` indicates the builtin dialect
     let dialect: Dialect?
     let name: String
-    let attributes: NamedAttributes
+    let attributes: [NamedAttribute]
     let operands: [Value]
     /// `nil` implies result type inference
     let resultTypes: [MLIR.`Type`]?

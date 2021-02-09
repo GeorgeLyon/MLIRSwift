@@ -13,7 +13,7 @@ for numArguments in 2...maxNumArguments {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes \(names.map { "\($0): MLIR.`Type`" }.joined(separator: ", _ ")),
       ownedRegions: [Region] = [])
@@ -28,7 +28,7 @@ for numArguments in 2...maxNumArguments {
     
     public init(
       _ dialect: Dialect, _ name: String,
-      attributes: NamedAttributes = [:],
+      attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes _: \(
         range.map { _ in "Operation.InferredResultType" }.joined(separator: ", _: ")),

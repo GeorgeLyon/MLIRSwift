@@ -9,7 +9,7 @@ function swift-format() {
 
 function generate() {
   swift run --package-path $TOOLS_ROOT/BoilerplateGenerator Generate$(echo $@ | tr -d ' ') |
-   swift-format > "$PROJECT_ROOT/Sources/MLIR/$(echo $@) (Generated).swift"
+   swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/$(echo $@) (Generated).swift"
 }
 
 generate Operation Definition Initializers

@@ -5,7 +5,7 @@ extension Operation.Definition where Results == (Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`,
     ownedRegions: [Region] = []
@@ -20,7 +20,7 @@ extension Operation.Definition where Results == (Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     ownedRegions: [Region] = []
@@ -40,7 +40,7 @@ extension Operation.Definition where Results == (Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`,
     ownedRegions: [Region] = []
@@ -55,7 +55,7 @@ extension Operation.Definition where Results == (Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType,
@@ -76,7 +76,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     ownedRegions: [Region] = []
@@ -91,7 +91,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -112,7 +112,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`,
@@ -128,7 +128,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -150,7 +150,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`,
@@ -166,7 +166,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -188,7 +188,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`,
@@ -204,7 +204,7 @@ extension Operation.Definition where Results == (Value, Value, Value, Value, Val
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -228,7 +228,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`,
@@ -244,7 +244,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -268,7 +268,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value)
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`, _ t8: MLIR.`Type`,
@@ -284,7 +284,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value)
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,
@@ -309,7 +309,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value,
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes t0: MLIR.`Type`, _ t1: MLIR.`Type`, _ t2: MLIR.`Type`, _ t3: MLIR.`Type`,
     _ t4: MLIR.`Type`, _ t5: MLIR.`Type`, _ t6: MLIR.`Type`, _ t7: MLIR.`Type`, _ t8: MLIR.`Type`,
@@ -326,7 +326,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value,
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: NamedAttributes = [:],
+    attributes: [NamedAttribute] = [],
     operands: [Value] = [],
     resultTypes _: Operation.InferredResultType, _: Operation.InferredResultType,
     _: Operation.InferredResultType, _: Operation.InferredResultType,

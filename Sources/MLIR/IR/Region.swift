@@ -9,10 +9,6 @@ public struct Region: CRepresentable {
     c = mlirRegionCreate()
   }
   
-  public var owningOperation: Operation? {
-    Operation(c: mlirRegionGetParentOperation(c))
-  }
-  
   let c: MlirRegion
   
   static let isNull = mlirRegionIsNull

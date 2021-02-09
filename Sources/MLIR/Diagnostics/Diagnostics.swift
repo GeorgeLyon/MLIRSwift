@@ -22,40 +22,38 @@ public struct Diagnostic: Swift.Error {
 
 // MARK: - Internal
 
-struct UnsafeDiagnostic: OpaqueStorageRepresentable {
+struct UnsafeDiagnostic: CRepresentable {
 
   struct Notes: Sequence {
     func makeIterator() -> Iterator {
       return Iterator(parent: parent)
     }
     struct Iterator: IteratorProtocol {
-      init(parent: UnsafeDiagnostic) {
+      init(parent: MlirDiagnostic) {
         self.parent = parent
-        self.count = mlirDiagnosticGetNumNotes(.borrow(parent))
+        self.count = mlirDiagnosticGetNumNotes(parent)
       }
       mutating func next() -> UnsafeDiagnostic? {
         guard index < count else { return nil }
-        let diagnostic = UnsafeDiagnostic.borrow(mlirDiagnosticGetNote(.borrow(parent), index))
+        let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent, index))
         index += 1
         return diagnostic
       }
-      private let parent: UnsafeDiagnostic
+      private let parent: MlirDiagnostic
       private let count: Int
       private var index = 0
     }
-    fileprivate let parent: UnsafeDiagnostic
+    fileprivate let parent: MlirDiagnostic
   }
 
-  var location: MLIR.Location { .borrow(mlirDiagnosticGetLocation(.borrow(self))) }
-  var severity: MLIR.Diagnostic.Severity {
-    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(.borrow(self)))
+  var location: Location { Location(c: mlirDiagnosticGetLocation(c)) }
+  var severity: Diagnostic.Severity {
+    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c))
   }
-  var notes: Notes { Notes(parent: self) }
+  var notes: Notes { Notes(parent: c) }
 
-  let storage: BridgingStorage<MlirDiagnostic, OwnedByMLIR>
+  let c: MlirDiagnostic
 }
-
-extension MlirDiagnostic: Bridged {}
 
 enum DiagnosticHandlingDirective {
   case stop
@@ -85,18 +83,18 @@ protocol DiagnosticHandler: AnyObject {
   func handle(_ unsafeDiagnostic: UnsafeDiagnostic) -> DiagnosticHandlingDirective
 }
 
-extension MLIR {
-  static func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
+extension Context {
+  func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
-      context,
+      c,
       mlirDiagnosticHandler,
       userData,
       mlirDeleteUserData)
     return DiagnosticHandlerRegistration(id: id)
   }
-  static func unregister(_ registration: DiagnosticHandlerRegistration) {
-    mlirContextDetachDiagnosticHandler(context, registration.id)
+  func unregister(_ registration: DiagnosticHandlerRegistration) {
+    mlirContextDetachDiagnosticHandler(c, registration.id)
   }
 }
 
@@ -129,7 +127,7 @@ private func mlirDiagnosticHandler(
 ) -> MlirLogicalResult {
   let handler =
     Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
-  return handler.handle(.borrow(mlirDiagnostic)).logicalResult
+  return handler.handle(UnsafeDiagnostic(c: mlirDiagnostic)).logicalResult
 }
 
 private func mlirDeleteUserData(userData: UnsafeMutableRawPointer!) {
