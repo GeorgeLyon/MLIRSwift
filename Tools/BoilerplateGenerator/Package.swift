@@ -9,8 +9,8 @@ let package = Package(
       name: "GenerateBlockInitializers",
       targets: ["GenerateBlockInitializers"]),
     .executable(
-      name: "GenerateBuildableOperationInitializers",
-      targets: ["GenerateBuildableOperationInitializers"]),
+      name: "GenerateOperationDefinitionInitializers",
+      targets: ["GenerateOperationDefinitionInitializers"]),
     .executable(
       name: "GenerateBlockOperationsAppend",
       targets: ["GenerateBlockOperationsAppend"]),
@@ -18,7 +18,7 @@ let package = Package(
   targets: [
     .target(name: "Utilities"),
     .target(name: "GenerateBlockInitializers", dependencies: ["Utilities"]),
-    .target(name: "GenerateBuildableOperationInitializers", dependencies: ["Utilities"]),
+    .target(name: "GenerateOperationDefinitionInitializers", dependencies: ["Utilities"]),
     .target(name: "GenerateBlockOperationsAppend", dependencies: ["Utilities"]),
   ]
 )
