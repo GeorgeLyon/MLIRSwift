@@ -1,5 +1,5 @@
 import XCTest
-@testable import MLIR
+import MLIR
 
 import CMLIR
 
@@ -13,10 +13,11 @@ final class DiagnosticTests: XCTestCase {
     XCTAssertLessThan(Diagnostic.Severity.remark, Diagnostic.Severity.note)
   }
   func testDiagnosticHandling() {
+    let context = MLIR.OwnedContext()
     let message = "Test Diagnostic"
-    let diagnostics = MLIR.collectDiagnostics {
+    let diagnostics = context.collectDiagnostics {
       message.withCString {
-        mlirEmitError(mlirLocationUnknownGet(MLIR.context), $0)
+        mlirEmitError(mlirLocationUnknownGet(context.cRepresentation), $0)
       }
     }
     XCTAssertEqual(diagnostics.count, 1)

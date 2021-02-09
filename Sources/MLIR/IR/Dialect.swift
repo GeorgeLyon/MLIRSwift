@@ -3,6 +3,10 @@ import CMLIR
 
 public struct Dialect {
   
+  public init(_ handle: MlirDialectHandle) {
+    self.c = handle
+  }
+  
   public var namespace: String {
     mlirDialectHandleGetNamespace(c).string
   }

@@ -1,7 +1,7 @@
 
 import CMLIR
 
-public struct Block: CRepresentable {
+public struct Block: CRepresentable, Printable {
   public init(argumentTypes: [Type] = []) {
     c = argumentTypes.withUnsafeCRepresentation {
       mlirBlockCreate($0.count, $0.baseAddress)
@@ -20,10 +20,14 @@ public struct Block: CRepresentable {
   public var owningOperation: Operation? {
     Operation(c: mlirBlockGetParentOperation(c))
   }
+  public var context: Context? {
+    owningOperation?.context
+  }
   
   let c: MlirBlock
   
   static let isNull = mlirBlockIsNull
+  static let print = mlirBlockPrint
 }
 
 // MARK: - Arguments
@@ -71,7 +75,7 @@ extension Block {
      - returns: The results of the operation
      - precondition: `definition` must be valid or this will crash
      */
-    public func append(_ definition: Operation.Definition<Operation.Results>, from location: Location) -> Operation.Results {
+    public func append(_ definition: Operation.Definition<Operation.Results>, at location: Location) -> Operation.Results {
       let operation = Operation(definition, location: location)!
       append(operation)
       return operation.results

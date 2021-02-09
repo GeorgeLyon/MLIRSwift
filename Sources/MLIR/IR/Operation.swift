@@ -12,6 +12,9 @@ public struct Operation: CRepresentable {
   public var owningOperation: Operation? {
     Operation(c: mlirOperationGetParentOperation(c))
   }
+  public var context: UnownedContext {
+    UnownedContext(c: mlirOperationGetContext(c))!
+  }
   
   let c: MlirOperation
   
@@ -146,7 +149,13 @@ extension Operation {
     
     fileprivate func createOperation(at location: Location) -> MlirOperation
     {
-      name.withUnsafeMlirStringRef { name in
+      let name: String
+      if let dialect = dialect {
+        name = "\(dialect.namespace).\(self.name)"
+      } else {
+        name = self.name
+      }
+      return name.withUnsafeMlirStringRef { name in
         operands.withUnsafeCRepresentation { operands in
             attributes.withUnsafeCRepresentation { attributes in
               ownedRegions.withUnsafeCRepresentation { ownedRegions in

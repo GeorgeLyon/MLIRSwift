@@ -1,4 +1,6 @@
 
+import CMLIR
+
 /**
  - precondition: Conforming types **must** have exactly 1 stored property, and the type of that property must be `CRepresentation`
  */
@@ -12,6 +14,8 @@ protocol CRepresentable {
   associatedtype IsNull = Void
   static var isNull: IsNull { get }
 }
+
+// MARK: - Initialization
 
 extension CRepresentable where IsNull == Void {
   static var isNull: Void { () }
@@ -36,6 +40,8 @@ extension CRepresentable where IsNull == (CRepresentation) -> Bool {
     }
   }
 }
+
+// MARK: - Arrays
 
 extension Array where Element: CRepresentable {
   func withUnsafeCRepresentation<R>(_ body: (UnsafeBufferPointer<Element.CRepresentation>) throws -> R) rethrows -> R

@@ -14,7 +14,7 @@ extension Type {
     let c: MlirType =  Array(inputs).withUnsafeCRepresentation { inputs in
       Array(results).withUnsafeCRepresentation { results in
         mlirFunctionTypeGet(
-          context.c,
+          context.cRepresentation,
           inputs.count, inputs.baseAddress,
           results.count, results.baseAddress)
       }
@@ -30,11 +30,11 @@ extension Type {
     let c: MlirType
     switch signedness {
     case .signed:
-      c = mlirIntegerTypeSignedGet(context.c, UInt32(bitWidth))
+      c = mlirIntegerTypeSignedGet(context.cRepresentation, UInt32(bitWidth))
     case .unsigned:
-      c = mlirIntegerTypeUnsignedGet(context.c, UInt32(bitWidth))
+      c = mlirIntegerTypeUnsignedGet(context.cRepresentation, UInt32(bitWidth))
     case .none:
-      c = mlirIntegerTypeGet(context.c, UInt32(bitWidth))
+      c = mlirIntegerTypeGet(context.cRepresentation, UInt32(bitWidth))
     }
     return Self(c: c)!
   }

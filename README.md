@@ -5,7 +5,7 @@ This project intends to make MLIR APIs accessible from Swift via the MLIR C Bind
 **DISCLAIMER:** This project is a work in progress, expect things to be incomplete and to change without notice. As such, we recommend tracking the `main` branch in your dependent project:
 ```
 dependencies: [
-  .package(name: "MLIR", url: "https://github.com/GeorgeLyon/MLIRSwift", .branch("circt"))
+  .package(name: "MLIR", url: "https://github.com/GeorgeLyon/MLIRSwift", .branch("main"))
 ],
 ```
 

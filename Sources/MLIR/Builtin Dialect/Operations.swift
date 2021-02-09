@@ -18,6 +18,9 @@ extension Operation.Definition where Results == () {
         .type(.function(
                 of: entryBlock.arguments.map(\.type),
                 to: returnTypes, in: context))
+      ],
+      ownedRegions: [
+        Region(ownedBlocks: blocks)
       ])
   }
 }

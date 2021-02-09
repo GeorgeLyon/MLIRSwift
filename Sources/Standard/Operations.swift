@@ -1,25 +1,25 @@
 import MLIR
 
-extension BuildableOperation {
+extension Operation.Definition {
 
   public static func constant(
     _ value: MLIR.Attribute,
     ofType type: MLIR.`Type`
   ) -> Self
   where
-    ResultTypes == (MLIR.`Type`)
+    Results == (Value)
   {
     Self(
       .std, "constant",
       attributes: [
-        "value": value
+        .value(value)
       ],
       resultType: type)
   }
 
   public static func `return`(_ values: MLIR.Value...) -> Self
   where
-    ResultTypes == ()
+    Results == ()
   {
     Self(
       .std, "return",

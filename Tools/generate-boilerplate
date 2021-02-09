@@ -13,4 +13,5 @@ function generate() {
 }
 
 generate Operation Definition Initializers
+generate Block Convenience Initializers
 generate Block Operations Append

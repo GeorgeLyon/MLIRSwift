@@ -22,7 +22,7 @@ public struct Diagnostic: Swift.Error {
 
 // MARK: - Internal
 
-struct UnsafeDiagnostic: CRepresentable {
+struct UnsafeDiagnostic: CRepresentable, Printable {
 
   struct Notes: Sequence {
     func makeIterator() -> Iterator {
@@ -53,6 +53,8 @@ struct UnsafeDiagnostic: CRepresentable {
   var notes: Notes { Notes(parent: c) }
 
   let c: MlirDiagnostic
+  
+  static let print = mlirDiagnosticPrint
 }
 
 enum DiagnosticHandlingDirective {
@@ -87,14 +89,14 @@ extension Context {
   func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
-      c,
+      cRepresentation,
       mlirDiagnosticHandler,
       userData,
       mlirDeleteUserData)
     return DiagnosticHandlerRegistration(id: id)
   }
   func unregister(_ registration: DiagnosticHandlerRegistration) {
-    mlirContextDetachDiagnosticHandler(c, registration.id)
+    mlirContextDetachDiagnosticHandler(cRepresentation, registration.id)
   }
 }
 
