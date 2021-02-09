@@ -9,6 +9,10 @@ public struct Operation: CRepresentable {
     Results(c: c)
   }
   
+  public var isValid: Bool {
+    mlirOperationVerify(c)
+  }
+  
   public var owningOperation: Operation? {
     Operation(c: mlirOperationGetParentOperation(c))
   }

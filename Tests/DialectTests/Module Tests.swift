@@ -41,6 +41,8 @@ final class ModuleTests: XCTestCase {
         ],
         in: context),
       at: location.viaCallsite())
+    XCTAssertTrue(constructed.body.operations.map(\.isValid).reduce(true, { $0 && $1 }))
+    XCTAssertTrue(constructed.operation.isValid)
     
     let parsed: Module = try context.parse(reference)
     
