@@ -4,14 +4,15 @@ extension Type {
   public static func function<Inputs, Results>(
     of inputs: Inputs,
     to results: Results,
-    in context: Context) -> Self
+    in context: Context
+  ) -> Self
   where
     Inputs: Sequence,
     Inputs.Element == Self,
     Results: Sequence,
     Results.Element == Self
   {
-    let c: MlirType =  Array(inputs).withUnsafeCRepresentation { inputs in
+    let c: MlirType = Array(inputs).withUnsafeCRepresentation { inputs in
       Array(results).withUnsafeCRepresentation { results in
         mlirFunctionTypeGet(
           context.cRepresentation,
@@ -25,7 +26,9 @@ extension Type {
   public enum Signedness {
     case signed, unsigned
   }
-  public static func integer(_ signedness: Signedness? = nil, bitWidth: Int, in context: Context) -> Self {
+  public static func integer(_ signedness: Signedness? = nil, bitWidth: Int, in context: Context)
+    -> Self
+  {
     precondition(bitWidth > 0)
     let c: MlirType
     switch signedness {

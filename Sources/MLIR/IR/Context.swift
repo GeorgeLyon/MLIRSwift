@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public protocol Context {
@@ -13,7 +12,7 @@ public final class OwnedContext: Context {
     }
   }
   public var cRepresentation: MlirContext { c }
-  
+
   deinit {
     mlirContextDestroy(c)
   }
@@ -23,9 +22,9 @@ public final class OwnedContext: Context {
 public struct UnownedContext: Context, CRepresentable {
   public var cRepresentation: MlirContext { c }
   let c: MlirContext
-  
+
   static let isNull = mlirContextIsNull
-  
+
   /// Suppress initializer synthesis
   private init() { fatalError() }
 }

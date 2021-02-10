@@ -4,12 +4,11 @@ import Foundation
 // MARK: - Public
 
 extension TextOutputStream {
-  
+
   /**
    - parameter body: A block taking arguments suitable for use with MLIR printing APIs such as `mlirOperationPrint`. The callback passed to this closure is `@escaping` because the MLIR C APIs take optionals (which must be `@escaping`), but it is very much not safe for the callback to escape the body of the closure.
    */
-  public mutating func write(_ body: (MlirStringCallback?, UnsafeMutableRawPointer) -> Void)
-  {
+  public mutating func write(_ body: (MlirStringCallback?, UnsafeMutableRawPointer) -> Void) {
     withUnsafeMutablePointer(to: &self) { targetRef in
       let stringCallback: StringCallback = {
         targetRef.pointee.write($0.string)
@@ -31,7 +30,9 @@ extension TextOutputStream {
 
 // MARK: - Internal
 
-protocol Printable: CRepresentable, TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible {
+protocol Printable: CRepresentable, TextOutputStreamable, CustomStringConvertible,
+  CustomDebugStringConvertible
+{
   static var print: (CRepresentation, MlirStringCallback?, UnsafeMutableRawPointer?) -> Void { get }
 }
 

@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Location: CRepresentable, Printable {
@@ -7,11 +6,11 @@ public struct Location: CRepresentable, Printable {
       mlirLocationFileLineColGet(context.cRepresentation, $0, UInt32(line), UInt32(column))
     }
   }
-  
+
   public static func unknown(in context: Context) -> Location {
     Location(c: mlirLocationUnknownGet(context.cRepresentation))
   }
-  
+
   public func called(from location: Location) -> Location {
     Location(c: mlirLocationCallSiteGet(self.c, location.c))
   }
@@ -20,12 +19,12 @@ public struct Location: CRepresentable, Printable {
   ) -> Location {
     Location(context: context, file: file, line: line, column: column).called(from: self)
   }
-  
+
   public var context: UnownedContext {
     UnownedContext(c: mlirLocationGetContext(c))!
   }
-  
+
   let c: MlirLocation
-  
+
   static let print = mlirLocationPrint
 }

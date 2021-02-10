@@ -1,4 +1,3 @@
-
 extension Collection where Index == LinkedListIndex<Self> {
   public subscript(position: Index) -> Element {
     position.value!.element

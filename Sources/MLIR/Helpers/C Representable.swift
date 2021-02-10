@@ -1,4 +1,3 @@
-
 import CMLIR
 
 /**
@@ -7,7 +6,7 @@ import CMLIR
 protocol CRepresentable {
   associatedtype CRepresentation
   var c: CRepresentation { get }
-  
+
   /**
    We use this forumlation rather than a refinement protocol because we want to be able to express non-nullable types, and one cannot write `T != Nullable` in a `where` clause, but one can write `IsNull == Void`.
    */
@@ -44,8 +43,9 @@ extension CRepresentable where IsNull == (CRepresentation) -> Bool {
 // MARK: - Arrays
 
 extension Array where Element: CRepresentable {
-  func withUnsafeCRepresentation<R>(_ body: (UnsafeBufferPointer<Element.CRepresentation>) throws -> R) rethrows -> R
-  {
+  func withUnsafeCRepresentation<R>(
+    _ body: (UnsafeBufferPointer<Element.CRepresentation>) throws -> R
+  ) rethrows -> R {
     precondition(Element.isMemoryLayoutCompatibleWithCRepresentation)
     return try withUnsafeBufferPointer { buffer in
       try buffer.withMemoryRebound(to: Element.CRepresentation.self, body)

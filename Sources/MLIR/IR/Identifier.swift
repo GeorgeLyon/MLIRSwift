@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Identifier: CRepresentable, CustomStringConvertible {
@@ -9,6 +8,6 @@ public struct Identifier: CRepresentable, CustomStringConvertible {
     UnownedContext(c: mlirIdentifierGetContext(c))!
   }
   public var description: String { mlirIdentifierStr(c).string }
-  
+
   let c: MlirIdentifier
 }

@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Attribute: CRepresentable, Parsable, Printable {
@@ -9,9 +8,9 @@ public struct Attribute: CRepresentable, Parsable, Printable {
   public var context: UnownedContext {
     UnownedContext(c: mlirAttributeGetContext(c))!
   }
-  
+
   let c: MlirAttribute
-  
+
   static let isNull = mlirAttributeIsNull
   static let parse = mlirAttributeParseGet
   static let print = mlirAttributePrint

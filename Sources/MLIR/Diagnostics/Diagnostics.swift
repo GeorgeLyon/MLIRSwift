@@ -53,7 +53,7 @@ struct UnsafeDiagnostic: CRepresentable, Printable {
   var notes: Notes { Notes(parent: c) }
 
   let c: MlirDiagnostic
-  
+
   static let print = mlirDiagnosticPrint
 }
 

@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Block: CRepresentable, Printable {
@@ -16,16 +15,16 @@ public struct Block: CRepresentable, Printable {
   public var operations: Operations {
     Operations(c: c)
   }
-  
+
   public var owningOperation: Operation? {
     Operation(c: mlirBlockGetParentOperation(c))
   }
   public var context: Context? {
     owningOperation?.context
   }
-  
+
   let c: MlirBlock
-  
+
   static let isNull = mlirBlockIsNull
   static let print = mlirBlockPrint
 }
@@ -57,7 +56,7 @@ extension Block {
     public func index(after i: Index) -> Index {
       i.successor(using: mlirOperationGetNextInBlock)
     }
-    
+
     /**
      Appends an operation and transfers ownership of that operation to this block
      */
@@ -68,19 +67,21 @@ extension Block {
        */
       mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation.c)
     }
-    
+
     /**
      Creates an operation owned by this block using the provided definition
      - parameter definition: A **valid** operation definition.
      - returns: The results of the operation
      - precondition: `definition` must be valid or this will crash
      */
-    public func append(_ definition: Operation.Definition<Operation.Results>, at location: Location) -> Operation.Results {
+    public func append(_ definition: Operation.Definition<Operation.Results>, at location: Location)
+      -> Operation.Results
+    {
       let operation = Operation(definition, location: location)!
       append(operation)
       return operation.results
     }
-    
+
     let c: MlirBlock
   }
 }

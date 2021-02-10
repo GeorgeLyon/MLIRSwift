@@ -1,10 +1,9 @@
-
 import CMLIR
 
 extension Operation: Printable {
-  
+
   static let print = mlirOperationPrint
-  
+
   public enum DebugInfoStyle: ExpressibleByNilLiteral {
     case none
     case standard
@@ -62,7 +61,7 @@ private struct OperationWithPrintingOptions: TextOutputStreamable, CustomStringC
       mlirOpPrintingFlagsDestroy(c)
     }
   }
-  
+
   func write<Target: TextOutputStream>(to target: inout Target) {
     options.withUnsafeMlirOpPrintingFlags { flags in
       target.write { mlirOperationPrintWithFlags(operation.c, flags, $0, $1) }
