@@ -5,17 +5,12 @@ import XCTest
 import MLIR
 
 final class TypeTests: XCTestCase {
-  override class func setUp() {
-    MLIR.load(.std)
-  }
-  override class func tearDown() {
-    MLIR.resetContext()
-  }
   func testMemRef() throws {
+    let context = MLIR.OwnedContext(dialects: .std)
     let input = "memref<?xf32>"
-    let parsed = try Type.parse(input)
+    let parsed: Type = try context.parse(input)
     XCTAssertEqual(input, "\(parsed)")
-    let constructed = Type.memref(shape: [.dynamic], element: .f32)
+    let constructed = Type.memref(shape: [.dynamic], element: .float32(in: context))
     XCTAssertEqual(input, "\(constructed)")
   }
 }

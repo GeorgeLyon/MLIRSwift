@@ -1,17 +1,13 @@
 import CMLIR
 
-public struct Identifier:
-  ExpressibleByStringLiteral,
-  ExpressibleByStringInterpolation,
-  OpaqueStorageRepresentable
-{
-  public init(stringLiteral value: String) {
-    self = .borrow(value.withUnsafeMlirStringRef { mlirIdentifierGet(MLIR.context, $0) })
+public struct Identifier: CRepresentable, CustomStringConvertible {
+  public init(_ string: String, in context: Context) {
+    c = string.withUnsafeMlirStringRef { mlirIdentifierGet(context.cRepresentation, $0) }
   }
-  init(storage: BridgingStorage<MlirIdentifier, OwnedByMLIR>) {
-    self.storage = storage
+  public var context: UnownedContext {
+    UnownedContext(c: mlirIdentifierGetContext(c))!
   }
-  let storage: BridgingStorage<MlirIdentifier, OwnedByMLIR>
-}
+  public var description: String { mlirIdentifierStr(c).string }
 
-extension MlirIdentifier: Bridged {}
+  let c: MlirIdentifier
+}

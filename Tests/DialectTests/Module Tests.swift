@@ -1,17 +1,12 @@
 import XCTest
+
 import Standard
 import SCF
-
 import MLIR
 
 final class ModuleTests: XCTestCase {
-  override class func setUp() {
-    MLIR.load(.std, .scf)
-  }
-  override class func tearDown() {
-    MLIR.resetContext()
-  }
   func testModule() throws {
+    let context = MLIR.OwnedContext(dialects: .std)
     let reference = """
       module  {
         func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
@@ -31,21 +26,25 @@ final class ModuleTests: XCTestCase {
 
       """
     
-    let location = Location(file: #fileID, line: #line, column: #column)
-    let constructed = Module(location: location) { ops in
-      ops.append(
-        .function(
-          "swap",
-          returning: [.integer(bitWidth: 1), .integer(bitWidth: 1)],
-          blocks: [
-            Block(.integer(bitWidth: 1), .integer(bitWidth: 1)) { ops, arg0, arg1 in
-              ops.append(.return(arg1, arg0), at: location.viaCallsite())
-            }
-          ]),
-        at: location.viaCallsite())
-    }
+    let location: Location = .unknown(in: context)
     
-    let parsed: Module = try .parse(reference)
+    let constructed = Module(location: location)
+    let i1: MLIR.`Type` = .integer(bitWidth: 1, in: context)
+    constructed.body.operations.append(
+      .function(
+        "swap",
+        returnTypes: [i1, i1],
+        blocks: [
+          Block(i1, i1) { ops, a, b in
+            ops.append(.return(b, a), at: location.viaCallsite())
+          }
+        ],
+        in: context),
+      at: location.viaCallsite())
+    XCTAssertTrue(constructed.body.operations.map(\.isValid).reduce(true, { $0 && $1 }))
+    XCTAssertTrue(constructed.operation.isValid)
+    
+    let parsed: Module = try context.parse(reference)
     
     XCTAssertEqual(parsed.body.operations.count, 2) /// Includes the module terminator
     XCTAssertEqual(parsed.operation.regions.count, 1)

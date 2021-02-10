@@ -7,11 +7,11 @@ function swift-format() {
   "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --mode format $@
 }
 
-swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateBlockInitializers |
- swift-format > "$PROJECT_ROOT/Sources/MLIR/Sugar/Block Initializers (Generated).swift"
+function generate() {
+  swift run --package-path $TOOLS_ROOT/BoilerplateGenerator Generate$(echo $@ | tr -d ' ') |
+   swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/$(echo $@) (Generated).swift"
+}
 
-swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateBuildableOperationInitializers |
- swift-format > "$PROJECT_ROOT/Sources/MLIR/Sugar/Buildable Operation Initializers (Generated).swift"
-
-swift run --package-path $TOOLS_ROOT/BoilerplateGenerator GenerateBlockOperationsAppend |
- swift-format > "$PROJECT_ROOT/Sources/MLIR/Sugar/Block Operations Append (Generated).swift"
+generate Operation Definition Initializers
+generate Block Convenience Initializers
+generate Block Operations Append

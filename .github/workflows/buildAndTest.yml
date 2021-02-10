@@ -73,7 +73,7 @@ jobs:
       
       - name: Format
         run: |
-          Tools/swift-format
+          Tools/swift-format --ci
           git diff
           git diff-index --quiet HEAD --
         

@@ -3,9 +3,12 @@ import CStandard
 import MLIR
 
 extension Type {
-  public static var index: Self { MLIR.bridge(mlirIndexTypeGet(MLIR.context))! }
-
-  public static var f32: Self { MLIR.bridge(mlirF32TypeGet(MLIR.context))! }
+  public static func index(in context: Context) -> Self {
+    Self(mlirIndexTypeGet(context.cRepresentation))!
+  }
+  public static func float32(in context: Context) -> Self {
+    Self(mlirF32TypeGet(context.cRepresentation))!
+  }
 
   public struct MemRefSize: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int64) {
@@ -26,8 +29,8 @@ extension Type {
     return shape.withUnsafeBufferPointer { shape in
       shape.withMemoryRebound(to: Int64.self) { shape in
         let unsafeMutable = UnsafeMutablePointer(mutating: shape.baseAddress)
-        return MLIR.bridge(
-          mlirMemRefTypeContiguousGet(MLIR.bridge(element), shape.count, unsafeMutable, 0))!
+        return Self(
+          mlirMemRefTypeContiguousGet(element.cRepresentation, shape.count, unsafeMutable, 0))!
       }
     }
   }

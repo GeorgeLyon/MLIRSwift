@@ -1,39 +1,36 @@
 import CMLIR
 
-extension Identifier {
-  public static var symbolName: Identifier { "sym_name" }
-  public static var type: Identifier { "type" }
-}
-
-extension Attribute: ExpressibleByArrayLiteral {
-  public init(arrayLiteral elements: MLIR.Attribute...) {
-    self = elements.withUnsafeBorrowedValues { buffer in
-      .borrow(mlirArrayAttrGet(MLIR.context, buffer.count, buffer.baseAddress))!
+extension Attribute {
+  public static func string(_ string: String, in context: Context) -> Self {
+    Attribute(c: string.withUnsafeMlirStringRef { mlirStringAttrGet(context.cRepresentation, $0) })!
+  }
+  public static func type(_ type: MLIR.`Type`) -> Self {
+    Attribute(c: mlirTypeAttrGet(type.c))!
+  }
+  public static func array(_ attributes: [Attribute], in context: Context) -> Attribute {
+    attributes.withUnsafeCRepresentation {
+      Attribute(c: mlirArrayAttrGet(context.cRepresentation, $0.count, $0.baseAddress))!
+    }
+  }
+  public static func dictionary(_ attributes: [NamedAttribute], in context: Context) -> Attribute {
+    attributes.withUnsafeCRepresentation {
+      Attribute(c: mlirDictionaryAttrGet(context.cRepresentation, $0.count, $0.baseAddress))!
+    }
+  }
+  public static func flatSymbolReference(_ name: String, in context: Context) -> Attribute {
+    name.withUnsafeMlirStringRef {
+      Attribute(c: mlirFlatSymbolRefAttrGet(context.cRepresentation, $0))!
     }
   }
 }
 
-extension Attribute: ExpressibleByDictionaryLiteral {
-  public init(dictionaryLiteral elements: (MLIR.Identifier, MLIR.Attribute)...) {
-    self =
-      elements
-      .map {
-        mlirNamedAttributeGet(.borrow($0.0), .borrow($0.1))
-      }
-      .withUnsafeBufferPointer { buffer in
-        .borrow(mlirDictionaryAttrGet(MLIR.context, buffer.count, buffer.baseAddress))!
-      }
+extension NamedAttribute {
+  public static func symbolName(_ name: String, in context: Context) -> NamedAttribute {
+    NamedAttribute(
+      name: Identifier("sym_name", in: context),
+      attribute: .string(name, in: context))
   }
-}
-
-extension Attribute {
-  public static func type(_ type: MLIR.`Type`) -> Self {
-    .borrow(mlirTypeAttrGet(.borrow(type)))!
-  }
-  public static func string(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirStringAttrGet(MLIR.context, $0) })!
-  }
-  public static func flatSymbolReference(_ value: String) -> Self {
-    .borrow(value.withUnsafeMlirStringRef { mlirFlatSymbolRefAttrGet(MLIR.context, $0) })!
+  public static func type(_ type: MLIR.`Type`) -> NamedAttribute {
+    NamedAttribute(name: Identifier("type", in: type.context), attribute: .type(type))
   }
 }

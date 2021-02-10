@@ -1,10 +1,6 @@
 import CMLIR
 import Foundation
 
-/**
- This file contains convenience functions for mapping between `MlirStringRef` and Swift strings.
- */
-
 extension MlirStringRef {
   var buffer: UnsafeBufferPointer<Int8> {
     UnsafeBufferPointer(start: data, count: length)

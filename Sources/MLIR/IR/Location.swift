@@ -1,26 +1,30 @@
 import CMLIR
 
-public struct Location: OpaqueStorageRepresentable {
-  public init(file: StaticString, line: Int, column: Int) {
-    self = .borrow(
-      file.withUnsafeMlirStringRef {
-        mlirLocationFileLineColGet(MLIR.context, $0, UInt32(line), UInt32(column))
-      })
+public struct Location: CRepresentable, Printable {
+  public init(context: Context, file: StaticString, line: Int, column: Int) {
+    c = file.withUnsafeMlirStringRef {
+      mlirLocationFileLineColGet(context.cRepresentation, $0, UInt32(line), UInt32(column))
+    }
+  }
+
+  public static func unknown(in context: Context) -> Location {
+    Location(c: mlirLocationUnknownGet(context.cRepresentation))
   }
 
   public func called(from location: Location) -> Location {
-    .borrow(mlirLocationCallSiteGet(.borrow(self), .borrow(location)))
+    Location(c: mlirLocationCallSiteGet(self.c, location.c))
   }
   public func viaCallsite(
     file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> Location {
-    Location(file: file, line: line, column: column).called(from: self)
+    Location(context: context, file: file, line: line, column: column).called(from: self)
   }
 
-  init(storage: BridgingStorage<MlirLocation, OwnedByMLIR>) { self.storage = storage }
-  let storage: BridgingStorage<MlirLocation, OwnedByMLIR>
-}
+  public var context: UnownedContext {
+    UnownedContext(c: mlirLocationGetContext(c))!
+  }
 
-extension MlirLocation: Bridged {
+  let c: MlirLocation
 
+  static let print = mlirLocationPrint
 }

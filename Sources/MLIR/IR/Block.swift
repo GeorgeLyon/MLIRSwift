@@ -1,64 +1,87 @@
 import CMLIR
 
-public struct Block<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
-  public init(argumentTypes: [MLIR.`Type`] = [])
-  where
-    Ownership == OwnedBySwift
-  {
-    self = argumentTypes.withUnsafeBorrowedValues {
-      .assumeOwnership(of: mlirBlockCreate($0.count, $0.baseAddress))!
+public struct Block: CRepresentable, Printable {
+  public init(argumentTypes: [Type] = []) {
+    c = argumentTypes.withUnsafeCRepresentation {
+      mlirBlockCreate($0.count, $0.baseAddress)
     }
   }
+  public func destroy() {
+    mlirBlockDestroy(c)
+  }
+  public var arguments: Arguments {
+    Arguments(c: c)
+  }
+  public var operations: Operations {
+    Operations(c: c)
+  }
 
+  public var owningOperation: Operation? {
+    Operation(c: mlirBlockGetParentOperation(c))
+  }
+  public var context: Context? {
+    owningOperation?.context
+  }
+
+  let c: MlirBlock
+
+  static let isNull = mlirBlockIsNull
+  static let print = mlirBlockPrint
+}
+
+// MARK: - Arguments
+
+extension Block {
   public struct Arguments: RandomAccessCollection {
     public let startIndex = 0
     public var endIndex: Int { mlirBlockGetNumArguments(c) }
     public subscript(position: Int) -> MLIR.Value {
-      .borrow(mlirBlockGetArgument(c, position))
+      Value(c: mlirBlockGetArgument(c, position))!
     }
-    public func add(_ type: MLIR.`Type`) -> MLIR.Value {
-      .borrow(mlirBlockAddArgument(c, .borrow(type)))
+    public func append(_ type: MLIR.`Type`) -> MLIR.Value {
+      Value(c: mlirBlockAddArgument(c, type.c))!
     }
     fileprivate let c: MlirBlock
   }
-  public var arguments: Arguments { Arguments(c: .borrow(self)) }
+}
 
-  public struct Operations: Collection, LinkedList {
-    public typealias Element = MLIR.Operation<OwnedByMLIR>
-    public struct Index: Comparable, OpaqueStorageRepresentable {
-      let storage: LinkedListIndexStorage<MlirOperation>
-      public static func < (lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
+// MARK: - Operations
+
+extension Block {
+  public struct Operations: Collection {
+    public typealias Index = LinkedListIndex<Self>
+    public typealias Element = Operation
+    public var startIndex: Index { .starting(with: mlirBlockGetFirstOperation(c)) }
+    public var endIndex: Index { .end }
+    public func index(after i: Index) -> Index {
+      i.successor(using: mlirOperationGetNextInBlock)
     }
 
     /**
-     Returns a representation of this operation which is owned by MLIR, since the passed in value will be invalidated.
+     Appends an operation and transfers ownership of that operation to this block
      */
-    @discardableResult
-    public func append(_ operation: MLIR.Operation<OwnedBySwift>) -> MLIR.Operation<OwnedByMLIR> {
-      let ownedOperation: MlirOperation = .assumeOwnership(of: operation)
+    public func append(_ ownedOperation: Operation) {
       /**
        The module terminator must always be at the end.
        If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
        */
-      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation)
-      let borrowedOperation: Operation = .borrow(ownedOperation)!
-      return borrowedOperation
+      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation.c)
     }
 
-    var first: MlirOperation { mlirBlockGetFirstOperation(c) }
-    static var next: (MlirOperation) -> MlirOperation { mlirOperationGetNextInBlock }
-    fileprivate let c: MlirBlock
+    /**
+     Creates an operation owned by this block using the provided definition
+     - parameter definition: A **valid** operation definition.
+     - returns: The results of the operation
+     - precondition: `definition` must be valid or this will crash
+     */
+    public func append(_ definition: Operation.Definition<Operation.Results>, at location: Location)
+      -> Operation.Results
+    {
+      let operation = Operation(definition, location: location)!
+      append(operation)
+      return operation.results
+    }
+
+    let c: MlirBlock
   }
-  public var operations: Operations { Operations(c: .borrow(self)) }
-
-  init(storage: BridgingStorage<MlirBlock, Ownership>) { self.storage = storage }
-  let storage: BridgingStorage<MlirBlock, Ownership>
-}
-
-// MARK: - Bridging
-
-extension MlirBlock: Bridged, Destroyable, CEquatable {
-  static let destroy = mlirBlockDestroy
-  static let areEqual = mlirBlockEqual
-  static let isNull = mlirBlockIsNull
 }

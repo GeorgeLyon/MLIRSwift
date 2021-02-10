@@ -1,19 +1,26 @@
-extension BuildableOperation where ResultTypes == () {
+extension Operation.Definition where Results == () {
+  /**
+   - precondition: `blocks` must contain at least one block
+   */
   public static func function(
     _ name: String,
-    returning returnTypes: [MLIR.`Type`] = [],
-    attributes: MLIR.NamedAttributes = [:],
-    blocks: [Block<OwnedBySwift>]
+    returnTypes: [MLIR.`Type`] = [],
+    attributes: [NamedAttribute] = [],
+    blocks: [Block],
+    in context: Context
   ) -> Self {
-    /// `buildFunc` requires at least one `Block`. For external functions use `externalFunc` instead.
     let entryBlock = blocks.first!
     return Self(
-      "func",
+      builtin: "func",
       attributes: attributes + [
-        .symbolName: .string(name),
-        .type: .type(.function(of: entryBlock.arguments.map(\.type), to: returnTypes)),
+        .symbolName(name, in: context),
+        .type(
+          .function(
+            of: entryBlock.arguments.map(\.type),
+            to: returnTypes, in: context)),
       ],
-      operands: [],
-      regions: [Region(blocks: blocks)])
+      ownedRegions: [
+        Region(ownedBlocks: blocks)
+      ])
   }
 }

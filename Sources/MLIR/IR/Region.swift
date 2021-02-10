@@ -1,35 +1,32 @@
 import CMLIR
 
-public struct Region<Ownership: MLIR.Ownership>: OpaqueStorageRepresentable {
-  public init(blocks: [MLIR.Block<OwnedBySwift>]) where Ownership == OwnedBySwift {
-    self = .assumeOwnership(of: mlirRegionCreate())!
-    blocks.forEach(self.blocks.append)
+public struct Region: CRepresentable {
+  /**
+   Creates an owned region
+   */
+  public init(ownedBlocks: [Block] = []) {
+    c = mlirRegionCreate()
+    ownedBlocks.forEach(blocks.append)
   }
 
-  public struct Blocks: Collection, LinkedList {
-    public typealias Element = MLIR.Block<OwnedByMLIR>
-    public struct Index: Comparable, OpaqueStorageRepresentable {
-      let storage: LinkedListIndexStorage<MlirBlock>
-      public static func < (lhs: Self, rhs: Self) -> Bool { lhs.storage < rhs.storage }
+  public struct Blocks: Collection {
+    public typealias Index = LinkedListIndex<Self>
+    public typealias Element = Block
+    public var startIndex: Index { .starting(with: mlirRegionGetFirstBlock(c)) }
+    public var endIndex: Index { .end }
+    public func index(after i: Index) -> Index {
+      i.successor(using: mlirBlockGetNextInRegion)
     }
 
-    public func append(_ block: MLIR.Block<OwnedBySwift>) {
-      mlirRegionAppendOwnedBlock(c, .assumeOwnership(of: block))
+    public func append(_ ownedBlock: Block) {
+      mlirRegionAppendOwnedBlock(c, ownedBlock.c)
     }
 
-    var first: MlirBlock { mlirRegionGetFirstBlock(c) }
-    static var next: (MlirBlock) -> MlirBlock { mlirBlockGetNextInRegion }
     fileprivate let c: MlirRegion
   }
-  public var blocks: Blocks { Blocks(c: .borrow(self)) }
+  public var blocks: Blocks { Blocks(c: c) }
 
-  init(storage: BridgingStorage<MlirRegion, Ownership>) { self.storage = storage }
-  let storage: BridgingStorage<MlirRegion, Ownership>
-}
+  let c: MlirRegion
 
-// MARK: - Bridging
-
-extension MlirRegion: Bridged, Destroyable {
-  static let destroy = mlirRegionDestroy
   static let isNull = mlirRegionIsNull
 }

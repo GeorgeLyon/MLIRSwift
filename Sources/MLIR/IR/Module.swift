@@ -1,31 +1,28 @@
 import CMLIR
 
-public struct Module: OpaqueStorageRepresentable {
-  public static func parse(_ source: String) throws -> Self {
-    try parse(assumeOwnership, mlirModuleCreateParse, source)
-  }
-  public init(location: Location) {
-    self = .assumeOwnership(of: mlirModuleCreateEmpty(.borrow(location)))!
+public final class Module: Parsable {
+  public convenience init(location: Location) {
+    self.init(c: mlirModuleCreateEmpty(location.c))!
   }
 
-  public var body: MLIR.Block<OwnedByMLIR> {
-    .borrow(mlirModuleGetBody(.borrow(self)))!
+  public var body: Block {
+    Block(c: mlirModuleGetBody(c))!
   }
-  public var operation: MLIR.Operation<OwnedByMLIR> {
-    .borrow(mlirModuleGetOperation(.borrow(self)))!
+  public var operation: Operation {
+    Operation(c: mlirModuleGetOperation(c))!
   }
 
-  init(storage: BridgingStorage<MlirModule, OwnedBySwift>) { self.storage = storage }
-  let storage: BridgingStorage<MlirModule, OwnedBySwift>
-}
+  /// `Module` is not `CRepresentable` because it is a `class`
+  init?(c: MlirModule) {
+    guard !mlirModuleIsNull(c) else {
+      return nil
+    }
+    self.c = c
+  }
+  deinit {
+    mlirModuleDestroy(c)
+  }
+  let c: MlirModule
 
-// MARK: - Bridging
-
-extension Module {
-  public var bridgedValue: MlirModule { .borrow(self) }
-}
-
-extension MlirModule: Bridged, Destroyable {
-  static let isNull = mlirModuleIsNull
-  static let destroy = mlirModuleDestroy
+  static let parse = mlirModuleCreateParse
 }
