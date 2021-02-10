@@ -5,6 +5,10 @@ import CMLIR
  */
 protocol CRepresentable {
   associatedtype CRepresentation
+
+  /**
+   We call this property `c` internally to allow the more descriptive `cRepresentation` to be reserved for the `public` analog. It is possible we may end up wanting every bridged type to publisize its `cRepresentation`, but for now we reserve the right to keep this private for some types.
+   */
   var c: CRepresentation { get }
 
   /**

@@ -12,6 +12,8 @@ public final class Module: Parsable {
     Operation(c: mlirModuleGetOperation(c))!
   }
 
+  public var cRepresentation: MlirModule { c }
+
   /// `Module` is not `CRepresentable` because it is a `class`
   init?(c: MlirModule) {
     guard !mlirModuleIsNull(c) else {
