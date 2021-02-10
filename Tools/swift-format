@@ -6,12 +6,15 @@ PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && cd "$(
 
 function swift-format() {
   # TODO: Add --parallel once Swift 5.4 is released
-  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" --recursive Sources $@
+  "$PROJECT_ROOT/.dependencies/installed/tools/swift-format" $@
 }
 
-if [[ $# == 0 ]]; then
-  # The default is to format in-place
-  swift-format --mode format --in-place
+if [[ "$1" == "--ci" ]]; then
+  if [[ "$#" != "1" ]]; then
+    echo "--ci cannot be used with any other arguments" 1>&2
+    exit 1
+  fi
+  swift-format --mode format --in-place --recursive Sources
 else
   swift-format $@
 fi
