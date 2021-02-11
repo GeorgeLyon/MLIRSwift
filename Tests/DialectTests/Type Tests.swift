@@ -1,6 +1,6 @@
 
 import XCTest
-@testable import Standard
+@testable import Dialects
 
 import MLIR
 
@@ -11,7 +11,7 @@ final class TypeTests: XCTestCase {
     let input = "memref<?xf32>"
     let parsed: Type = try context.parse(input)
     XCTAssertEqual(input, "\(parsed)")
-    let constructed = Type.memref(shape: [.dynamic], element: .float32(in: context))
+    let constructed: Type = .memoryReference(to: .float32(in: context), withDimensions: [.dynamic])
     XCTAssertEqual(input, "\(constructed)")
   }
 }

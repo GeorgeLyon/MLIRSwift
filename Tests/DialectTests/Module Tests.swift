@@ -1,7 +1,6 @@
 import XCTest
 
-import Standard
-import SCF
+import Dialects
 import MLIR
 
 final class ModuleTests: XCTestCase {

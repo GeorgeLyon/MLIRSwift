@@ -1,4 +1,4 @@
-import CSCF
+import CDialects
 import MLIR
 
 extension Dialect {

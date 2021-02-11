@@ -11,8 +11,8 @@ let package = Package(
       name: "MLIR",
       targets: ["MLIR"]),
     .library(
-      name: "MLIRStandard",
-      targets: ["Standard"]),
+      name: "MLIRDialects",
+      targets: ["Dialects"]),
   ],
   targets: [
     .systemLibrary(
@@ -26,21 +26,13 @@ let package = Package(
       dependencies: ["MLIR"]),
     
     .systemLibrary(
-      name: "CStandard",
+      name: "CDialects",
       pkgConfig: "LLVM-for-Swift"),
     .target(
-      name: "Standard",
-      dependencies: ["CStandard", "MLIR"]),
-    
-    .systemLibrary(
-      name: "CSCF",
-      pkgConfig: "LLVM-for-Swift"),
-    .target(
-      name: "SCF",
-      dependencies: ["CSCF", "MLIR"]),
-    
+      name: "Dialects",
+      dependencies: ["CDialects", "MLIR"]),
     .testTarget(
       name: "DialectTests",
-      dependencies: ["SCF", "Standard"]),
+      dependencies: ["Dialects"]),
   ]
 )

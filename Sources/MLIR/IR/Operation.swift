@@ -91,13 +91,13 @@ extension Operation {
 
 // MARK: - Operation Definition
 
+/**
+ `Definition` closely resembles `MlirOperationState` with a few notable caveats:
+ - `Definition` includes Swift type-system information about the cardinality of results
+ - `Definition` does not include location, making it easier to define an operation that is then used in various places
+ */
 extension Operation {
 
-  /**
-   `Definition` closely resembles `MlirOperationState` with a few notable caveats:
-   - `Definition` includes Swift type-system information about the cardinality of results
-   - `Definition` does not include location, making it easier to define an operation that is then used in various places
-   */
   public struct Definition<Results> {
 
     public init(
