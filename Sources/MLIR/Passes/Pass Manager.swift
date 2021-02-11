@@ -10,7 +10,13 @@ public struct Pass: CRepresentable {
 
 public struct PassManager: CRepresentable {
   public init(context: Context, passes: Pass...) {
+    self.init(context: context, passes: Array(passes))
+  }
+  public init(context: Context, passes: [Pass]) {
     c = mlirPassManagerCreate(context.c)
+    for pass in passes {
+      mlirPassManagerAddOwnedPass(c, pass.c)
+    }
   }
   public func destroy() {
     mlirPassManagerDestroy(c)

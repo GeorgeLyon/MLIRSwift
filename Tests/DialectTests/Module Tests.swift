@@ -4,9 +4,32 @@ import Dialects
 import MLIR
 
 final class ModuleTests: XCTestCase {
+  var context: Context!
+  override func setUp() {
+    context = Context(dialects: .std)
+  }
+  override func tearDown() {
+    context.destroy()
+    context = nil
+  }
+  
+  func testCanonicalization() throws {
+    let passManager = PassManager(context: context, passes: .canonicalization)
+    defer { passManager.destroy() }
+    let module: Module = try context.parse("""
+      module  {
+        func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
+          %0 = "std.addi"(%arg0, %arg0) : (i1, i1) -> i1
+          return %arg1, %arg0 : i1, i1
+        }
+      }
+      """)
+    defer { module.destroy() }
+    passManager.runPasses(on: module)
+    print(module.operation)
+  }
+  
   func testModule() throws {
-    let context = MLIR.Context(dialects: .std)
-    defer { context.destroy() }
     let reference = """
       module  {
         func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
