@@ -1,25 +1,17 @@
 import CMLIR
 
-public protocol Context {
-  var cRepresentation: MlirContext { get }
-}
-
-public final class OwnedContext: Context {
+public struct Context: CRepresentable {
+  
   public init(dialects: Dialect...) {
     c = mlirContextCreate()
     for dialect in dialects {
       _ = mlirDialectHandleLoadDialect(dialect.c, c)
     }
   }
-  public var cRepresentation: MlirContext { c }
-
-  deinit {
+  public func destroy() {
     mlirContextDestroy(c)
   }
-  let c: MlirContext
-}
-
-public struct UnownedContext: Context, CRepresentable {
+  
   public var cRepresentation: MlirContext { c }
   let c: MlirContext
 

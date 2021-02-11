@@ -13,7 +13,8 @@ final class DiagnosticTests: XCTestCase {
     XCTAssertLessThan(Diagnostic.Severity.remark, Diagnostic.Severity.note)
   }
   func testDiagnosticHandling() {
-    let context = MLIR.OwnedContext()
+    let context = MLIR.Context()
+    defer { context.destroy() }
     let message = "Test Diagnostic"
     let diagnostics = context.collectDiagnostics {
       message.withCString {

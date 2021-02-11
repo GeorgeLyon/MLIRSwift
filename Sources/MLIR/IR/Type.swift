@@ -6,8 +6,8 @@ public struct Type: CRepresentable, Printable, Parsable {
   }
   public var cRepresentation: MlirType { c }
 
-  public var context: UnownedContext {
-    UnownedContext(c: mlirTypeGetContext(c))!
+  public var context: Context {
+    Context(c: mlirTypeGetContext(c))!
   }
 
   let c: MlirType

@@ -4,7 +4,8 @@ import XCTest
 
 final class TypeTests: XCTestCase {
   func testInteger() {
-    let context = MLIR.OwnedContext()
+    let context = MLIR.Context()
+    defer { context.destroy() }
     XCTAssertEqual("\(Type.integer(bitWidth: 1, in: context))", "i1")
     XCTAssertEqual("\(Type.integer(.signed, bitWidth: 1, in: context))", "si1")
     XCTAssertEqual("\(Type.integer(.unsigned, bitWidth: 1, in: context))", "ui1")

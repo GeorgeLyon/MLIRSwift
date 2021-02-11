@@ -6,7 +6,8 @@ import MLIR
 
 final class ModuleTests: XCTestCase {
   func testModule() throws {
-    let context = MLIR.OwnedContext(dialects: .std)
+    let context = MLIR.Context(dialects: .std)
+    defer { context.destroy() }
     let reference = """
       module  {
         func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
@@ -29,6 +30,7 @@ final class ModuleTests: XCTestCase {
     let location: Location = .unknown(in: context)
     
     let constructed = Module(location: location)
+    defer { constructed.destroy() }
     let i1: MLIR.`Type` = .integer(bitWidth: 1, in: context)
     constructed.body.operations.append(
       .function(
@@ -45,6 +47,7 @@ final class ModuleTests: XCTestCase {
     XCTAssertTrue(constructed.operation.isValid)
     
     let parsed: Module = try context.parse(reference)
+    defer { parsed.destroy() }
     
     XCTAssertEqual(parsed.body.operations.count, 2) /// Includes the module terminator
     XCTAssertEqual(parsed.operation.regions.count, 1)

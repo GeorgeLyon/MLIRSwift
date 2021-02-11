@@ -1,13 +1,46 @@
 module CMLIR [system] {
   header "CMLIR.h"
   
-  // LLVM
+  // Dependencies
+  link "LLVMBinaryFormat"
+  link "LLVMBitstreamReader"
+  link "LLVMCore"
   link "LLVMDemangle"
+  link "LLVMRemarks"
   link "LLVMSupport"
-  
-  // MLIR
-  link "MLIRSupport"
-  link "MLIRParser"
+  link "MLIRAffine"
+  link "MLIRAffineEDSC"
+  link "MLIRAnalysis"
+  link "MLIRCallInterfaces"
+  link "MLIRCastInterfaces"
+  link "MLIRControlFlowInterfaces"
+  link "MLIRCopyOpInterface"
+  link "MLIREDSC"
   link "MLIRIR"
+  link "MLIRInferTypeOpInterface"
+  link "MLIRLinalg"
+  link "MLIRLoopAnalysis"
+  link "MLIRLoopLikeInterface"
+  link "MLIRPDL"
+  link "MLIRPDLInterp"
+  link "MLIRPDLToPDLInterp"
+  link "MLIRParser"
+  link "MLIRPass"
+  link "MLIRPresburger"
+  link "MLIRRewrite"
+  link "MLIRSCF"
+  link "MLIRSideEffectInterfaces"
+  link "MLIRStandard"
+  link "MLIRSupport"
+  link "MLIRTensor"
+  link "MLIRTransformUtils"
+  link "MLIRTransforms"
+  link "MLIRVector"
+  link "MLIRVectorInterfaces"
+  link "MLIRViewLikeInterface"
+  
+  // CAPI
   link "MLIRCAPIIR"
+  link "MLIRCAPITransforms"
+
 }
