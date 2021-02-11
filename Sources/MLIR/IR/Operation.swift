@@ -18,6 +18,9 @@ public struct Operation: CRepresentable {
   public var owningOperation: Operation? {
     Operation(c: mlirOperationGetParentOperation(c))
   }
+  public var owningBlock: Block? {
+    Block(c: mlirOperationGetBlock(c))
+  }
   public var context: UnownedContext {
     UnownedContext(c: mlirOperationGetContext(c))!
   }
