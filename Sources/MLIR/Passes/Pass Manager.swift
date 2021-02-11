@@ -8,17 +8,17 @@ public struct Pass: CRepresentable {
   let c: MlirPass
 }
 
-public struct PassManager: CRepresentable {
-  public init(context: Context, passes: Pass...) {
+public final class PassManager: CRepresentable {
+  public convenience init(context: Context, passes: Pass...) {
     self.init(context: context, passes: Array(passes))
   }
   public init(context: Context, passes: [Pass]) {
-    c = mlirPassManagerCreate(context.c)
+    c = mlirPassManagerCreate(context.cRepresentation)
     for pass in passes {
       mlirPassManagerAddOwnedPass(c, pass.c)
     }
   }
-  public func destroy() {
+  deinit {
     mlirPassManagerDestroy(c)
   }
   

@@ -20,8 +20,8 @@ public struct Location: CRepresentable, Printable {
     Location(context: context, file: file, line: line, column: column).called(from: self)
   }
 
-  public var context: Context {
-    Context(c: mlirLocationGetContext(c))!
+  public var context: UnownedContext {
+    UnownedContext(c: mlirLocationGetContext(c))!
   }
 
   let c: MlirLocation

@@ -21,8 +21,8 @@ public struct Operation: CRepresentable {
   public var owningBlock: Block? {
     Block(c: mlirOperationGetBlock(c))
   }
-  public var context: Context {
-    Context(c: mlirOperationGetContext(c))!
+  public var context: UnownedContext {
+    UnownedContext(c: mlirOperationGetContext(c))!
   }
 
   let c: MlirOperation

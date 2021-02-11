@@ -4,7 +4,7 @@ public struct Value: CRepresentable, Printable {
   public var type: MLIR.`Type` {
     MLIR.`Type`(c: mlirValueGetType(c))!
   }
-  public var context: Context {
+  public var context: UnownedContext {
     type.context
   }
 

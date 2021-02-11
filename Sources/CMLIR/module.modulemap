@@ -10,7 +10,6 @@ module CMLIR [system] {
   link "LLVMBitstreamReader"
   link "LLVMCore"
   link "LLVMDemangle"
-  link "LLVMRemarks"
   link "LLVMSupport"
   link "MLIRAffine"
   link "MLIRAffineEDSC"
@@ -42,5 +41,4 @@ module CMLIR [system] {
   link "MLIRVector"
   link "MLIRVectorInterfaces"
   link "MLIRViewLikeInterface"
-
 }

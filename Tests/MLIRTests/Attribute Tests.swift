@@ -5,8 +5,7 @@ import CMLIR
 
 final class AttributeTests: XCTestCase {
   func testAttributes() throws {
-    let context = MLIR.Context()
-    defer { context.destroy() }
+    let context = MLIR.OwnedContext()
     XCTAssertEqual("\(Attribute.string("Foo", in: context))", #""Foo""#)
     
     let dictionaryAttribute: Attribute = .dictionary(

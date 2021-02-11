@@ -6,8 +6,7 @@ import MLIR
 
 final class TypeTests: XCTestCase {
   func testMemRef() throws {
-    let context = MLIR.Context(dialects: .std)
-    defer { context.destroy() }
+    let context = MLIR.OwnedContext(dialects: .std)
     let input = "memref<?xf32>"
     let parsed: Type = try context.parse(input)
     XCTAssertEqual(input, "\(parsed)")

@@ -4,18 +4,9 @@ import Dialects
 import MLIR
 
 final class ModuleTests: XCTestCase {
-  var context: Context!
-  override func setUp() {
-    context = Context(dialects: .std)
-  }
-  override func tearDown() {
-    context.destroy()
-    context = nil
-  }
-  
   func testCanonicalization() throws {
+    let context = MLIR.OwnedContext(dialects: .std)
     let passManager = PassManager(context: context, passes: .canonicalization)
-    defer { passManager.destroy() }
     let module: Module = try context.parse("""
       module  {
         func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
@@ -23,13 +14,22 @@ final class ModuleTests: XCTestCase {
           return %arg1, %arg0 : i1, i1
         }
       }
+
       """)
-    defer { module.destroy() }
     passManager.runPasses(on: module)
-    print(module.operation)
+    XCTAssertEqual(
+      "\(module.operation)", """
+      module  {
+        func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
+          return %arg1, %arg0 : i1, i1
+        }
+      }
+
+      """)
   }
   
   func testModule() throws {
+    let context = MLIR.OwnedContext(dialects: .std)
     let reference = """
       module  {
         func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
@@ -52,7 +52,6 @@ final class ModuleTests: XCTestCase {
     let location: Location = .unknown(in: context)
     
     let constructed = Module(location: location)
-    defer { constructed.destroy() }
     let i1: MLIR.`Type` = .integer(bitWidth: 1, in: context)
     constructed.body.operations.append(
       .function(
@@ -69,7 +68,6 @@ final class ModuleTests: XCTestCase {
     XCTAssertTrue(constructed.operation.isValid)
     
     let parsed: Module = try context.parse(reference)
-    defer { parsed.destroy() }
     
     XCTAssertEqual(parsed.body.operations.count, 2) /// Includes the module terminator
     XCTAssertEqual(parsed.operation.regions.count, 1)

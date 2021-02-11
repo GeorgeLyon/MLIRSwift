@@ -1,11 +1,8 @@
 import CMLIR
 
-public struct Module: CRepresentable, Parsable {
-  public init(location: Location) {
+public final class Module: Parsable {
+  public convenience init(location: Location) {
     self.init(c: mlirModuleCreateEmpty(location.c))!
-  }
-  public func destroy() {
-    mlirModuleDestroy(c)
   }
 
   public var body: Block {
@@ -23,6 +20,9 @@ public struct Module: CRepresentable, Parsable {
       return nil
     }
     self.c = c
+  }
+  deinit {
+    mlirModuleDestroy(c)
   }
   let c: MlirModule
 

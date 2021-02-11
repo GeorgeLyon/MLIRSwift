@@ -5,8 +5,8 @@ public struct Attribute: CRepresentable, Parsable, Printable {
     self.init(c: cRepresentation)
   }
   public var cRepresentation: MlirAttribute { c }
-  public var context: Context {
-    Context(c: mlirAttributeGetContext(c))!
+  public var context: UnownedContext {
+    UnownedContext(c: mlirAttributeGetContext(c))!
   }
 
   let c: MlirAttribute
