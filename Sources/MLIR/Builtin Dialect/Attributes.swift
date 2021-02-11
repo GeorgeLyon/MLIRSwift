@@ -12,10 +12,16 @@ extension Attribute {
       Attribute(c: mlirArrayAttrGet(context.cRepresentation, $0.count, $0.baseAddress))!
     }
   }
+  public static func array(_ head: Attribute, _ tail: Attribute...) -> Attribute {
+    array([head] + tail, in: head.context)
+  }
   public static func dictionary(_ attributes: [NamedAttribute], in context: Context) -> Attribute {
     attributes.withUnsafeCRepresentation {
       Attribute(c: mlirDictionaryAttrGet(context.cRepresentation, $0.count, $0.baseAddress))!
     }
+  }
+  public static func dictionary(_ head: NamedAttribute, _ tail: NamedAttribute...) -> Attribute {
+    dictionary([head] + tail, in: head.attribute.context)
   }
   public static func flatSymbolReference(_ name: String, in context: Context) -> Attribute {
     name.withUnsafeMlirStringRef {
