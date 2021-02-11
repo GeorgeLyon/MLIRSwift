@@ -7,7 +7,12 @@ public struct Identifier: CRepresentable, CustomStringConvertible {
   public var context: UnownedContext {
     UnownedContext(c: mlirIdentifierGetContext(c))!
   }
-  public var description: String { mlirIdentifierStr(c).string }
+  public var stringValue: String {
+    mlirIdentifierStr(c).string
+  }
+  public var description: String {
+    stringValue
+  }
 
   let c: MlirIdentifier
 }

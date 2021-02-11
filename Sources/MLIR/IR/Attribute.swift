@@ -23,5 +23,11 @@ public struct NamedAttribute: CRepresentable {
   public init(name: String, attribute: Attribute) {
     self.init(name: Identifier(name, in: attribute.context), attribute: attribute)
   }
+  public var name: Identifier {
+    Identifier(c: c.name)
+  }
+  public var attribute: Attribute {
+    Attribute(c: c.attribute)!
+  }
   let c: MlirNamedAttribute
 }

@@ -1,6 +1,9 @@
 import CMLIR
 
 public struct Operation: CRepresentable {
+  public var attributes: Attributes {
+    Attributes(c: c)
+  }
   public var regions: Regions {
     Regions(c: c)
   }
@@ -31,7 +34,59 @@ public struct Operation: CRepresentable {
   static let isNull = mlirOperationIsNull
 }
 
-// MARK: - Definition
+// MARK: - Attributes
+
+extension Operation {
+  public struct Attributes {
+    public subscript(_ name: String) -> Attribute? {
+      get {
+        Attribute(c: name.withUnsafeMlirStringRef { mlirOperationGetAttributeByName(c, $0) })
+      }
+      nonmutating set {
+        name.withUnsafeMlirStringRef {
+          if let newValue = newValue {
+            mlirOperationSetAttributeByName(c, $0, newValue.c)
+          } else {
+            mlirOperationRemoveAttributeByName(c, $0)
+          }
+        }
+      }
+    }
+    public func set(_ namedAttribute: NamedAttribute) {
+      /// Eventually we may want to expose API in MLIR to do this less circuitously
+      self[namedAttribute.name.stringValue] = namedAttribute.attribute
+    }
+    fileprivate let c: MlirOperation
+  }
+}
+
+// MARK: - Regions
+
+extension Operation {
+  public struct Regions: RandomAccessCollection {
+    public let startIndex = 0
+    public var endIndex: Int { mlirOperationGetNumRegions(c) }
+    public subscript(position: Int) -> Region {
+      Region(c: mlirOperationGetRegion(c, position))!
+    }
+    fileprivate let c: MlirOperation
+  }
+}
+
+// MARK: - Results
+
+extension Operation {
+  public struct Results: RandomAccessCollection {
+    public let startIndex = 0
+    public var endIndex: Int { mlirOperationGetNumResults(c) }
+    public subscript(position: Int) -> Value {
+      Value(c: mlirOperationGetResult(c, position))!
+    }
+    fileprivate let c: MlirOperation
+  }
+}
+
+// MARK: - Operation Definition
 
 extension Operation {
 
@@ -203,31 +258,5 @@ extension Operation {
      }
      ```
      */
-  }
-}
-
-// MARK: - Regions
-
-extension Operation {
-  public struct Regions: RandomAccessCollection {
-    public let startIndex = 0
-    public var endIndex: Int { mlirOperationGetNumRegions(c) }
-    public subscript(position: Int) -> Region {
-      Region(c: mlirOperationGetRegion(c, position))!
-    }
-    fileprivate let c: MlirOperation
-  }
-}
-
-// MARK: - Results
-
-extension Operation {
-  public struct Results: RandomAccessCollection {
-    public let startIndex = 0
-    public var endIndex: Int { mlirOperationGetNumResults(c) }
-    public subscript(position: Int) -> Value {
-      Value(c: mlirOperationGetResult(c, position))!
-    }
-    fileprivate let c: MlirOperation
   }
 }
