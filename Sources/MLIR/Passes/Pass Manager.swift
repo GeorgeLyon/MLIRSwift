@@ -1,4 +1,3 @@
-
 import CMLIR
 
 public struct Pass: CRepresentable {
@@ -21,10 +20,10 @@ public final class PassManager: CRepresentable {
   deinit {
     mlirPassManagerDestroy(c)
   }
-  
+
   public func runPasses(on module: Module) {
     mlirPassManagerRun(c, module.c)
   }
-  
+
   let c: MlirPassManager
 }

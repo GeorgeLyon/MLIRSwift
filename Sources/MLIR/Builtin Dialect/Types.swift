@@ -1,14 +1,14 @@
 import CMLIR
 
 extension Type {
-  
+
   public static func index(in context: Context) -> Self {
     Self(mlirIndexTypeGet(context.cRepresentation))!
   }
   public static func float32(in context: Context) -> Self {
     Self(mlirF32TypeGet(context.cRepresentation))!
   }
-  
+
   public enum Signedness {
     case signed, unsigned
   }
@@ -27,7 +27,7 @@ extension Type {
     }
     return Self(c: c)!
   }
-  
+
   public struct MemRefSize: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int64) {
       precondition(value >= 0)
@@ -41,7 +41,9 @@ extension Type {
       self.value = value
     }
   }
-  public static func memoryReference(to element: `Type`, withDimensions dimensions: [MemRefSize]) -> Self {
+  public static func memoryReference(to element: `Type`, withDimensions dimensions: [MemRefSize])
+    -> Self
+  {
     precondition(MemoryLayout<Int64>.size == MemoryLayout<MemRefSize>.size)
     precondition(MemoryLayout<Int64>.stride == MemoryLayout<MemRefSize>.stride)
     return dimensions.withUnsafeBufferPointer { dimensions in
@@ -52,7 +54,7 @@ extension Type {
       }
     }
   }
-  
+
   public static func function<Inputs, Results>(
     of inputs: Inputs,
     to results: Results,
