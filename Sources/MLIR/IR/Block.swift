@@ -23,6 +23,10 @@ public struct Block: CRepresentable, Printable {
     owningOperation?.context
   }
 
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    mlirBlockEqual(lhs.c, rhs.c)
+  }
+
   let c: MlirBlock
 
   static let isNull = mlirBlockIsNull
