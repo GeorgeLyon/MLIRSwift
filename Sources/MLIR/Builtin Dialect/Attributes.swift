@@ -31,12 +31,32 @@ extension Attribute {
 }
 
 extension NamedAttribute {
+  /// Specify attributes associated with the `i`th argument to an operation
+  public static func argument(
+    _ i: Int,
+    attributes head: NamedAttribute,
+    _ tail: NamedAttribute...
+  ) -> NamedAttribute {
+    let context = head.attribute.context
+    return NamedAttribute(
+      name: "arg\(i)",
+      attribute: .dictionary([head] + tail, in: context))
+  }
+  /// Specify attributes associated with the `i`th result to an operation
+  public static func result(
+    _ i: Int,
+    attributes head: NamedAttribute,
+    _ tail: NamedAttribute...
+  ) -> NamedAttribute {
+    let context = head.attribute.context
+    return NamedAttribute(
+      name: "result\(i)",
+      attribute: .dictionary([head] + tail, in: context))
+  }
   public static func symbolName(_ name: String, in context: Context) -> NamedAttribute {
-    NamedAttribute(
-      name: Identifier("sym_name", in: context),
-      attribute: .string(name, in: context))
+    NamedAttribute(name: "sym_name", attribute: .string(name, in: context))
   }
   public static func type(_ type: MLIR.`Type`) -> NamedAttribute {
-    NamedAttribute(name: Identifier("type", in: type.context), attribute: .type(type))
+    NamedAttribute(name: "type", attribute: .type(type))
   }
 }
