@@ -4,6 +4,9 @@ public struct Value: CRepresentable, Printable {
   public var type: MLIR.`Type` {
     MLIR.`Type`(c: mlirValueGetType(c))!
   }
+  public var context: UnownedContext {
+    type.context
+  }
 
   public enum Kind {
     case argument(of: Block)
