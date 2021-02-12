@@ -1,6 +1,6 @@
 import CMLIR
 
-public struct Type: CRepresentable, Printable, Parsable {
+public struct Type: Equatable, CRepresentable, Printable, Parsable {
   public init?(_ cRepresentation: MlirType) {
     self.init(c: cRepresentation)
   }
@@ -8,6 +8,10 @@ public struct Type: CRepresentable, Printable, Parsable {
 
   public var context: UnownedContext {
     UnownedContext(c: mlirTypeGetContext(c))!
+  }
+
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    mlirTypeEqual(lhs.c, rhs.c)
   }
 
   let c: MlirType
