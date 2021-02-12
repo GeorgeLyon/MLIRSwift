@@ -1,4 +1,4 @@
-import CStandard
+import CDialects
 import MLIR
 
 extension Dialect {

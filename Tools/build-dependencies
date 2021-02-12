@@ -10,16 +10,6 @@ which git
 which cmake
 which ninja
 
-function calculate_md5() {
-  if which md5sum > /dev/null; then
-    md5sum | cut -f1 -d' '
-  else
-    md5
-  fi
-}
-# This will fail if we can't calculate MD5s
-echo "Test MD5" | calculate_md5 > /dev/null
-
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
@@ -33,9 +23,8 @@ LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
 LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
 LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 LLVM_SYSTEM_LIBRARY_TARGETS="
+  $PROJECT_ROOT/Sources/CDialects
   $PROJECT_ROOT/Sources/CMLIR
-  $PROJECT_ROOT/Sources/CStandard
-  $PROJECT_ROOT/Sources/CSCF
   $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
 LLVM_HEADER_TARGETS="
   install-llvm-headers
@@ -48,11 +37,11 @@ PKG_CONFIG=$(cat << EOF
 prefix=$INSTALL_PATH
 
 Name: LLVM for Swift
-Description: LLVM, potentially with additional projects. Installed using Utilities/build-dependencies in MLIRSwift.
+Description: LLVM, potentially with additional projects. Installed using Tools/build-dependencies in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
 Libs: -lcurses $(
-  # For some reason, linking the C++ standard libary explicitly is necessary on Linux but breaks the macOS build.
+  # For some reason, linking the C++ standard libary is different on Linux and macOS
   [[ "$OSTYPE" == "darwin"* ]] && echo "-lc++" || echo "-lstdc++"
 ) -L\${prefix}/lib
 EOF
@@ -131,7 +120,7 @@ cmake \
   -DLLVM_ENABLE_ASSERTIONS=ON \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Debug} \
+  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-RelWithDebInfo} \
   $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
 cmake \
   --build "$LLVM_BUILD_ROOT" \

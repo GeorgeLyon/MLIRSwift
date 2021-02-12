@@ -4,6 +4,9 @@ extension Attribute {
   public static func string(_ string: String, in context: Context) -> Self {
     Attribute(c: string.withUnsafeMlirStringRef { mlirStringAttrGet(context.cRepresentation, $0) })!
   }
+  public static func integer(_ value: Int, of type: MLIR.`Type`) -> Attribute {
+    Attribute(mlirIntegerAttrGet(type.cRepresentation, Int64(value)))!
+  }
   public static func type(_ type: MLIR.`Type`) -> Self {
     Attribute(c: mlirTypeAttrGet(type.c))!
   }
