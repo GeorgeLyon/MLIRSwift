@@ -63,3 +63,23 @@ extension NamedAttribute {
     NamedAttribute(name: "type", attribute: .type(type))
   }
 }
+
+extension Array where Element == NamedAttribute {
+  public static func function<Inputs, Results>(
+    _ name: String,
+    of inputs: Inputs,
+    to results: Results,
+    in context: Context
+  ) -> Self
+  where
+    Inputs: Sequence,
+    Inputs.Element == Type,
+    Results: Sequence,
+    Results.Element == Type
+  {
+    [
+      .symbolName(name, in: context),
+      .type(.function(of: inputs, to: results, in: context)),
+    ]
+  }
+}

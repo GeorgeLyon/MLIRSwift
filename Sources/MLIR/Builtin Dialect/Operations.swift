@@ -12,13 +12,8 @@ extension OperationDefinition where Results == () {
     let entryBlock = blocks.first!
     return Self(
       builtin: "func",
-      attributes: attributes + [
-        .symbolName(name, in: context),
-        .type(
-          .function(
-            of: entryBlock.arguments.map(\.type),
-            to: returnTypes, in: context)),
-      ],
+      attributes: attributes
+        + .function(name, of: entryBlock.arguments.map(\.type), to: returnTypes, in: context),
       ownedRegions: [
         Region(ownedBlocks: blocks)
       ])
