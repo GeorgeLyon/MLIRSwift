@@ -11,9 +11,7 @@ dependencies: [
 
 ## Usage
 
-The best reference for how to use this package will always be the tests ([Module Tests](Tests/MLIRStandardTests/Module%20Tests.swift) is probably the most interesting), and I recommend consulting them for more details.
-
-At a high level, you start by creating an `MLIRConfiguration` (lets call it `MyMLIR`), which involves creating an `MLIRContext` with the dialects you want enabled. Once you have this configuration, you can create a `MyMLIR.Module`.
+The best reference for how to use this package will always be the tests ([Module Tests](Tests/DialectTests/Module%20Tests.swift) is probably the most interesting), and I recommend consulting them for more details.
 
 ## MLIR
 
@@ -25,7 +23,7 @@ In the meantime, you can manually install MLIR using the `Tools/build-dependenci
 
 ### Updating
 
-We do not include MLIR (llvm) as a submodule, because this would cause Swift Pacakge Manager to pull in all of LLVM for any project depending on MLIRSwift. Instead, we store the hash we care about in the top-level `llvm-commit` file, update this file to a new commit to update MLIR. Note that this file _must_ be a hash and not a branch like `main`, since the contents of this file is used to cache the LLVM build on GitHub Actions. 
+We do not include MLIR (llvm) as a submodule, because this would cause Swift Pacakge Manager to pull in all of LLVM in any project depending on MLIRSwift. Instead, we store the hash we care about in `Tools/llvm-commit` file, update this file to a new commit to update MLIR. Note that this file _must_ be a hash and not a branch like `main`, since the contents of this file is used to cache the LLVM build on GitHub Actions. 
 
 ### Using an external MLIR checkout
 
