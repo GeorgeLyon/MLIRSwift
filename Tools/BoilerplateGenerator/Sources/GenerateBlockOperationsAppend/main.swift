@@ -13,7 +13,7 @@ for numArguments in 0...maxNumArguments {
   <<"""
 
   /// Appends an operation with \(numArguments) results
-  public func append(_ definition: Operation.Definition<(\(values))>, at location: Location) -> (\(values)) {
+  public func append(_ definition: OperationDefinition<(\(values))>, at location: Location) -> (\(values)) {
     let operation = Operation(definition, location: location)!
     append(operation)
     let results = operation.results

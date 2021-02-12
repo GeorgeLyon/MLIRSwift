@@ -1,6 +1,6 @@
 import MLIR
 
-extension Operation.Definition {
+extension OperationDefinition {
 
   public static func constant(
     _ value: MLIR.Attribute,

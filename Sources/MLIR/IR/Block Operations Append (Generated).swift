@@ -3,7 +3,7 @@
 extension Block.Operations {
 
   /// Appends an operation with 0 results
-  public func append(_ definition: Operation.Definition<()>, at location: Location) {
+  public func append(_ definition: OperationDefinition<()>, at location: Location) {
     let operation = Operation(definition, location: location)!
     append(operation)
     let results = operation.results
@@ -12,8 +12,7 @@ extension Block.Operations {
   }
 
   /// Appends an operation with 1 results
-  public func append(_ definition: Operation.Definition<(Value)>, at location: Location) -> (Value)
-  {
+  public func append(_ definition: OperationDefinition<(Value)>, at location: Location) -> (Value) {
     let operation = Operation(definition, location: location)!
     append(operation)
     let results = operation.results
@@ -22,7 +21,7 @@ extension Block.Operations {
   }
 
   /// Appends an operation with 2 results
-  public func append(_ definition: Operation.Definition<(Value, Value)>, at location: Location) -> (
+  public func append(_ definition: OperationDefinition<(Value, Value)>, at location: Location) -> (
     Value, Value
   ) {
     let operation = Operation(definition, location: location)!
@@ -34,7 +33,7 @@ extension Block.Operations {
 
   /// Appends an operation with 3 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value)>, at location: Location
+    _ definition: OperationDefinition<(Value, Value, Value)>, at location: Location
   ) -> (Value, Value, Value) {
     let operation = Operation(definition, location: location)!
     append(operation)
@@ -45,7 +44,7 @@ extension Block.Operations {
 
   /// Appends an operation with 4 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value, Value)>, at location: Location
+    _ definition: OperationDefinition<(Value, Value, Value, Value)>, at location: Location
   ) -> (Value, Value, Value, Value) {
     let operation = Operation(definition, location: location)!
     append(operation)
@@ -56,7 +55,7 @@ extension Block.Operations {
 
   /// Appends an operation with 5 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value, Value, Value)>, at location: Location
+    _ definition: OperationDefinition<(Value, Value, Value, Value, Value)>, at location: Location
   ) -> (Value, Value, Value, Value, Value) {
     let operation = Operation(definition, location: location)!
     append(operation)
@@ -67,7 +66,7 @@ extension Block.Operations {
 
   /// Appends an operation with 6 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value, Value, Value, Value)>,
+    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value)>,
     at location: Location
   ) -> (Value, Value, Value, Value, Value, Value) {
     let operation = Operation(definition, location: location)!
@@ -79,7 +78,7 @@ extension Block.Operations {
 
   /// Appends an operation with 7 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value, Value, Value, Value, Value)>,
+    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value, Value)>,
     at location: Location
   ) -> (Value, Value, Value, Value, Value, Value, Value) {
     let operation = Operation(definition, location: location)!
@@ -91,7 +90,7 @@ extension Block.Operations {
 
   /// Appends an operation with 8 results
   public func append(
-    _ definition: Operation.Definition<(Value, Value, Value, Value, Value, Value, Value, Value)>,
+    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value, Value, Value)>,
     at location: Location
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value) {
     let operation = Operation(definition, location: location)!
@@ -105,7 +104,7 @@ extension Block.Operations {
 
   /// Appends an operation with 9 results
   public func append(
-    _ definition: Operation.Definition<
+    _ definition: OperationDefinition<
       (Value, Value, Value, Value, Value, Value, Value, Value, Value)
     >, at location: Location
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value, Value) {
@@ -121,7 +120,7 @@ extension Block.Operations {
 
   /// Appends an operation with 10 results
   public func append(
-    _ definition: Operation.Definition<
+    _ definition: OperationDefinition<
       (Value, Value, Value, Value, Value, Value, Value, Value, Value, Value)
     >, at location: Location
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value, Value, Value) {

@@ -78,7 +78,7 @@ extension Block {
      - returns: The results of the operation
      - precondition: `definition` must be valid or this will crash
      */
-    public func append(_ definition: Operation.Definition<Operation.Results>, at location: Location)
+    public func append(_ definition: OperationDefinition<Operation.Results>, at location: Location)
       -> Operation.Results
     {
       let operation = Operation(definition, location: location)!

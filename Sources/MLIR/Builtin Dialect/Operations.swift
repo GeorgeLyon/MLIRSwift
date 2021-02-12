@@ -1,4 +1,4 @@
-extension Operation.Definition where Results == () {
+extension OperationDefinition where Results == () {
   /**
    - precondition: `blocks` must contain at least one block
    */

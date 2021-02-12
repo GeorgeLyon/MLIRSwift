@@ -9,7 +9,7 @@ for numArguments in 2...maxNumArguments {
   <<"""
 
   // \(numArguments) results
-  extension Operation.Definition where Results == (\(range.map { _ in "Value" }.joined(separator: ", "))) {
+  extension OperationDefinition where Results == (\(range.map { _ in "Value" }.joined(separator: ", "))) {
     
     public init(
       _ dialect: Dialect, _ name: String,
