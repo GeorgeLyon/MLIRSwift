@@ -1,6 +1,26 @@
 import CMLIR
 
 public struct Operation: CRepresentable {
+  public init(
+    _ dialect: Dialect, _ name: String,
+    attributes: [NamedAttribute] = [],
+    operands: [Value] = [],
+    resultTypes: [MLIR.`Type`] = [],
+    ownedRegions: [Region] = [],
+    location: Location
+  ) {
+    self.init(
+      c:
+        OperationDefinition(
+          dialect, name,
+          attributes: attributes,
+          operands: operands,
+          resultTypes: resultTypes,
+          ownedRegions: ownedRegions
+        )
+        .createOperation(at: location))!
+  }
+
   public var attributes: Attributes {
     Attributes(c: c)
   }
