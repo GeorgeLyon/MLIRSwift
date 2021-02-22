@@ -52,7 +52,7 @@ final class ModuleTests: XCTestCase {
     let location: Location = .unknown(in: context)
     
     let constructed = Module(location: location)
-    let i1: MLIR.`Type` = .integer(bitWidth: 1, in: context)
+    let i1: MLIR.`Type` = context.get(.integer(bitWidth: 1))
     constructed.body.operations.append(
       .function(
         "swap",

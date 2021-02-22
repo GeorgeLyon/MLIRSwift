@@ -28,3 +28,7 @@ public struct UnownedContext: Context, CRepresentable {
   /// Suppress initializer synthesis
   private init() { fatalError() }
 }
+
+public func == (lhs: Context, rhs: Context) -> Bool {
+  mlirContextEqual(lhs.cRepresentation, rhs.cRepresentation)
+}

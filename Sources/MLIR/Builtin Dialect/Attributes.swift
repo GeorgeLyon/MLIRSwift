@@ -10,6 +10,9 @@ extension Attribute {
   public static func type(_ type: MLIR.`Type`) -> Self {
     Attribute(c: mlirTypeAttrGet(type.c))!
   }
+  public static func type(_ type: ContextualType, in context: Context) -> Self {
+    Attribute(c: mlirTypeAttrGet(context.get(type).c))!
+  }
   public static func array(_ attributes: [Attribute], in context: Context) -> Attribute {
     attributes.withUnsafeCRepresentation {
       Attribute(c: mlirArrayAttrGet(context.cRepresentation, $0.count, $0.baseAddress))!
@@ -62,6 +65,9 @@ extension NamedAttribute {
   public static func type(_ type: MLIR.`Type`) -> NamedAttribute {
     NamedAttribute(name: "type", attribute: .type(type))
   }
+  public static func type(_ type: ContextualType, in context: Context) -> NamedAttribute {
+    NamedAttribute(name: "type", attribute: .type(type, in: context))
+  }
 }
 
 extension Array where Element == NamedAttribute {
@@ -79,7 +85,7 @@ extension Array where Element == NamedAttribute {
   {
     [
       .symbolName(name, in: context),
-      .type(.function(of: inputs, to: results, in: context)),
+      .type(.function(of: inputs, to: results), in: context),
     ]
   }
 }
