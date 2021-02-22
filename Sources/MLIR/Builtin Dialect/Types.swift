@@ -5,7 +5,7 @@ extension Type {
     Self(mlirIndexTypeGet(context.cRepresentation))!
   }
   public var isIndex: Bool { mlirTypeIsAIndex(c) }
-  
+
   public static func float32(in context: Context) -> Self {
     Self(mlirF32TypeGet(context.cRepresentation))!
   }
@@ -17,9 +17,9 @@ public struct IntegerType: ContextualTypeProtocol {
     case signed, unsigned
   }
   public let signedness: Signedness?
-  
+
   public let bitWidth: Int
- 
+
   public func type(in context: Context) -> Type {
     precondition(bitWidth > 0)
     let c: MlirType
@@ -56,7 +56,6 @@ extension Type {
   }
 }
 
-
 public struct MemoryReferenceType: ContextualTypeProtocol {
   public struct Size: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int64) {
@@ -73,7 +72,7 @@ public struct MemoryReferenceType: ContextualTypeProtocol {
   }
   public let dimensions: [Size]
   public let element: Type
-  
+
   public func type(in context: Context) -> Type {
     precondition(element.context == context)
     precondition(MemoryLayout<Int64>.size == MemoryLayout<Size>.size)
@@ -88,17 +87,18 @@ public struct MemoryReferenceType: ContextualTypeProtocol {
   }
 }
 extension ContextualType {
-  public static func memoryReference(to element: `Type`, withDimensions dimensions: [MemoryReferenceType.Size])
+  public static func memoryReference(
+    to element: `Type`, withDimensions dimensions: [MemoryReferenceType.Size]
+  )
     -> Self
   {
     Self(MemoryReferenceType(dimensions: dimensions, element: element))
   }
 }
 
-
 public struct FunctionType: ContextualTypeProtocol {
   public let inputs, results: [Type]
-  
+
   public func type(in context: Context) -> Type {
     let c: MlirType = inputs.withUnsafeCRepresentation { inputs in
       results.withUnsafeCRepresentation { results in
