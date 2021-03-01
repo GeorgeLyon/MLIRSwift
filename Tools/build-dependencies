@@ -6,9 +6,9 @@ if [[ "$VERBOSE" == "true" ]]; then
   set -x
 fi
 
-which git
-which cmake
-which ninja
+which git > /dev/null
+which cmake > /dev/null
+which ninja > /dev/null
 
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
