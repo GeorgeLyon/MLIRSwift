@@ -49,3 +49,13 @@ public extension Context {
     type.body(self)
   }
 }
+
+// MARK: - Convenience
+
+public func == (lhs: ContextualType, rhs: Type) -> Bool {
+  rhs.context.get(lhs) == lhs
+}
+
+public func == (lhs: Type, rhs: ContextualType) -> Bool {
+  rhs == lhs
+}
