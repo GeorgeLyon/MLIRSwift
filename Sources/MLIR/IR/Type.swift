@@ -52,10 +52,10 @@ public extension Context {
 
 // MARK: - Convenience
 
-public func == (lhs: ContextualType, rhs: Type) -> Bool {
-  rhs.context.get(lhs) == lhs
+public func == (lhs: ContextualType?, rhs: Type?) -> Bool {
+  rhs.flatMap { lhs.map($0.context.get) } == rhs
 }
 
-public func == (lhs: Type, rhs: ContextualType) -> Bool {
+public func == (lhs: Type?, rhs: ContextualType?) -> Bool {
   rhs == lhs
 }
