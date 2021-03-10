@@ -13,9 +13,8 @@ for numArguments in 0...maxNumArguments {
   <<"""
 
   /// Appends an operation with \(numArguments) results
-  public func append(_ definition: OperationDefinition<(\(values))>, at location: Location) -> (\(values)) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(\(values))>) -> (\(values)) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == \(numArguments))
     return (\(range.map { "results[\($0)]" }.joined(separator: ", ")))

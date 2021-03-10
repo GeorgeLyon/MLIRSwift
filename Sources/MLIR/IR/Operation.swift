@@ -1,244 +1,53 @@
 import CMLIR
 
-public struct Operation: CRepresentable {
+public protocol OperationProtocol {
+  init(cRepresentation: MlirOperation)
+  var cRepresentation: MlirOperation { get }
+}
+
+extension OperationProtocol {
+  
+  /**
+   - parameter resultTypes: `nil` implies type inference
+   */
   public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultTypes: [MLIR.`Type`] = [],
-    ownedRegions: [Region] = [],
+    dialect: Dialect,
+    name: String,
+    attributes: [MLIR.NamedAttribute] = [],
+    operands: [MLIR.Value] = [],
+    resultTypes: [MLIR.`Type`]? = [],
+    ownedRegions: [MLIR.Region] = [],
     location: Location
   ) {
     self.init(
-      c:
-        OperationDefinition(
-          dialect, name,
-          attributes: attributes,
-          operands: operands,
-          resultTypes: resultTypes,
-          ownedRegions: ownedRegions
-        )
-        .createOperation(at: location))!
+      dialect: dialect as Dialect?,
+      name: name,
+      attributes: attributes,
+      operands: operands,
+      resultTypes: resultTypes,
+      ownedRegions: ownedRegions,
+      location: location)
   }
-
-  public var attributes: Attributes {
-    Attributes(c: c)
-  }
-  public var regions: Regions {
-    Regions(c: c)
-  }
-  public var results: Results {
-    Results(c: c)
-  }
-
-  public var isValid: Bool {
-    mlirOperationVerify(c)
-  }
-
-  public var owningOperation: Operation? {
-    Operation(c: mlirOperationGetParentOperation(c))
-  }
-  public var owningBlock: Block? {
-    Block(c: mlirOperationGetBlock(c))
-  }
-  public var context: UnownedContext {
-    UnownedContext(c: mlirOperationGetContext(c))!
-  }
-
-  let c: MlirOperation
-
+  
   /**
-   Creates an owned operation.
+   - parameter resultTypes: `nil` implies type inference
    */
-  init?<T>(_ definition: OperationDefinition<T>, location: Location) {
-    self.init(c: definition.createOperation(at: location))
-  }
-
-  static let isNull = mlirOperationIsNull
-}
-
-// MARK: - Attributes
-
-extension Operation {
-  public struct Attributes {
-    public subscript(_ name: String) -> Attribute? {
-      get {
-        Attribute(c: name.withUnsafeMlirStringRef { mlirOperationGetAttributeByName(c, $0) })
-      }
-      nonmutating set {
-        name.withUnsafeMlirStringRef {
-          if let newValue = newValue {
-            mlirOperationSetAttributeByName(c, $0, newValue.c)
-          } else {
-            mlirOperationRemoveAttributeByName(c, $0)
-          }
-        }
-      }
-    }
-    public func set(_ namedAttribute: NamedAttribute) {
-      /// Eventually we may want to expose API in MLIR to do this less circuitously
-      self[namedAttribute.name.stringValue] = namedAttribute.attribute
-    }
-    fileprivate let c: MlirOperation
-  }
-}
-
-// MARK: - Regions
-
-extension Operation {
-  public struct Regions: RandomAccessCollection {
-    public let startIndex = 0
-    public var endIndex: Int { mlirOperationGetNumRegions(c) }
-    public subscript(position: Int) -> Region {
-      Region(c: mlirOperationGetRegion(c, position))!
-    }
-    fileprivate let c: MlirOperation
-  }
-}
-
-// MARK: - Results
-
-extension Operation {
-  public struct Results: RandomAccessCollection {
-    public let startIndex = 0
-    public var endIndex: Int { mlirOperationGetNumResults(c) }
-    public subscript(position: Int) -> Value {
-      Value(c: mlirOperationGetResult(c, position))!
-    }
-    fileprivate let c: MlirOperation
-  }
-}
-
-// MARK: - Operation Definition
-
-/**
- `OperationDefinition` closely resembles `OperationDefinition` with a few notable caveats:
- - `OperationDefinition` includes Swift type-system information about the cardinality of results
- - `OperationDefinition` does not include location, making it easier to define an operation that is then used in various places
- */
-public struct OperationDefinition<Results> {
-
-  public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultTypes: [MLIR.`Type`] = [],
-    ownedRegions: [Region] = []
-  )
-  where
-    Results == Operation.Results
-  {
-    self.dialect = dialect
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = resultTypes
-    self.ownedRegions = ownedRegions
-  }
-
-  public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultTypes: Operation.InferredResultType,
-    ownedRegions: [Region] = []
-  )
-  where
-    Results == Operation.Results
-  {
-    self.dialect = dialect
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = nil
-    self.ownedRegions = ownedRegions
-  }
-
-  public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    ownedRegions: [Region] = []
-  )
-  where
-    Results == ()
-  {
-    self.dialect = dialect
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = []
-    self.ownedRegions = ownedRegions
-  }
-
-  public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultType: MLIR.`Type`,
-    ownedRegions: [Region] = []
-  )
-  where
-    Results == (Value)
-  {
-    self.dialect = dialect
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = [resultType]
-    self.ownedRegions = ownedRegions
-  }
-
-  public init(
-    _ dialect: Dialect, _ name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultType: Operation.InferredResultType,
-    ownedRegions: [Region] = []
-  )
-  where
-    Results == (Value)
-  {
-    self.dialect = dialect
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = nil
-    self.ownedRegions = ownedRegions
-  }
-
   init(
-    builtin name: String,
-    attributes: [NamedAttribute] = [],
-    operands: [Value] = [],
-    resultTypes: [MLIR.`Type`] = [],
-    ownedRegions: [Region] = []
+    dialect: Dialect? = nil,
+    name: String,
+    attributes: [MLIR.NamedAttribute],
+    operands: [MLIR.Value],
+    resultTypes: [MLIR.`Type`]?,
+    ownedRegions: [MLIR.Region],
+    location: Location
   ) {
-    self.dialect = nil
-    self.name = name
-    self.attributes = attributes
-    self.operands = operands
-    self.resultTypes = resultTypes
-    self.ownedRegions = ownedRegions
-  }
-
-  /// `nil` indicates the builtin dialect
-  let dialect: Dialect?
-  let name: String
-  let attributes: [NamedAttribute]
-  let operands: [Value]
-  /// `nil` implies result type inference
-  let resultTypes: [MLIR.`Type`]?
-  let ownedRegions: [Region]
-
-  fileprivate func createOperation(at location: Location) -> MlirOperation {
-    let name: String
+    let qualifiedName: String
     if let dialect = dialect {
-      name = "\(dialect.namespace).\(self.name)"
+      qualifiedName = "\(dialect.namespace).\(name)"
     } else {
-      name = self.name
+      qualifiedName = name
     }
-    return name.withUnsafeMlirStringRef { name in
+    self.init(cRepresentation: qualifiedName.withUnsafeMlirStringRef { name in
       operands.withUnsafeCRepresentation { operands in
         attributes.withUnsafeCRepresentation { attributes in
           ownedRegions.withUnsafeCRepresentation { ownedRegions in
@@ -259,23 +68,183 @@ public struct OperationDefinition<Results> {
           }
         }
       }
+    })
+  }
+  
+  public typealias Attributes = _OperationAttributes
+  public var attributes: Attributes {
+    Attributes(c: cRepresentation)
+  }
+  
+  public typealias Regions = _OperationRegions
+  public var regions: Regions {
+    Regions(c: cRepresentation)
+  }
+  
+  public typealias Results = _OperationResults
+  public var results: Results {
+    Results(c: cRepresentation)
+  }
+
+  public var isValid: Bool {
+    mlirOperationVerify(cRepresentation)
+  }
+
+  public var owningOperation: Operation? {
+    Operation(c: mlirOperationGetParentOperation(cRepresentation))
+  }
+  public var owningBlock: Block? {
+    Block(c: mlirOperationGetBlock(cRepresentation))
+  }
+  public var context: UnownedContext {
+    UnownedContext(c: mlirOperationGetContext(cRepresentation))!
+  }
+}
+
+public struct Operation: OperationProtocol, CRepresentable {
+  public init(cRepresentation: MlirOperation) {
+    self.c = cRepresentation
+  }
+  public var cRepresentation: MlirOperation { c }
+  let c: MlirOperation
+  
+  static let isNull = mlirOperationIsNull
+}
+
+// MARK: - Attributes
+
+public struct _OperationAttributes {
+  public subscript(_ name: String) -> Attribute? {
+    get {
+      Attribute(c: name.withUnsafeMlirStringRef { mlirOperationGetAttributeByName(c, $0) })
+    }
+    nonmutating set {
+      name.withUnsafeMlirStringRef {
+        if let newValue = newValue {
+          mlirOperationSetAttributeByName(c, $0, newValue.c)
+        } else {
+          mlirOperationRemoveAttributeByName(c, $0)
+        }
+      }
     }
   }
+  public func set(_ namedAttribute: NamedAttribute) {
+    /// Eventually we may want to expose API in MLIR to do this less circuitously
+    self[namedAttribute.name.stringValue] = namedAttribute.attribute
+  }
+  fileprivate let c: MlirOperation
+}
+
+// MARK: - Regions
+
+public struct _OperationRegions: RandomAccessCollection {
+  public let startIndex = 0
+  public var endIndex: Int { mlirOperationGetNumRegions(c) }
+  public subscript(position: Int) -> Region {
+    Region(c: mlirOperationGetRegion(c, position))!
+  }
+  fileprivate let c: MlirOperation
+}
+
+// MARK: - Results
+
+public struct _OperationResults: RandomAccessCollection {
+  public let startIndex = 0
+  public var endIndex: Int { mlirOperationGetNumResults(c) }
+  public subscript(position: Int) -> Value {
+    Value(c: mlirOperationGetResult(c, position))!
+  }
+  fileprivate let c: MlirOperation
+}
+
+// MARK: - Typed Operation
+
+public struct TypedOperation<Results>: OperationProtocol {
+  public init(cRepresentation: MlirOperation) {
+    self.c = cRepresentation
+  }
+  public var cRepresentation: MlirOperation { c }
+  
+  let c: MlirOperation
+
+  public init(
+    _ dialect: Dialect, _ name: String,
+    attributes: [NamedAttribute] = [],
+    operands: [Value] = [],
+    ownedRegions: [Region] = [],
+    location: Location
+  )
+  where
+    Results == ()
+  {
+    self.init(
+      dialect: dialect,
+      name: name,
+      attributes: attributes,
+      operands: operands,
+      resultTypes: [],
+      ownedRegions: ownedRegions,
+      location: location)
+  }
+
+  public init(
+    _ dialect: Dialect, _ name: String,
+    attributes: [NamedAttribute] = [],
+    operands: [Value] = [],
+    resultType: MLIR.`Type`,
+    ownedRegions: [Region] = [],
+    location: Location
+  )
+  where
+    Results == (Value)
+  {
+    self.init(
+      dialect: dialect,
+      name: name,
+      attributes: attributes,
+      operands: operands,
+      resultTypes: [resultType],
+      ownedRegions: ownedRegions,
+      location: location)
+  }
+
+  public init(
+    _ dialect: Dialect, _ name: String,
+    attributes: [NamedAttribute] = [],
+    operands: [Value] = [],
+    resultType: InferredResultType,
+    ownedRegions: [Region] = [],
+    location: Location
+  )
+  where
+    Results == (Value)
+  {
+    self.init(
+      dialect: dialect,
+      name: name,
+      attributes: attributes,
+      operands: operands,
+      resultTypes: nil,
+      ownedRegions: ownedRegions,
+      location: location)
+  }
+
 }
 
 // MARK: - Inferred Results
 
-extension Operation {
-  public struct InferredResultType {
-    public static let inferred = Self()
+public extension TypedOperation {
+  typealias InferredResultType = _OperationInferredResultType
+}
+public struct _OperationInferredResultType {
+  public static let inferred = Self()
 
-    /**
-     If it becomes interesting, we can implement the following function so we could do partial inference like so: `OperationDefinition(resultTypes: .inferred, .inferred(expecting: .integer(bitWidth: 1))`
-     ```
-     public static func inferred(expecting type: MLIR.`Type`) -> Self {
+  /**
+   If it becomes interesting, we can implement the following function so we could do partial inference like so: `OperationDefinition(resultTypes: .inferred, .inferred(expecting: .integer(bitWidth: 1))`
+   ```
+   public static func inferred(expecting type: MLIR.`Type`) -> Self {
 
-     }
-     ```
-     */
-  }
+   }
+   ```
+   */
 }

@@ -1,10 +1,11 @@
 import MLIR
 
-extension OperationDefinition {
+extension TypedOperation {
 
   public static func constant(
     _ value: MLIR.Attribute,
-    ofType type: MLIR.`Type`
+    ofType type: MLIR.`Type`,
+    at location: Location
   ) -> Self
   where
     Results == (Value)
@@ -14,16 +15,18 @@ extension OperationDefinition {
       attributes: [
         .value(value)
       ],
-      resultType: type)
+      resultType: type,
+      location: location)
   }
 
-  public static func `return`(_ values: MLIR.Value...) -> Self
+  public static func `return`(_ values: MLIR.Value..., at location: Location) -> Self
   where
     Results == ()
   {
     Self(
       .std, "return",
-      operands: values)
+      operands: values,
+      location: location)
   }
 
 }

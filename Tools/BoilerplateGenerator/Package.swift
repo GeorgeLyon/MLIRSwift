@@ -6,8 +6,8 @@ let package = Package(
   name: "BoilerplateGenerator",
   products: [
     .executable(
-      name: "GenerateOperationDefinitionInitializers",
-      targets: ["GenerateOperationDefinitionInitializers"]),
+      name: "GenerateTypedOperationInitializers",
+      targets: ["GenerateTypedOperationInitializers"]),
     .executable(
       name: "GenerateBlockConvenienceInitializers",
       targets: ["GenerateBlockConvenienceInitializers"]),
@@ -17,7 +17,7 @@ let package = Package(
   ],
   targets: [
     .target(name: "Utilities"),
-    .target(name: "GenerateOperationDefinitionInitializers", dependencies: ["Utilities"]),
+    .target(name: "GenerateTypedOperationInitializers", dependencies: ["Utilities"]),
     .target(name: "GenerateBlockConvenienceInitializers", dependencies: ["Utilities"]),
     .target(name: "GenerateBlockOperationsAppend", dependencies: ["Utilities"]),
   ]

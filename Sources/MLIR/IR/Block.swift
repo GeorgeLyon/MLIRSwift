@@ -64,26 +64,12 @@ extension Block {
     /**
      Appends an operation and transfers ownership of that operation to this block
      */
-    public func append(_ ownedOperation: Operation) {
+    public func append(_ ownedOperation: OperationProtocol) {
       /**
        The module terminator must always be at the end.
        If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
        */
-      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation.c)
-    }
-
-    /**
-     Creates an operation owned by this block using the provided definition
-     - parameter definition: A **valid** operation definition.
-     - returns: The results of the operation
-     - precondition: `definition` must be valid or this will crash
-     */
-    public func append(_ definition: OperationDefinition<Operation.Results>, at location: Location)
-      -> Operation.Results
-    {
-      let operation = Operation(definition, location: location)!
-      append(operation)
-      return operation.results
+      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation.cRepresentation)
     }
 
     let c: MlirBlock

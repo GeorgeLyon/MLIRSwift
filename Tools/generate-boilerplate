@@ -12,6 +12,6 @@ function generate() {
    swift-format > "$PROJECT_ROOT/Sources/MLIR/IR/$(echo $@) (Generated).swift"
 }
 
-generate Operation Definition Initializers
+generate Typed Operation Initializers
 generate Block Convenience Initializers
 generate Block Operations Append

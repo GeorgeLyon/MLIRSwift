@@ -3,86 +3,72 @@
 extension Block.Operations {
 
   /// Appends an operation with 0 results
-  public func append(_ definition: OperationDefinition<()>, at location: Location) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<()>) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 0)
     return ()
   }
 
   /// Appends an operation with 1 results
-  public func append(_ definition: OperationDefinition<(Value)>, at location: Location) -> (Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value)>) -> (Value) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 1)
     return (results[0])
   }
 
   /// Appends an operation with 2 results
-  public func append(_ definition: OperationDefinition<(Value, Value)>, at location: Location) -> (
-    Value, Value
-  ) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value)>) -> (Value, Value) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 2)
     return (results[0], results[1])
   }
 
   /// Appends an operation with 3 results
-  public func append(
-    _ definition: OperationDefinition<(Value, Value, Value)>, at location: Location
-  ) -> (Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value, Value)>) -> (Value, Value, Value) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 3)
     return (results[0], results[1], results[2])
   }
 
   /// Appends an operation with 4 results
-  public func append(
-    _ definition: OperationDefinition<(Value, Value, Value, Value)>, at location: Location
-  ) -> (Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value, Value, Value)>) -> (
+    Value, Value, Value, Value
+  ) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 4)
     return (results[0], results[1], results[2], results[3])
   }
 
   /// Appends an operation with 5 results
-  public func append(
-    _ definition: OperationDefinition<(Value, Value, Value, Value, Value)>, at location: Location
-  ) -> (Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value, Value, Value, Value)>) -> (
+    Value, Value, Value, Value, Value
+  ) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 5)
     return (results[0], results[1], results[2], results[3], results[4])
   }
 
   /// Appends an operation with 6 results
-  public func append(
-    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value)>,
-    at location: Location
-  ) -> (Value, Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value, Value, Value, Value, Value)>) -> (
+    Value, Value, Value, Value, Value, Value
+  ) {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 6)
     return (results[0], results[1], results[2], results[3], results[4], results[5])
   }
 
   /// Appends an operation with 7 results
-  public func append(
-    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value, Value)>,
-    at location: Location
-  ) -> (Value, Value, Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+  public func append(_ operation: TypedOperation<(Value, Value, Value, Value, Value, Value, Value)>)
+    -> (Value, Value, Value, Value, Value, Value, Value)
+  {
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 7)
     return (results[0], results[1], results[2], results[3], results[4], results[5], results[6])
@@ -90,11 +76,9 @@ extension Block.Operations {
 
   /// Appends an operation with 8 results
   public func append(
-    _ definition: OperationDefinition<(Value, Value, Value, Value, Value, Value, Value, Value)>,
-    at location: Location
+    _ operation: TypedOperation<(Value, Value, Value, Value, Value, Value, Value, Value)>
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 8)
     return (
@@ -104,12 +88,9 @@ extension Block.Operations {
 
   /// Appends an operation with 9 results
   public func append(
-    _ definition: OperationDefinition<
-      (Value, Value, Value, Value, Value, Value, Value, Value, Value)
-    >, at location: Location
+    _ operation: TypedOperation<(Value, Value, Value, Value, Value, Value, Value, Value, Value)>
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 9)
     return (
@@ -120,12 +101,11 @@ extension Block.Operations {
 
   /// Appends an operation with 10 results
   public func append(
-    _ definition: OperationDefinition<
+    _ operation: TypedOperation<
       (Value, Value, Value, Value, Value, Value, Value, Value, Value, Value)
-    >, at location: Location
+    >
   ) -> (Value, Value, Value, Value, Value, Value, Value, Value, Value, Value) {
-    let operation = Operation(definition, location: location)!
-    append(operation)
+    append(operation as OperationProtocol)
     let results = operation.results
     precondition(results.count == 10)
     return (

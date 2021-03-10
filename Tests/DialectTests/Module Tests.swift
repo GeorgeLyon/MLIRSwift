@@ -59,11 +59,10 @@ final class ModuleTests: XCTestCase {
         returnTypes: [i1, i1],
         blocks: [
           Block(i1, i1) { ops, a, b in
-            ops.append(.return(b, a), at: location.viaCallsite())
+            ops.append(.return(b, a, at: location.viaCallsite()))
           }
         ],
-        in: context),
-      at: location.viaCallsite())
+        at: location.viaCallsite()))
     XCTAssertTrue(constructed.body.operations.map(\.isValid).reduce(true, { $0 && $1 }))
     XCTAssertTrue(constructed.operation.isValid)
     

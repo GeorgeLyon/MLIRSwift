@@ -1,4 +1,4 @@
-extension OperationDefinition where Results == () {
+extension OperationProtocol where Self == TypedOperation<()> {
   /**
    - precondition: `blocks` must contain at least one block
    */
@@ -7,15 +7,19 @@ extension OperationDefinition where Results == () {
     returnTypes: [MLIR.`Type`] = [],
     attributes: [NamedAttribute] = [],
     blocks: [Block],
-    in context: Context
+    at location: Location
   ) -> Self {
     let entryBlock = blocks.first!
     return Self(
-      builtin: "func",
+      dialect: nil,
+      name: "func",
       attributes: attributes
-        + .function(name, of: entryBlock.arguments.map(\.type), to: returnTypes, in: context),
+        + .function(name, of: entryBlock.arguments.map(\.type), to: returnTypes, in: location.context),
+      operands: [],
+      resultTypes: [],
       ownedRegions: [
         Region(ownedBlocks: blocks)
-      ])
+      ],
+      location: location)
   }
 }
