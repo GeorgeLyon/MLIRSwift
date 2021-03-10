@@ -1,61 +1,68 @@
+
 import CMLIR
 
-public struct Type: Equatable, CRepresentable, Printable, Parsable {
-  public init?(_ cRepresentation: MlirType) {
-    self.init(c: cRepresentation)
-  }
-  public var cRepresentation: MlirType { c }
-
-  public var context: UnownedContext {
-    UnownedContext(c: mlirTypeGetContext(c))!
-  }
-
-  public static func == (lhs: Self, rhs: Self) -> Bool {
-    mlirTypeEqual(lhs.c, rhs.c)
-  }
-
-  let c: MlirType
-
-  static let isNull = mlirTypeIsNull
-  static let print = mlirTypePrint
-  static let parse = mlirTypeParseGet
-}
-
-public protocol ContextualTypeProtocol {
-  func type(in context: Context) -> Type
+/**
+ A representation of an MLIR type that is independent of a context
+ */
+public protocol ContextualType {
+  func `in`(_ context: Context) -> Type
 }
 
 /**
- We may be able to get rid of this if https://forums.swift.org/t/se-0299-second-review-extending-static-member-lookup-in-generic-contexts/44565 is accepted
+ Swift representation of an `MlirType`
+ 
+ - note: The type-name `Type` is awkward because it conflicts with Swift's built-in `Type` type which represent the metatype of a given type. This can be disambiguated with backtics, which we think is preferrable to calling this type something else (like `MLIRType`).
  */
-public struct ContextualType {
-  public init(_ wrapped: ContextualTypeProtocol) {
-    self.body = wrapped.type(in:)
+public struct Type: ContextualType, Equatable, MlirRepresentable {
+  
+  /**
+   Creates a type from an `MlirType`, which **must not** be null
+   */
+  public init(_ mlir: MlirType) {
+    precondition(!mlirTypeIsNull(mlir))
+    self.mlir = mlir
   }
-  public static func explicit(_ type: Type) -> Self {
-    Self { context in
-      precondition(context == type.context)
-      return type
-    }
+  public let mlir: MlirType
+  
+  /**
+   Type implements `ContextualType`, but requires that `context`be the context owning this type.
+   */
+  public func `in`(_ context: Context) -> Type {
+    precondition(context == self.context)
+    return self
   }
-  private init(_ body: @escaping (Context) -> Type) {
-    self.body = body
+  
+  /**
+   The context which owns this type
+   */
+  public var context: UnownedContext {
+    UnownedContext(mlirTypeGetContext(mlir))
   }
-  fileprivate let body: (Context) -> Type
 }
 
-public extension Context {
-  func get(_ type: ContextualType) -> Type {
-    type.body(self)
+// MARK: - Equality
+
+extension Type {
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    mlirTypeEqual(lhs.mlir, rhs.mlir)
   }
 }
 
-// MARK: - Convenience
-
+/**
+ Types can be equated with contextual types
+ 
+ - note: This operation is defined on optionals so we get optional comparisons as well
+ */
 public func == (lhs: ContextualType?, rhs: Type?) -> Bool {
-  rhs.flatMap { lhs.map($0.context.get) } == rhs
+  switch (lhs, rhs) {
+  case (.none, .none): return true
+  case (.some, .none), (.none, .some): return false
+  case let (lhs?, rhs?):
+    return lhs.in(rhs.context) == rhs
+  }
 }
 
 public func == (lhs: Type?, rhs: ContextualType?) -> Bool {
   rhs == lhs
 }
+

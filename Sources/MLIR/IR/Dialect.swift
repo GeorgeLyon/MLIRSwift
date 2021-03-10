@@ -1,17 +1,26 @@
+
 import CMLIR
 
+/**
+ The Swift representation of an MLIR dialect
+ */
 public struct Dialect {
 
+  /**
+   Creates a `Dialect` from an `MlirDialectHandle`
+   
+   - note: While MLIR does have an `MlirDialect` type, we find that type is not particularly useful, so we choose not to provide a Swift analog. This frees up the name `Dialect` to be used as an analog to `MlirDialectHandle`. If it is needed in the future, we can create a Swift analog for `MlirDialect` with a name like `Dialect.Instance`.
+   */
   public init(_ handle: MlirDialectHandle) {
-    self.c = handle
-  }
-
-  public var namespace: String {
-    mlirDialectHandleGetNamespace(c).string
+    self.mlir = handle
   }
 
   /**
-   While MLIR does have an `MlirDialect` type, we find that type is not particularly useful, so we promote the vastly more useful `MlirDialectHandle` to `Dialect`. If it ends up being necessary, we can bridge`MlirDialect` as `Dialect.Instance` or something similarc.
+   The namespace associated with this dialect
    */
-  let c: MlirDialectHandle
+  public var namespace: String {
+    mlirDialectHandleGetNamespace(mlir).string
+  }
+
+  let mlir: MlirDialectHandle
 }

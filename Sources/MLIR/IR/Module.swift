@@ -1,30 +1,30 @@
+
 import CMLIR
 
-public final class Module: Parsable {
+/**
+ The top-level object which owns an IR graph
+ 
+ This module, along with any IR it owns, is destroyed on deinitialization.
+ */
+public final class Module {
+  
+  /**
+   Creates an empty module with at the specified location
+   */
   public convenience init(location: Location) {
-    self.init(c: mlirModuleCreateEmpty(location.c))!
+    self.init(assumingOwnershipOf: mlirModuleCreateEmpty(location.mlir))
   }
-
-  public var body: Block {
-    Block(c: mlirModuleGetBody(c))!
-  }
-  public var operation: Operation {
-    Operation(c: mlirModuleGetOperation(c))!
-  }
-
-  public var cRepresentation: MlirModule { c }
-
-  /// `Module` is not `CRepresentable` because it is a `class`
-  init?(c: MlirModule) {
-    guard !mlirModuleIsNull(c) else {
-      return nil
-    }
-    self.c = c
+  
+  /**
+   Assumes ownership of an MLIR module, meaning that module will be destroyed when `self` is deinitialized
+   */
+  public init(assumingOwnershipOf mlir: MlirModule) {
+    precondition(!mlirModuleIsNull(mlir))
+    self.mlir = mlir
   }
   deinit {
-    mlirModuleDestroy(c)
+    mlirModuleDestroy(mlir)
   }
-  let c: MlirModule
-
-  static let parse = mlirModuleCreateParse
+  
+  public let mlir: MlirModule
 }

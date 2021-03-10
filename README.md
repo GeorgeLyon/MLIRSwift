@@ -28,3 +28,8 @@ We do not include MLIR (llvm) as a submodule, because this would cause Swift Pac
 ### Using an external MLIR checkout
 
 You can point use your own local version of MLIR in a number of ways, the most flexible is simply to install a custom "LLVM-for-Swift.pc" file that points to your locally built version (consult `Tools/build-dependencies` for an example). A simpler option may be to run `Tools/build-dependencies` with the environment variable `LLVM_REPO` set to `""`, and `LLVM_REPO_PATH` set to the path to the repo you want to use. There are a number of other knobs you can turn in `Tools/build-dependencies` to customize this approach.
+
+## Design
+
+
+

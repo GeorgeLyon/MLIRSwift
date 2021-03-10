@@ -1,30 +1,57 @@
 import CMLIR
 
-public struct Location: CRepresentable, Printable {
-  public init(context: Context, file: StaticString, line: Int, column: Int) {
-    c = file.withUnsafeMlirStringRef {
-      mlirLocationFileLineColGet(context.cRepresentation, $0, UInt32(line), UInt32(column))
+public struct Location {
+
+  /**
+   Creates a location owned by `context` with the provided file, line and column
+   */
+  public static func file(_ file: StaticString, line: Int, column: Int, in context: Context) -> Location {
+    file.withUnsafeMlirStringRef {
+      Location(
+        mlirLocationFileLineColGet(
+          context.mlir,
+          $0,
+          UInt32(line),
+          UInt32(column)))
     }
   }
-
+  
+  /**
+   Creates an unknown location owned by the provided context
+   */
   public static func unknown(in context: Context) -> Location {
-    Location(c: mlirLocationUnknownGet(context.cRepresentation))
+    Location(mlirLocationUnknownGet(context.mlir))
   }
 
-  public func called(from location: Location) -> Location {
-    Location(c: mlirLocationCallSiteGet(self.c, location.c))
+  /**
+   Creates a call site location with `self` as the callee and `callSite` as the caller
+   */
+  public func called(from callSite: Location) -> Location {
+    Location(mlirLocationCallSiteGet(mlir, callSite.mlir))
   }
+  
+  /**
+   Creates a call site location with `self` as the callee and the current source location as the caller
+   */
   public func viaCallsite(
     file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> Location {
-    Location(context: context, file: file, line: line, column: column).called(from: self)
+    .file(file, line: line, column: column, in: context)
+      .called(from: self)
   }
 
+  /**
+   The `context` associated with this location
+   */
   public var context: UnownedContext {
-    UnownedContext(c: mlirLocationGetContext(c))!
+    UnownedContext(mlirLocationGetContext(mlir))
   }
 
-  let c: MlirLocation
-
-  static let print = mlirLocationPrint
+  /**
+   Creates an location from an `MlirLocation`
+   */
+  public init(_ mlir: MlirLocation) {
+    self.mlir = mlir
+  }
+  public let mlir: MlirLocation
 }
