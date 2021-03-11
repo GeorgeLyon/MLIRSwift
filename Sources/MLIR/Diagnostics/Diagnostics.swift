@@ -53,7 +53,7 @@ struct UnsafeDiagnostic {
   var notes: Notes { Notes(parent: mlir) }
 
   let mlir: MlirDiagnostic
-  
+
 }
 
 enum DiagnosticHandlingDirective {

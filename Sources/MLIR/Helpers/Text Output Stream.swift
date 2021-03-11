@@ -7,7 +7,7 @@ extension TextOutputStream {
 
   /**
    Writes to `self` using MLIR-style string callbacks
-   
+
    - parameter body: A block taking arguments suitable for use with MLIR printing APIs such as `mlirOperationPrint`. The callback passed to this closure is `@escaping` because the MLIR C APIs take optionals (which must be `@escaping`), but it is very much not safe for the callback to escape the body of the closure.
    */
   public mutating func write(_ body: (MlirStringCallback?, UnsafeMutableRawPointer) -> Void) {
@@ -33,8 +33,7 @@ extension TextOutputStream {
 
 // MARK: - Printing
 
-protocol Printable: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible
-{
+protocol Printable: TextOutputStreamable, CustomStringConvertible, CustomDebugStringConvertible {
   associatedtype MlirRepresentation
   var mlir: MlirRepresentation { get }
   static var print: PrintCallback { get }
@@ -50,8 +49,9 @@ extension Printable {
   public var debugDescription: String {
     "\(Self.self)(\(self))"
   }
-  
-  typealias PrintCallback = (MlirRepresentation, MlirStringCallback?, UnsafeMutableRawPointer?) -> Void
+
+  typealias PrintCallback = (MlirRepresentation, MlirStringCallback?, UnsafeMutableRawPointer?) ->
+    Void
 }
 
 extension Attribute: Printable {

@@ -31,7 +31,7 @@ extension Type {
 // MARK: - Integer
 
 public struct IntegerType: ContextualType {
-  
+
   public enum Signedness {
     case signed, unsigned
   }
@@ -54,7 +54,9 @@ public struct IntegerType: ContextualType {
   }
 }
 extension ContextualType where Self == IntegerType {
-  public static func integer(_ signedness: IntegerType.Signedness? = nil, bitWidth: Int) -> IntegerType {
+  public static func integer(_ signedness: IntegerType.Signedness? = nil, bitWidth: Int)
+    -> IntegerType
+  {
     IntegerType(signedness: signedness, bitWidth: bitWidth)
   }
 }
@@ -78,7 +80,7 @@ extension Type {
 // MARK: - Memory Reference
 
 public struct MemoryReferenceType: ContextualType {
-  
+
   public struct Size: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int64) {
       precondition(value >= 0)
@@ -128,18 +130,19 @@ public struct FunctionType: ContextualType {
   public let inputs, results: [ContextualType]
 
   public func `in`(_ context: Context) -> Type {
-    let c: MlirType = inputs
+    let c: MlirType =
+      inputs
       .map { $0.in(context) }
       .withUnsafeMlirRepresentation { inputs in
         results
           .map { $0.in(context) }
           .withUnsafeMlirRepresentation { results in
-          mlirFunctionTypeGet(
-            context.mlir,
-            inputs.count, inputs.baseAddress,
-            results.count, results.baseAddress)
-        }
-    }
+            mlirFunctionTypeGet(
+              context.mlir,
+              inputs.count, inputs.baseAddress,
+              results.count, results.baseAddress)
+          }
+      }
     return Type(c)
   }
 }

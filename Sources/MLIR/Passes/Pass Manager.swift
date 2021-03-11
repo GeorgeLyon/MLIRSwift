@@ -5,7 +5,7 @@ import CMLIR
  */
 public struct Pass: MlirRepresentable {
   public let mlir: MlirPass
-  
+
   /// Suppress synthesized initializer
   private init() { fatalError() }
 }

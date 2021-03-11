@@ -1,4 +1,3 @@
-
 /**
  A Swift struct which is memory-layout-compatible with an MLIR type represented by a single pointer.
  */
@@ -10,13 +9,13 @@ protocol MlirRepresentable {
 extension MlirRepresentable {
   /**
    Initializes this type by casting directly from its MLIR representation.
-   
+
    - precondition: `mlir` must not be `nil`
    */
   public init(_ mlir: MlirRepresentation) {
     self.init(checkingForNull: mlir)!
   }
-  
+
   /**
    Initializes this type by casting directly from its MLIR representation if non-`nil`
    */
@@ -61,7 +60,7 @@ private extension MlirRepresentable {
     [
       (MemoryLayout<Self>.size, MemoryLayout<T>.size),
       (MemoryLayout<Self>.stride, MemoryLayout<T>.stride),
-      (MemoryLayout<Self>.alignment, MemoryLayout<T>.alignment)
+      (MemoryLayout<Self>.alignment, MemoryLayout<T>.alignment),
     ]
     .allSatisfy(==)
   }

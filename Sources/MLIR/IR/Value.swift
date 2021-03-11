@@ -1,9 +1,9 @@
 import CMLIR
 
 public struct Value: MlirRepresentable {
-  
+
   public let mlir: MlirValue
-  
+
   public var type: MLIR.`Type` {
     Type(mlirValueGetType(mlir))
   }

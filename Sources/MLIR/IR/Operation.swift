@@ -7,13 +7,13 @@ public typealias AnyOperation = Operation<_OperationResults>
 
 /**
  Swift representation of an MLIR Operation
- 
+
  The generic argument `Results` indicates how the operation should treat its results.
  */
 public struct Operation<Results>: MlirRepresentable {
-  
+
   public let mlir: MlirOperation
-  
+
   /**
    - parameter resultTypes: `nil` implies type inference
    */
@@ -35,7 +35,7 @@ public struct Operation<Results>: MlirRepresentable {
       ownedRegions: ownedRegions,
       location: location)
   }
-  
+
   /**
    - parameter resultTypes: `nil` implies type inference
    */
@@ -56,42 +56,42 @@ public struct Operation<Results>: MlirRepresentable {
       ownedRegions: ownedRegions,
       location: location)
   }
-  
+
   /**
    Returns a new operation with the result type erased
    */
   public var typeErased: AnyOperation {
     AnyOperation(mlir)
   }
-  
+
   /**
    Returns `true` if verification of this operation is successful
    */
   public var isValid: Bool {
     mlirOperationVerify(mlir)
   }
-  
+
   /**
    Returns the operation that owns this operation, if one exists
    */
   public var owningOperation: Operation? {
     Operation(mlirOperationGetParentOperation(mlir))
   }
-  
+
   /**
    Returns the block that contains this operation, if one exists
    */
   public var owningBlock: Block? {
     Block(mlirOperationGetBlock(mlir))
   }
-  
+
   /**
    Returns the context associated with this operation
    */
   public var context: UnownedContext {
     UnownedContext(mlirOperationGetContext(mlir))
   }
-  
+
   private init(
     dialect: Dialect? = nil,
     name: String,
@@ -108,28 +108,29 @@ public struct Operation<Results>: MlirRepresentable {
     } else {
       qualifiedName = name
     }
-    self.init(qualifiedName.withUnsafeMlirStringRef { name in
-      operands.withUnsafeMlirRepresentation { operands in
-        attributes.map { $0.in(context) }.withUnsafeMlirRepresentation { attributes in
-          ownedRegions.withUnsafeMlirRepresentation { ownedRegions in
-            var state = mlirOperationStateGet(name, location.mlir)
-            mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
-            mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
-            mlirOperationStateAddOwnedRegions(
-              &state, ownedRegions.count, ownedRegions.baseAddress)
-            if let resultTypes = resultTypes {
-              return resultTypes.withUnsafeMlirRepresentation { resultTypes in
-                mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
+    self.init(
+      qualifiedName.withUnsafeMlirStringRef { name in
+        operands.withUnsafeMlirRepresentation { operands in
+          attributes.map { $0.in(context) }.withUnsafeMlirRepresentation { attributes in
+            ownedRegions.withUnsafeMlirRepresentation { ownedRegions in
+              var state = mlirOperationStateGet(name, location.mlir)
+              mlirOperationStateAddOperands(&state, operands.count, operands.baseAddress)
+              mlirOperationStateAddAttributes(&state, attributes.count, attributes.baseAddress)
+              mlirOperationStateAddOwnedRegions(
+                &state, ownedRegions.count, ownedRegions.baseAddress)
+              if let resultTypes = resultTypes {
+                return resultTypes.withUnsafeMlirRepresentation { resultTypes in
+                  mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
+                  return mlirOperationCreate(&state)
+                }
+              } else {
+                mlirOperationStateEnableResultTypeInference(&state)
                 return mlirOperationCreate(&state)
               }
-            } else {
-              mlirOperationStateEnableResultTypeInference(&state)
-              return mlirOperationCreate(&state)
             }
           }
         }
-      }
-    })
+      })
   }
 }
 
@@ -230,7 +231,7 @@ public enum _OperationDebugInfoStyle: ExpressibleByNilLiteral {
 extension Operation {
 
   public typealias DebugInfoStyle = _OperationDebugInfoStyle
-  
+
   public func withPrintingOptions(
     elideElementsAttributesLargerThan: Bool? = nil,
     debugInformationStyle: DebugInfoStyle = nil,

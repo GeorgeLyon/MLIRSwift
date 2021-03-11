@@ -10,13 +10,15 @@ extension Operation where Results == () {
     at location: Location
   ) -> Self {
     let entryBlock = blocks.first!
-    
+
     var attributes = attributes
-    
+
     /// These will hopefully be able to use dot syntax as Swift 5.4 matures
     attributes.append(SymbolNameNamedAttribute.symbolName(name))
-    attributes.append(TypeNamedAttribute.type(FunctionType.function(of: entryBlock.arguments.map(\.type), to: returnTypes)))
-    
+    attributes.append(
+      TypeNamedAttribute.type(
+        FunctionType.function(of: entryBlock.arguments.map(\.type), to: returnTypes)))
+
     return Self(
       builtin: "func",
       attributes: attributes,

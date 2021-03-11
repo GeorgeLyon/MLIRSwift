@@ -1,9 +1,8 @@
-
 import CMLIR
 
 /**
  An object which owns simpler objects like `Type` and `Location`. Objects **must not** be used after the owning context is destroyed (this will result in undefined behavior).
- 
+
  The main difference between the two types of context (`OwnedContext` and `UnownedContext`) is that `OwnedContext` is a class which destroys the context on deinitialization.
  */
 public protocol Context {
@@ -18,7 +17,7 @@ public func == (lhs: Context, rhs: Context) -> Bool {
  A context which destroys itself on deinitialization.
  */
 public final class OwnedContext: Context {
-  
+
   /**
    Creates a context loaded with the specified dialects
    */
@@ -31,7 +30,7 @@ public final class OwnedContext: Context {
   deinit {
     mlirContextDestroy(mlir)
   }
-  
+
   public var mlir: MlirContext
 }
 
@@ -40,7 +39,7 @@ public final class OwnedContext: Context {
  */
 public struct UnownedContext: Context, MlirRepresentable {
   public var mlir: MlirContext
-  
+
   /// Suppress synthesized initializer
   private init() { fatalError() }
 }

@@ -1,13 +1,12 @@
-
 import CMLIR
 
 /**
  An IR node containing blocks
  */
 public struct Region: MlirRepresentable {
-  
+
   public let mlir: MlirRegion
-  
+
   /**
    Creates an owned region
    */

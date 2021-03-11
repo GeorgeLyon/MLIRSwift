@@ -13,9 +13,9 @@ public protocol ContextualAttribute {
  A Swift representation of an MLIR attribute
  */
 public struct Attribute: ContextualAttribute, MlirRepresentable {
-  
+
   public let mlir: MlirAttribute
-  
+
   /**
    Attribute implements `ContextualAttribute`, but requires that `context`be the context owning this type.
    */
@@ -23,17 +23,17 @@ public struct Attribute: ContextualAttribute, MlirRepresentable {
     precondition(context == self.context)
     return self
   }
-  
+
   /**
    The context which owns this attribute
    */
   public var context: UnownedContext {
     UnownedContext(mlirAttributeGetContext(mlir))
   }
-  
+
   /// Suppress synthesized initializer
   private init() { fatalError() }
-  
+
 }
 
 // MARK: Equality
@@ -46,7 +46,7 @@ extension Attribute: Equatable {
 
 /**
  Attributes can be equated with contextual attributes
- 
+
  - note: This operation is defined on optionals so we get optional comparisons as well
  */
 public func == (lhs: ContextualAttribute?, rhs: Attribute?) -> Bool {
@@ -73,18 +73,18 @@ public protocol ContextualNamedAttribute {
 
 /**
  Represent an identifier-attribute pair.
- 
+
  - note: We model this as its own type, and collections of named attributes as arrays of `NamedAttribute`, because often the type of an attribute can be inferred from the identifier which we would not have access to if we represented the collection as a dictionary of attributes.
  */
 public struct NamedAttribute: ContextualNamedAttribute {
-  
+
   /**
    Creates a named attribute from an identifier and an attribute
    */
   public init(name: Identifier, attribute: Attribute) {
     self.init(mlirNamedAttributeGet(name.mlir, attribute.mlir))
   }
-  
+
   /**
    Creates a named attribute from a string and an attribute
    */
@@ -93,10 +93,10 @@ public struct NamedAttribute: ContextualNamedAttribute {
       name: Identifier(name, in: attribute.context),
       attribute: attribute)
   }
-  
+
   /**
    Creates a named attribute from an `MlirNamedAttribute`
-   
+
    - precondition: The attribute must not be null
    - precondition: `name` and `attribute` must be in the same context
    */
@@ -106,7 +106,7 @@ public struct NamedAttribute: ContextualNamedAttribute {
     precondition(name.context == attribute.context)
   }
   public let mlir: MlirNamedAttribute
-  
+
   /**
    - precondition: `context` must be equal to the context which owns this named attribute
    */
@@ -114,7 +114,7 @@ public struct NamedAttribute: ContextualNamedAttribute {
     precondition(context == self.context)
     return self
   }
-  
+
   /**
    The context which owns the identifier and attribute comprising `self`
    */
@@ -123,14 +123,14 @@ public struct NamedAttribute: ContextualNamedAttribute {
     assert(name.context == attribute.context)
     return name.context
   }
-  
+
   /**
    The name of this named attribute
    */
   public var name: Identifier {
     Identifier(mlir.name)
   }
-  
+
   /**
    The attribute of this named attribute
    */
@@ -145,7 +145,8 @@ extension Array where Element == NamedAttribute {
   ) rethrows -> R {
     precondition(MemoryLayout<NamedAttribute>.size == MemoryLayout<MlirNamedAttribute>.size)
     precondition(MemoryLayout<NamedAttribute>.stride == MemoryLayout<MlirNamedAttribute>.stride)
-    precondition(MemoryLayout<NamedAttribute>.alignment == MemoryLayout<MlirNamedAttribute>.alignment)
+    precondition(
+      MemoryLayout<NamedAttribute>.alignment == MemoryLayout<MlirNamedAttribute>.alignment)
     return try withUnsafeBufferPointer { buffer in
       try buffer.withMemoryRebound(to: MlirNamedAttribute.self, body)
     }

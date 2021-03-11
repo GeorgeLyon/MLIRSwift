@@ -4,7 +4,7 @@ import CMLIR
  An IR node which can have arguments and holds operations
  */
 public struct Block: MlirRepresentable, Equatable {
-  
+
   /**
    Creates a block with the specified argument types
    */
@@ -13,29 +13,29 @@ public struct Block: MlirRepresentable, Equatable {
       Self(mlirBlockCreate($0.count, $0.baseAddress))
     }
   }
-  
+
   public init(_ mlir: MlirBlock) {
     precondition(!mlirBlockIsNull(mlir))
     self.mlir = mlir
   }
   public let mlir: MlirBlock
-  
+
   /**
    Destroys this block
-   
+
    This block **must not** be used after `destroy` returns, doing so will lead to undefined behavior
    */
   public func destroy() {
     mlirBlockDestroy(mlir)
   }
-  
+
   /**
    The arguments to this block
    */
   public var arguments: Arguments {
     Arguments(block: mlir)
   }
-  
+
   /**
    The operations in this block
    */
@@ -53,7 +53,7 @@ public struct Block: MlirRepresentable, Equatable {
   public static func == (lhs: Self, rhs: Self) -> Bool {
     mlirBlockEqual(lhs.mlir, rhs.mlir)
   }
-  
+
 }
 
 // MARK: - Arguments
@@ -94,7 +94,7 @@ extension Block {
        */
       mlirBlockInsertOwnedOperationBefore(block, mlirBlockGetTerminator(block), ownedOperation.mlir)
     }
-    
+
     /**
      Appends an operation with 0 results
      */
@@ -103,7 +103,7 @@ extension Block {
       precondition(operation.results.count == 0)
       append(operation)
     }
-    
+
     public let block: MlirBlock
   }
 }

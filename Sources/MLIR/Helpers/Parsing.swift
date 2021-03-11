@@ -1,8 +1,7 @@
-
 import CMLIR
 
 extension Context {
-  
+
   /**
    Attempts to parse `source` as a module
    */
@@ -29,7 +28,7 @@ extension Context {
       isNull: mlirAttributeIsNull,
       init: Attribute.init)
   }
-  
+
   /**
    Attempts to parse `source` as a type
    */
@@ -43,7 +42,7 @@ extension Context {
       isNull: mlirTypeIsNull,
       init: Type.init)
   }
- 
+
   private func parse<T, U>(
     _ source: String,
     parse: (MlirContext, MlirStringRef) -> T,
