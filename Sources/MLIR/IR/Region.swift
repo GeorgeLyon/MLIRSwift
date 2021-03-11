@@ -1,32 +1,35 @@
+
 import CMLIR
 
-public struct Region: CRepresentable {
+/**
+ An IR node containing blocks
+ */
+public struct Region: MlirRepresentable {
+  
+  public let mlir: MlirRegion
+  
   /**
    Creates an owned region
    */
   public init(ownedBlocks: [Block] = []) {
-    c = mlirRegionCreate()
+    self.init(mlirRegionCreate())
     ownedBlocks.forEach(blocks.append)
   }
 
   public struct Blocks: Collection {
     public typealias Index = LinkedListIndex<Self>
     public typealias Element = Block
-    public var startIndex: Index { .starting(with: mlirRegionGetFirstBlock(c)) }
+    public var startIndex: Index { .starting(with: mlirRegionGetFirstBlock(region)) }
     public var endIndex: Index { .end }
     public func index(after i: Index) -> Index {
       i.successor(using: mlirBlockGetNextInRegion)
     }
 
     public func append(_ ownedBlock: Block) {
-      mlirRegionAppendOwnedBlock(c, ownedBlock.c)
+      mlirRegionAppendOwnedBlock(region, ownedBlock.mlir)
     }
 
-    fileprivate let c: MlirRegion
+    fileprivate let region: MlirRegion
   }
-  public var blocks: Blocks { Blocks(c: c) }
-
-  let c: MlirRegion
-
-  static let isNull = mlirRegionIsNull
+  public var blocks: Blocks { Blocks(region: mlir) }
 }

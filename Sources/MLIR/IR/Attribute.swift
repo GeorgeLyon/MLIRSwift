@@ -12,15 +12,8 @@ public protocol ContextualAttribute {
 /**
  A Swift representation of an MLIR attribute
  */
-public struct Attribute: ContextualAttribute, Equatable, MlirRepresentable {
+public struct Attribute: ContextualAttribute, MlirRepresentable {
   
-  /**
-   Creates an attribute from an `MlirAttribute`
-   */
-  public init(_ mlir: MlirAttribute) {
-    precondition(!mlirAttributeIsNull(mlir))
-    self.mlir = mlir
-  }
   public let mlir: MlirAttribute
   
   /**
@@ -37,11 +30,15 @@ public struct Attribute: ContextualAttribute, Equatable, MlirRepresentable {
   public var context: UnownedContext {
     UnownedContext(mlirAttributeGetContext(mlir))
   }
+  
+  /// Suppress synthesized initializer
+  private init() { fatalError() }
+  
 }
 
 // MARK: Equality
 
-extension Attribute {
+extension Attribute: Equatable {
   public static func == (lhs: Attribute, rhs: Attribute) -> Bool {
     mlirAttributeEqual(lhs.mlir, rhs.mlir)
   }
@@ -79,7 +76,7 @@ public protocol ContextualNamedAttribute {
  
  - note: We model this as its own type, and collections of named attributes as arrays of `NamedAttribute`, because often the type of an attribute can be inferred from the identifier which we would not have access to if we represented the collection as a dictionary of attributes.
  */
-public struct NamedAttribute: ContextualNamedAttribute, MlirRepresentable {
+public struct NamedAttribute: ContextualNamedAttribute {
   
   /**
    Creates a named attribute from an identifier and an attribute
@@ -139,5 +136,18 @@ public struct NamedAttribute: ContextualNamedAttribute, MlirRepresentable {
    */
   public var attribute: Attribute {
     Attribute(mlir.attribute)
+  }
+}
+
+extension Array where Element == NamedAttribute {
+  func withUnsafeMlirRepresentation<R>(
+    _ body: (UnsafeBufferPointer<MlirNamedAttribute>) throws -> R
+  ) rethrows -> R {
+    precondition(MemoryLayout<NamedAttribute>.size == MemoryLayout<MlirNamedAttribute>.size)
+    precondition(MemoryLayout<NamedAttribute>.stride == MemoryLayout<MlirNamedAttribute>.stride)
+    precondition(MemoryLayout<NamedAttribute>.alignment == MemoryLayout<MlirNamedAttribute>.alignment)
+    return try withUnsafeBufferPointer { buffer in
+      try buffer.withMemoryRebound(to: MlirNamedAttribute.self, body)
+    }
   }
 }

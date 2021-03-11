@@ -3,7 +3,6 @@ import MLIR
 
 import CMLIR
 
-/*
 final class DiagnosticTests: XCTestCase {
   func testDiagnosticSeverity() {
     XCTAssertGreaterThan(Diagnostic.Severity.error, Diagnostic.Severity.warning)
@@ -18,7 +17,7 @@ final class DiagnosticTests: XCTestCase {
     let message = "Test Diagnostic"
     let diagnostics = context.collectDiagnostics {
       message.withCString {
-        mlirEmitError(mlirLocationUnknownGet(context.cRepresentation), $0)
+        mlirEmitError(mlirLocationUnknownGet(context.mlir), $0)
       }
     }
     XCTAssertEqual(diagnostics.count, 1)
@@ -27,4 +26,3 @@ final class DiagnosticTests: XCTestCase {
     XCTAssertEqual(diagnostic.message, message)
   }
 }
-*/

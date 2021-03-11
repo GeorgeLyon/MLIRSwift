@@ -1,6 +1,6 @@
 import CMLIR
 
-public struct Location {
+public struct Location: MlirRepresentable {
 
   /**
    Creates a location owned by `context` with the provided file, line and column
@@ -47,11 +47,5 @@ public struct Location {
     UnownedContext(mlirLocationGetContext(mlir))
   }
 
-  /**
-   Creates an location from an `MlirLocation`
-   */
-  public init(_ mlir: MlirLocation) {
-    self.mlir = mlir
-  }
   public let mlir: MlirLocation
 }

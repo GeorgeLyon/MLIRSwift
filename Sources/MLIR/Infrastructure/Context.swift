@@ -35,17 +35,12 @@ public final class OwnedContext: Context {
   public var mlir: MlirContext
 }
 
-public struct UnownedContext: Context {
-  
-  /**
-   Creates an unowned context from an `MlirContext`
-   
-   - precondition: The provided context must not be null.
-   */
-  public init(_ mlir: MlirContext) {
-    precondition(!mlirContextIsNull(mlir))
-    self.mlir =  mlir
-  }
-  
+/**
+ A context which is owned by MLIR
+ */
+public struct UnownedContext: Context, MlirRepresentable {
   public var mlir: MlirContext
+  
+  /// Suppress synthesized initializer
+  private init() { fatalError() }
 }

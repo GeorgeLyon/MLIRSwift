@@ -16,7 +16,6 @@ extension Context {
       isNull: mlirModuleIsNull,
       init: Module.init)
   }
-  
   /**
    Attempts to parse `source` as an attribute
    */
@@ -44,7 +43,7 @@ extension Context {
       isNull: mlirTypeIsNull,
       init: Type.init)
   }
-  
+ 
   private func parse<T, U>(
     _ source: String,
     parse: (MlirContext, MlirStringRef) -> T,

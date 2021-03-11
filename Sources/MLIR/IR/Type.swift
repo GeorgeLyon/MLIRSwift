@@ -13,15 +13,8 @@ public protocol ContextualType {
  
  - note: The type-name `Type` is awkward because it conflicts with Swift's built-in `Type` type which represent the metatype of a given type. This can be disambiguated with backtics, which we think is preferrable to calling this type something else (like `MLIRType`).
  */
-public struct Type: ContextualType, Equatable, MlirRepresentable {
+public struct Type: ContextualType, MlirRepresentable {
   
-  /**
-   Creates a type from an `MlirType`, which **must not** be null
-   */
-  public init(_ mlir: MlirType) {
-    precondition(!mlirTypeIsNull(mlir))
-    self.mlir = mlir
-  }
   public let mlir: MlirType
   
   /**
@@ -38,11 +31,14 @@ public struct Type: ContextualType, Equatable, MlirRepresentable {
   public var context: UnownedContext {
     UnownedContext(mlirTypeGetContext(mlir))
   }
+  
+  /// Suppress synthesized initializer
+  private init() { fatalError() }
 }
 
 // MARK: - Equality
 
-extension Type {
+extension Type: Equatable {
   public static func == (lhs: Self, rhs: Self) -> Bool {
     mlirTypeEqual(lhs.mlir, rhs.mlir)
   }

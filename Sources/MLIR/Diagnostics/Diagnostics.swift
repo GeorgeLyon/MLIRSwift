@@ -35,7 +35,7 @@ struct UnsafeDiagnostic {
       }
       mutating func next() -> UnsafeDiagnostic? {
         guard index < count else { return nil }
-        let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent, index))
+        let diagnostic = UnsafeDiagnostic(mlir: mlirDiagnosticGetNote(parent, index))
         index += 1
         return diagnostic
       }
@@ -46,15 +46,14 @@ struct UnsafeDiagnostic {
     fileprivate let parent: MlirDiagnostic
   }
 
-  var location: Location { Location(mlirDiagnosticGetLocation(c)) }
+  var location: Location { Location(mlirDiagnosticGetLocation(mlir)) }
   var severity: Diagnostic.Severity {
-    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c))
+    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(mlir))
   }
-  var notes: Notes { Notes(parent: c) }
+  var notes: Notes { Notes(parent: mlir) }
 
-  let c: MlirDiagnostic
-
-  static let print = mlirDiagnosticPrint
+  let mlir: MlirDiagnostic
+  
 }
 
 enum DiagnosticHandlingDirective {
@@ -129,7 +128,7 @@ private func mlirDiagnosticHandler(
 ) -> MlirLogicalResult {
   let handler =
     Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
-  return handler.handle(UnsafeDiagnostic(c: mlirDiagnostic)).logicalResult
+  return handler.handle(UnsafeDiagnostic(mlir: mlirDiagnostic)).logicalResult
 }
 
 private func mlirDeleteUserData(userData: UnsafeMutableRawPointer!) {

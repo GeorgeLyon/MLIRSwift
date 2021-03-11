@@ -3,23 +3,17 @@ import CMLIR
 /**
  Swift represention of an `MlirIdentifier`
  */
-public struct Identifier {
+public struct Identifier: MlirRepresentable {
   
   /**
    Creates an identifier from a string
    */
   public init(_ string: String, in context: Context) {
-    mlir = string.withUnsafeMlirStringRef {
+    self.init(string.withUnsafeMlirStringRef {
       mlirIdentifierGet(context.mlir, $0)
-    }
+    })
   }
   
-  /**
-   Creates an identifier from an `MlirIdentifier`
-   */
-  public init(_ mlir: MlirIdentifier) {
-    self.mlir = mlir
-  }
   let mlir: MlirIdentifier
   
   public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -42,7 +36,7 @@ public struct Identifier {
   
 }
 
-// MARK: - Convenience
+// MARK: - Printing
 
 extension Identifier: CustomStringConvertible {
   public var description: String {

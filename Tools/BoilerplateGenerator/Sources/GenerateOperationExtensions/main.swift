@@ -1,21 +1,21 @@
 
 import Utilities
 
-let maxNumArguments = 10
+let maxNumResults = 10
 
-for numArguments in 2...maxNumArguments {
-  let range = 0..<numArguments
+for numResults in 2...maxNumResults {
+  let range = 0..<numResults
   let names = range.map { "t\($0)" }
   <<"""
 
-  // \(numArguments) results
-  extension OperationProtocol where Self == TypedOperation<(\(range.map { _ in "Value" }.joined(separator: ", ")))> {
+  // \(numResults) results
+  extension Operation where Results == (\(range.map { _ in "Value" }.joined(separator: ", "))) {
     
     public init(
       _ dialect: Dialect, _ name: String,
       attributes: [NamedAttribute] = [],
       operands: [Value] = [],
-      resultTypes \(names.map { "\($0): MLIR.`Type`" }.joined(separator: ", _ ")),
+      resultTypes \(names.map { "\($0): Type" }.joined(separator: ", _ ")),
       ownedRegions: [Region] = [],
       location: Location
     ) {
@@ -34,7 +34,7 @@ for numArguments in 2...maxNumArguments {
       attributes: [NamedAttribute] = [],
       operands: [Value] = [],
       resultTypes _: \(
-        range.map { _ in "Self.InferredResultType" }.joined(separator: ", _: ")),
+        range.map { _ in "InferredResultType" }.joined(separator: ", _: ")),
       ownedRegions: [Region] = [],
       location: Location
     ) {
@@ -46,6 +46,12 @@ for numArguments in 2...maxNumArguments {
         resultTypes: nil,
         ownedRegions: ownedRegions,
         location: location)
+    }
+  
+    public var results: Results {
+      let results = typeErased.results
+      precondition(results.count == \(numResults))
+      return (\(range.map { "results[\($0)]" }.joined(separator: ", ")))
     }
 
   }
