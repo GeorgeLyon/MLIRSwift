@@ -15,7 +15,7 @@ for numResults in 2...maxNumResults {
       _ dialect: Dialect, _ name: String,
       attributes: [NamedAttribute] = [],
       operands: [Value] = [],
-      resultTypes \(names.map { "\($0): Type" }.joined(separator: ", _ ")),
+      resultTypes \(names.map { "\($0): ContextualType" }.joined(separator: ", _ ")),
       ownedRegions: [Region] = [],
       location: Location
     ) {

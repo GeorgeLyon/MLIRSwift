@@ -21,7 +21,7 @@ public final class OwnedContext: Context {
   /**
    Creates a context loaded with the specified dialects
    */
-  public init(_ dialects: Dialect...) {
+  public init(dialects: Dialect...) {
     mlir = mlirContextCreate()
     for dialect in dialects {
       _ = mlirDialectHandleLoadDialect(dialect.mlir, mlir)

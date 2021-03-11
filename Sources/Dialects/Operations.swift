@@ -1,6 +1,6 @@
 import MLIR
 
-extension TypedOperation {
+extension Operation {
 
   public static func constant(
     _ value: MLIR.Attribute,
@@ -13,7 +13,7 @@ extension TypedOperation {
     Self(
       .std, "constant",
       attributes: [
-        .value(value)
+        //        .value(value)
       ],
       resultType: type,
       location: location)

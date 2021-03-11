@@ -26,4 +26,18 @@ public final class Module {
   }
 
   public let mlir: MlirModule
+
+  /**
+   The body of this module
+   */
+  public var body: Block {
+    Block(mlirModuleGetBody(mlir))
+  }
+
+  /**
+   Returns this module as an operation
+   */
+  public var operation: AnyOperation {
+    Operation(mlirModuleGetOperation(mlir))
+  }
 }

@@ -22,7 +22,7 @@ public struct Operation<Results>: MlirRepresentable {
     name: String,
     attributes: [ContextualNamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes: [Type]? = [],
+    resultTypes: [ContextualType]? = [],
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -43,7 +43,7 @@ public struct Operation<Results>: MlirRepresentable {
     builtin name: String,
     attributes: [ContextualNamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes: [Type]? = [],
+    resultTypes: [ContextualType]? = [],
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -97,7 +97,7 @@ public struct Operation<Results>: MlirRepresentable {
     name: String,
     attributes: [ContextualNamedAttribute],
     operands: [Value],
-    resultTypes: [Type]?,
+    resultTypes: [ContextualType]?,
     ownedRegions: [Region],
     location: Location
   ) {
@@ -119,10 +119,13 @@ public struct Operation<Results>: MlirRepresentable {
               mlirOperationStateAddOwnedRegions(
                 &state, ownedRegions.count, ownedRegions.baseAddress)
               if let resultTypes = resultTypes {
-                return resultTypes.withUnsafeMlirRepresentation { resultTypes in
-                  mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
-                  return mlirOperationCreate(&state)
-                }
+                return
+                  resultTypes
+                  .map { $0.in(context) }
+                  .withUnsafeMlirRepresentation { resultTypes in
+                    mlirOperationStateAddResults(&state, resultTypes.count, resultTypes.baseAddress)
+                    return mlirOperationCreate(&state)
+                  }
               } else {
                 mlirOperationStateEnableResultTypeInference(&state)
                 return mlirOperationCreate(&state)
@@ -324,7 +327,7 @@ extension Operation where Results == Value {
     _ dialect: Dialect, _ name: String,
     attributes: [ContextualNamedAttribute] = [],
     operands: [Value] = [],
-    resultType type: Type,
+    resultType type: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {

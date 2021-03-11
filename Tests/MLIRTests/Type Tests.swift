@@ -22,5 +22,6 @@ final class TypeTests: XCTestCase {
     test("i1", parsesAs: .integer(bitWidth: 1))
     test("si1", parsesAs: .integer(.signed, bitWidth: 1))
     test("ui1", parsesAs: .integer(.unsigned, bitWidth: 1))
+    test("memref<?xf32>", parsesAs: MemoryReferenceType.memoryReference(to: Float32Type.float32, withDimensions: [.dynamic]))
   }
 }

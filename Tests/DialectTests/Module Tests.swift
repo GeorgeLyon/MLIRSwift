@@ -50,9 +50,9 @@ final class ModuleTests: XCTestCase {
       """
     
     let location: Location = .unknown(in: context)
-    
+
     let constructed = Module(location: location)
-    let i1: MLIR.`Type` = context.get(.integer(bitWidth: 1))
+    let i1: Type = IntegerType.integer(bitWidth: 1).in(context)
     constructed.body.operations.append(
       .function(
         "swap",

@@ -4,7 +4,7 @@ extension Operation where Results == () {
    */
   public static func function(
     _ name: String,
-    returnTypes: [MLIR.`Type`] = [],
+    returnTypes: [ContextualType] = [],
     attributes: [ContextualNamedAttribute] = [],
     blocks: [Block],
     at location: Location

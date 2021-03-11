@@ -95,10 +95,9 @@ public struct MemoryReferenceType: ContextualType {
     }
   }
   public let dimensions: [Size]
-  public let element: Type
+  public let element: ContextualType
 
   public func `in`(_ context: Context) -> Type {
-    precondition(element.context == context)
     precondition(MemoryLayout<Int64>.size == MemoryLayout<Size>.size)
     precondition(MemoryLayout<Int64>.stride == MemoryLayout<Size>.stride)
     return dimensions.withUnsafeBufferPointer { dimensions in
@@ -106,7 +105,7 @@ public struct MemoryReferenceType: ContextualType {
         let unsafeMutable = UnsafeMutablePointer(mutating: dimensions.baseAddress)
         return Type(
           mlirMemRefTypeContiguousGet(
-            element.mlir,
+            element.in(context).mlir,
             dimensions.count,
             unsafeMutable,
             0))
@@ -116,7 +115,7 @@ public struct MemoryReferenceType: ContextualType {
 }
 extension ContextualType where Self == MemoryReferenceType {
   public static func memoryReference(
-    to element: `Type`, withDimensions dimensions: [MemoryReferenceType.Size]
+    to element: ContextualType, withDimensions dimensions: [MemoryReferenceType.Size]
   )
     -> Self
   {
@@ -153,9 +152,9 @@ extension ContextualType where Self == FunctionType {
   ) -> Self
   where
     Inputs: Sequence,
-    Inputs.Element == Type,
+    Inputs.Element == ContextualType,
     Results: Sequence,
-    Results.Element == Type
+    Results.Element == ContextualType
   {
     FunctionType(inputs: Array(inputs), results: Array(results))
   }

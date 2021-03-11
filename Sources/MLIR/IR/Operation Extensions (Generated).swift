@@ -7,7 +7,7 @@ extension Operation where Results == (Value, Value) {
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -54,7 +54,7 @@ extension Operation where Results == (Value, Value, Value) {
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -101,7 +101,8 @@ extension Operation where Results == (Value, Value, Value, Value) {
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -149,7 +150,8 @@ extension Operation where Results == (Value, Value, Value, Value, Value) {
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -197,7 +199,8 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value) 
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType, _ t5: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -245,7 +248,8 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType, _ t5: ContextualType, _ t6: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -293,8 +297,9 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
-    _ t7: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType, _ t5: ContextualType, _ t6: ContextualType,
+    _ t7: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -346,8 +351,9 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value)
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
-    _ t7: Type, _ t8: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType, _ t5: ContextualType, _ t6: ContextualType,
+    _ t7: ContextualType, _ t8: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
@@ -400,8 +406,9 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value,
     _ dialect: Dialect, _ name: String,
     attributes: [NamedAttribute] = [],
     operands: [Value] = [],
-    resultTypes t0: Type, _ t1: Type, _ t2: Type, _ t3: Type, _ t4: Type, _ t5: Type, _ t6: Type,
-    _ t7: Type, _ t8: Type, _ t9: Type,
+    resultTypes t0: ContextualType, _ t1: ContextualType, _ t2: ContextualType,
+    _ t3: ContextualType, _ t4: ContextualType, _ t5: ContextualType, _ t6: ContextualType,
+    _ t7: ContextualType, _ t8: ContextualType, _ t9: ContextualType,
     ownedRegions: [Region] = [],
     location: Location
   ) {

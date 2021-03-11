@@ -10,9 +10,9 @@ let package = Package(
     .library(
       name: "MLIR",
       targets: ["MLIR"]),
-//    .library(
-//      name: "MLIRDialects",
-//      targets: ["Dialects"]),
+    .library(
+      name: "MLIRDialects",
+      targets: ["Dialects"]),
   ],
   targets: [
     .systemLibrary(
@@ -25,14 +25,14 @@ let package = Package(
       name: "MLIRTests",
       dependencies: ["MLIR"]),
     
-//    .systemLibrary(
-//      name: "CDialects",
-//      pkgConfig: "LLVM-for-Swift"),
-//    .target(
-//      name: "Dialects",
-//      dependencies: ["CDialects", "MLIR"]),
-//    .testTarget(
-//      name: "DialectTests",
-//      dependencies: ["Dialects"]),
+    .systemLibrary(
+      name: "CDialects",
+      pkgConfig: "LLVM-for-Swift"),
+    .target(
+      name: "Dialects",
+      dependencies: ["CDialects", "MLIR"]),
+    .testTarget(
+      name: "DialectTests",
+      dependencies: ["Dialects"]),
   ]
 )
