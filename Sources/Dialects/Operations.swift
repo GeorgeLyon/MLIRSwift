@@ -13,7 +13,7 @@ extension Operation {
     Self(
       .std, "constant",
       attributes: [
-        //        .value(value)
+        ValueNamedAttribute.value(value)
       ],
       resultType: type,
       location: location)
