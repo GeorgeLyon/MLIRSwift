@@ -12,7 +12,7 @@ public struct StringAttribute: ContextualAttribute {
   }
 }
 extension ContextualAttribute where Self == StringAttribute {
-  public static func string(_ value: String) -> StringAttribute {
+  public static func string(_ value: String) -> Self {
     StringAttribute(value: value)
   }
 }
@@ -31,7 +31,7 @@ extension ContextualAttribute where Self == IntegerAttribute {
     _ signedness: IntegerType.Signedness? = nil,
     bitWidth: Int,
     value: Int
-  ) -> IntegerAttribute {
+  ) -> Self {
     IntegerAttribute(
       type: IntegerType(signedness: signedness, bitWidth: bitWidth),
       value: value)
@@ -47,7 +47,7 @@ public struct TypeAttribute: ContextualAttribute {
   }
 }
 public extension ContextualAttribute where Self == TypeAttribute {
-  static func type(_ type: ContextualType) -> TypeAttribute {
+  static func type(_ type: ContextualType) -> Self {
     TypeAttribute(type: type)
   }
 }

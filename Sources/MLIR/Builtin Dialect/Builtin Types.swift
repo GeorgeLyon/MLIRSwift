@@ -8,7 +8,7 @@ public struct IndexType: ContextualType {
   }
 }
 extension ContextualType where Self == IndexType {
-  public static var index: IndexType { IndexType() }
+  public static var index: Self { IndexType() }
 }
 extension Type {
   public var isIndex: Bool { mlirTypeIsAIndex(mlir) }
@@ -22,7 +22,7 @@ public struct Float32Type: ContextualType {
   }
 }
 extension ContextualType where Self == Float32Type {
-  public static var float32: Float32Type { Float32Type() }
+  public static var float32: Self { Float32Type() }
 }
 extension Type {
   public var isFloat32: Bool { mlirTypeIsAF32(mlir) }
@@ -55,7 +55,7 @@ public struct IntegerType: ContextualType {
 }
 extension ContextualType where Self == IntegerType {
   public static func integer(_ signedness: IntegerType.Signedness? = nil, bitWidth: Int)
-    -> IntegerType
+    -> Self
   {
     IntegerType(signedness: signedness, bitWidth: bitWidth)
   }
