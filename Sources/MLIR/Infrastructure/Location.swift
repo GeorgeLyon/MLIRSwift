@@ -38,7 +38,7 @@ public struct Location: MlirRepresentable {
   public func viaCallsite(
     file: StaticString = #fileID, line: Int = #line, column: Int = #column
   ) -> Location {
-    .file(file, line: line, column: column, in: context)
+    Location.file(file, line: line, column: column, in: context)
       .called(from: self)
   }
 

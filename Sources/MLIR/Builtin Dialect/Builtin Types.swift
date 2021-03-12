@@ -96,6 +96,7 @@ public struct MemoryReferenceType: ContextualType {
   }
   public let dimensions: [Size]
   public let element: ContextualType
+  public let memorySpace: IntegerAttribute
 
   public func `in`(_ context: Context) -> Type {
     precondition(MemoryLayout<Int64>.size == MemoryLayout<Size>.size)
@@ -108,18 +109,20 @@ public struct MemoryReferenceType: ContextualType {
             element.in(context).mlir,
             dimensions.count,
             unsafeMutable,
-            0))
+            memorySpace.in(context).mlir))
       }
     }
   }
 }
 extension ContextualType where Self == MemoryReferenceType {
   public static func memoryReference(
-    to element: ContextualType, withDimensions dimensions: [MemoryReferenceType.Size]
+    to element: ContextualType,
+    withDimensions dimensions: [MemoryReferenceType.Size],
+    inMemorySpace memorySpace: IntegerAttribute
   )
     -> Self
   {
-    MemoryReferenceType(dimensions: dimensions, element: element)
+    MemoryReferenceType(dimensions: dimensions, element: element, memorySpace: memorySpace)
   }
 }
 

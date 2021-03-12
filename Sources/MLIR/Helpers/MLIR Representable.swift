@@ -21,7 +21,7 @@ extension MlirRepresentable {
    */
   public init?(checkingForNull mlir: MlirRepresentation) {
     Self.validateMemoryLayout()
-    let value = withUnsafePointer(to: mlir) { pointer -> Self? in
+    let optionalValue = withUnsafePointer(to: mlir) { pointer -> Self? in
       let raw = UnsafeRawPointer(pointer)
       if raw.assumingMemoryBound(to: MlirPointer.self).pointee == nil {
         return nil
@@ -29,7 +29,7 @@ extension MlirRepresentable {
         return raw.assumingMemoryBound(to: Self.self).pointee
       }
     }
-    guard let value = value else { return nil }
+    guard let value = optionalValue else { return nil }
     self = value
   }
 }

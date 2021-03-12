@@ -20,13 +20,13 @@ final class AttributeTests: XCTestCase {
       }
     }
 
-    test(#""foo""#, parsesAs: .string("foo"))
+    test(#""foo""#, parsesAs: StringAttribute.string("foo"))
     
-    test(#"["foo", "bar"]"#, parsesAs: ArrayAttribute.array([.string("foo"), .string("bar")]))
+    test(#"["foo", "bar"]"#, parsesAs: ArrayAttribute.array([.string("foo"), StringAttribute.string("bar")]))
     /// Uncommenting the following line traps
 //    test(#"["foo", "bar"]"#, parsesAs: .array([.string("foo"), .string("bar")]))
     
-    test(#"{foo = "bar"}"#, parsesAs: DictionaryAttribute.dictionary(["foo": .string("bar")]))
+    test(#"{foo = "bar"}"#, parsesAs: DictionaryAttribute.dictionary(["foo": StringAttribute.string("bar")]))
     /// Uncommenting the following line traps
 //     test(#"{foo = "bar"}"#, parsesAs: .dictionary(["foo": StringAttribute.string("bar")]))
   }
