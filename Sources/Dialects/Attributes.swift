@@ -11,7 +11,7 @@ public struct ValueNamedAttribute: ContextualNamedAttribute {
     NamedAttribute(name: "value", attribute: attribute.in(context))
   }
 }
-extension ContextualNamedAttribute where Self == ValueNamedAttribute {
+extension ValueNamedAttribute /* ContextualNamedAttribute where Self == ValueNamedAttribute */ {
   public static func value(_ attribute: Attribute) -> Self {
     ValueNamedAttribute(attribute: attribute)
   }

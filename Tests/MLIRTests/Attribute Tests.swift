@@ -23,11 +23,11 @@ final class AttributeTests: XCTestCase {
     test(#""foo""#, parsesAs: StringAttribute.string("foo"))
     
     test(#"["foo", "bar"]"#, parsesAs: ArrayAttribute.array([.string("foo"), StringAttribute.string("bar")]))
-    /// Uncommenting the following line traps
+    /// When Swift 5.4 is released, we will be able to do the following:
 //    test(#"["foo", "bar"]"#, parsesAs: .array([.string("foo"), .string("bar")]))
     
     test(#"{foo = "bar"}"#, parsesAs: DictionaryAttribute.dictionary(["foo": StringAttribute.string("bar")]))
-    /// Uncommenting the following line traps
+    /// When Swift 5.4 is released, we will be able to do the following:
 //     test(#"{foo = "bar"}"#, parsesAs: .dictionary(["foo": StringAttribute.string("bar")]))
   }
 }

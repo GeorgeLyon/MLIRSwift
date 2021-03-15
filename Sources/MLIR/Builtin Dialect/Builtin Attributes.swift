@@ -11,7 +11,7 @@ public struct StringAttribute: ContextualAttribute {
       })
   }
 }
-extension ContextualAttribute where Self == StringAttribute {
+extension StringAttribute /* ContextualAttribute where Self == StringAttribute */ {
   public static func string(_ value: String) -> Self {
     StringAttribute(value: value)
   }
@@ -26,7 +26,7 @@ public struct IntegerAttribute: ContextualAttribute {
     Attribute(mlirIntegerAttrGet(type.in(context).mlir, Int64(value)))
   }
 }
-extension ContextualAttribute where Self == IntegerAttribute {
+extension IntegerAttribute /* ContextualAttribute where Self == IntegerAttribute */ {
   public static func integer(
     _ signedness: IntegerType.Signedness? = nil,
     bitWidth: Int,
@@ -46,7 +46,7 @@ public struct TypeAttribute: ContextualAttribute {
     Attribute(mlirTypeAttrGet(type.in(context).mlir))
   }
 }
-public extension ContextualAttribute where Self == TypeAttribute {
+public extension TypeAttribute /* ContextualAttribute where Self == TypeAttribute */ {
   static func type(_ type: ContextualType) -> Self {
     TypeAttribute(type: type)
   }
@@ -64,7 +64,7 @@ public struct ArrayAttribute: ContextualAttribute {
       }
   }
 }
-public extension ContextualAttribute where Self == ArrayAttribute {
+public extension ArrayAttribute /* ContextualAttribute where Self == ArrayAttribute */ {
   static func array(_ elements: [ContextualAttribute]) -> Self {
     ArrayAttribute(elements: elements)
   }
@@ -85,7 +85,7 @@ public struct DictionaryAttribute: ContextualAttribute {
       }
   }
 }
-public extension ContextualAttribute where Self == DictionaryAttribute {
+public extension DictionaryAttribute /* ContextualAttribute where Self == DictionaryAttribute */ {
   static func dictionary(_ elements: [ContextualNamedAttribute]) -> Self {
     DictionaryAttribute(elements: elements)
   }
@@ -118,7 +118,7 @@ public struct FlatSymbolReferenceAttribute: ContextualAttribute {
     }
   }
 }
-public extension ContextualAttribute where Self == FlatSymbolReferenceAttribute {
+public extension FlatSymbolReferenceAttribute /* ContextualAttribute where Self == FlatSymbolReferenceAttribute */ {
   static func flatSymbolReference(_ name: String) -> Self {
     FlatSymbolReferenceAttribute(name: name)
   }

@@ -7,7 +7,7 @@ public struct IndexType: ContextualType {
     Type(mlirIndexTypeGet(context.mlir))
   }
 }
-extension ContextualType where Self == IndexType {
+extension IndexType /* ContextualType where Self == IndexType */ {
   public static var index: Self { IndexType() }
 }
 extension Type {
@@ -21,7 +21,7 @@ public struct Float32Type: ContextualType {
     Type(mlirF32TypeGet(context.mlir))
   }
 }
-extension ContextualType where Self == Float32Type {
+extension Float32Type /* ContextualType where Self == Float32Type */ {
   public static var float32: Self { Float32Type() }
 }
 extension Type {
@@ -53,7 +53,7 @@ public struct IntegerType: ContextualType {
     return Type(c)
   }
 }
-extension ContextualType where Self == IntegerType {
+extension IntegerType /* ContextualType where Self == IntegerType */ {
   public static func integer(_ signedness: IntegerType.Signedness? = nil, bitWidth: Int)
     -> Self
   {
@@ -114,7 +114,7 @@ public struct MemoryReferenceType: ContextualType {
     }
   }
 }
-extension ContextualType where Self == MemoryReferenceType {
+extension MemoryReferenceType /* ContextualType where Self == MemoryReferenceType */ {
   public static func memoryReference(
     to element: ContextualType,
     withDimensions dimensions: [MemoryReferenceType.Size],
@@ -148,7 +148,8 @@ public struct FunctionType: ContextualType {
     return Type(c)
   }
 }
-extension ContextualType where Self == FunctionType {
+extension FunctionType /* ContextualType where Self == FunctionType */
+{
   public static func function<Inputs, Results>(
     of inputs: Inputs,
     to results: Results

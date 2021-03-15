@@ -3,8 +3,8 @@ import MLIR
 extension Operation {
 
   public static func constant(
-    _ value: MLIR.Attribute,
-    ofType type: MLIR.`Type`,
+    _ value: Attribute,
+    ofType type: Type,
     at location: Location
   ) -> Self
   where
@@ -19,7 +19,7 @@ extension Operation {
       location: location)
   }
 
-  public static func `return`(_ values: MLIR.Value..., at location: Location) -> Self
+  public static func `return`(_ values: Value..., at location: Location) -> Self
   where
     Results == ()
   {
