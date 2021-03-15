@@ -118,7 +118,9 @@ public struct FlatSymbolReferenceAttribute: ContextualAttribute {
     }
   }
 }
-public extension FlatSymbolReferenceAttribute /* ContextualAttribute where Self == FlatSymbolReferenceAttribute */ {
+public extension
+  FlatSymbolReferenceAttribute /* ContextualAttribute where Self == FlatSymbolReferenceAttribute */
+{
   static func flatSymbolReference(_ name: String) -> Self {
     FlatSymbolReferenceAttribute(name: name)
   }

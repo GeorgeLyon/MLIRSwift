@@ -14,6 +14,13 @@ public struct Block: MlirRepresentable, Equatable {
     }
   }
 
+  /**
+   Creates a block with the specified argument types
+   */
+  public init(argumentTypes: [ContextualType], in context: Context) {
+    self.init(argumentTypes: argumentTypes.map { $0.in(context) })
+  }
+
   public init(_ mlir: MlirBlock) {
     precondition(!mlirBlockIsNull(mlir))
     self.mlir = mlir

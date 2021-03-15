@@ -29,6 +29,16 @@ for numArguments in 1...maxNumArguments {
     try buildOperations(operations, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
   }
 
+  /// \(numArguments) arguments, contentual types
+  public init(
+    \(names.map { "_ \($0): ContextualType" }.joined(separator: ", ")),
+    in context: Context,
+    buildOperations: (Block.Operations, \(range.map { _ in "Value" }.joined(separator: ", "))) throws -> Void
+  ) rethrows {
+    self.init(argumentTypes: [\(names.joined(separator: ", "))], in: context)
+    try buildOperations(operations, \(range.map { "arguments[\($0)]" }.joined(separator: ", ")))
+  }
+
   """
 }
 <<"}"

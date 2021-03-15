@@ -1,7 +1,7 @@
 import CMLIR
 
 /**
- An operation which treats its result as an array without any constraints
+ An operation which has no constraints on its results
  */
 public typealias AnyOperation = Operation<_OperationResults>
 

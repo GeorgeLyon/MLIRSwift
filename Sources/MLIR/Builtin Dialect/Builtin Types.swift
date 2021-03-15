@@ -148,8 +148,7 @@ public struct FunctionType: ContextualType {
     return Type(c)
   }
 }
-extension FunctionType /* ContextualType where Self == FunctionType */
-{
+extension FunctionType /* ContextualType where Self == FunctionType */ {
   public static func function<Inputs, Results>(
     of inputs: Inputs,
     to results: Results
