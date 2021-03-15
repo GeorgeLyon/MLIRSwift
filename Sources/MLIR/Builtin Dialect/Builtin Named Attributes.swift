@@ -12,7 +12,7 @@ public struct NestedNamedAttributes: ContextualNamedAttribute {
   }
 }
 public extension
-  NestedNamedAttributes /* ContextualNamedAttribute where Self == NestedNamedAttributes */
+  /* ContextualNamedAttribute where Self == */ NestedNamedAttributes
 {
   static func argument(
     _ index: Int,
@@ -51,7 +51,7 @@ public struct SymbolNameNamedAttribute: ContextualNamedAttribute {
   }
 }
 public extension
-  SymbolNameNamedAttribute /* ContextualNamedAttribute where Self == SymbolNameNamedAttribute */
+  /* ContextualNamedAttribute where Self == */ SymbolNameNamedAttribute
 {
   static func symbolName(_ name: String) -> Self {
     Self(name: name)
@@ -68,8 +68,7 @@ public struct TypeNamedAttribute: ContextualNamedAttribute {
       attribute: TypeAttribute.type(type.in(context)).in(context))
   }
 }
-public extension TypeNamedAttribute /* ContextualNamedAttribute where Self == TypeNamedAttribute */
-{
+public extension /* ContextualNamedAttribute where Self == */ TypeNamedAttribute {
   static func type(_ type: ContextualType) -> Self {
     Self(type: type)
   }
