@@ -2,6 +2,9 @@ import CMLIR
 
 public struct Value: MlirRepresentable {
 
+  public init(_ mlir: MlirValue) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirValue
 
   public var type: MLIR.`Type` {

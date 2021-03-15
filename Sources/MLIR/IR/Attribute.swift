@@ -14,6 +14,9 @@ public protocol ContextualAttribute {
  */
 public struct Attribute: ContextualAttribute, MlirRepresentable {
 
+  public init(_ mlir: MlirAttribute) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirAttribute
 
   /**

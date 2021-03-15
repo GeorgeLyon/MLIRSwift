@@ -14,6 +14,9 @@ public protocol ContextualType {
  */
 public struct Type: ContextualType, MlirRepresentable {
 
+  public init(_ mlir: MlirType) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirType
 
   /**

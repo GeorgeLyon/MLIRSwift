@@ -12,6 +12,9 @@ public typealias AnyOperation = Operation<_OperationResults>
  */
 public struct Operation<Results>: MlirRepresentable {
 
+  public init(_ mlir: MlirOperation) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirOperation
 
   /**

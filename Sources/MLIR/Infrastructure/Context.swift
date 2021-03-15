@@ -38,6 +38,10 @@ public final class OwnedContext: Context {
  A context which is owned by MLIR
  */
 public struct UnownedContext: Context, MlirRepresentable {
+
+  public init(_ mlir: MlirContext) {
+    self.init(mlir: mlir)
+  }
   public var mlir: MlirContext
 
   /// Suppress synthesized initializer

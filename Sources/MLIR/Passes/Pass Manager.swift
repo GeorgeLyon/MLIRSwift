@@ -4,6 +4,10 @@ import CMLIR
  An MLIR pass
  */
 public struct Pass: MlirRepresentable {
+
+  public init(_ mlir: MlirPass) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirPass
 
   /// Suppress synthesized initializer

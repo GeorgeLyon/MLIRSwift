@@ -49,6 +49,9 @@ public struct Location: MlirRepresentable {
     UnownedContext(mlirLocationGetContext(mlir))
   }
 
+  public init(_ mlir: MlirLocation) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirLocation
 }
 

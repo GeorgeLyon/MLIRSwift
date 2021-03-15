@@ -12,14 +12,14 @@ extension MlirRepresentable {
 
    - precondition: `mlir` must not be `nil`
    */
-  public init(_ mlir: MlirRepresentation) {
+  init(mlir: MlirRepresentation) {
     self.init(checkingForNull: mlir)!
   }
 
   /**
    Initializes this type by casting directly from its MLIR representation if non-`nil`
    */
-  public init?(checkingForNull mlir: MlirRepresentation) {
+  init?(checkingForNull mlir: MlirRepresentation) {
     Self.validateMemoryLayout()
     let optionalValue = withUnsafePointer(to: mlir) { pointer -> Self? in
       let raw = UnsafeRawPointer(pointer)

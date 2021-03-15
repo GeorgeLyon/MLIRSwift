@@ -15,7 +15,10 @@ public struct Identifier: MlirRepresentable {
       })
   }
 
-  let mlir: MlirIdentifier
+  public init(_ mlir: MlirIdentifier) {
+    self.init(mlir: mlir)
+  }
+  public let mlir: MlirIdentifier
 
   public static func == (lhs: Self, rhs: Self) -> Bool {
     mlirIdentifierEqual(lhs.mlir, rhs.mlir)

@@ -5,6 +5,9 @@ import CMLIR
  */
 public struct Region: MlirRepresentable {
 
+  public init(_ mlir: MlirRegion) {
+    self.init(mlir: mlir)
+  }
   public let mlir: MlirRegion
 
   /**
