@@ -52,6 +52,7 @@ public struct Location: MlirRepresentable {
   public let mlir: MlirLocation
 }
 
+/// For some reason, declaring this conformance in `Text Output Stream.swift` (like all the others) crashes the Swift 5.3 compiler.
 extension Location: Printable {
   static let print = mlirLocationPrint
 }
