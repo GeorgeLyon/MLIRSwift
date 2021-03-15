@@ -50,8 +50,7 @@ public struct SymbolNameNamedAttribute: ContextualNamedAttribute {
       attribute: StringAttribute.string(name).in(context))
   }
 }
-public extension ContextualNamedAttribute where Self == SymbolNameNamedAttribute
-{
+public extension ContextualNamedAttribute where Self == SymbolNameNamedAttribute {
   static func symbolName(_ name: String) -> Self {
     Self(name: name)
   }
