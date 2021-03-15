@@ -51,3 +51,7 @@ public struct Location: MlirRepresentable {
 
   public let mlir: MlirLocation
 }
+
+extension Location: Printable {
+  static let print = mlirLocationPrint
+}

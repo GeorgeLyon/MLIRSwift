@@ -57,9 +57,6 @@ extension Printable {
 extension Attribute: Printable {
   static let print = mlirAttributePrint
 }
-//extension Location: Printable {
-//  static let print = mlirLocationPrint
-//}
 extension Operation: Printable {
   static var print: PrintCallback { mlirOperationPrint }
 }
