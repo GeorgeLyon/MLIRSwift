@@ -50,20 +50,18 @@ final class ModuleTests: XCTestCase {
       """
     
     let location: Location = .unknown(in: context)
-    
+
     let constructed = Module(location: location)
-    let i1: MLIR.`Type` = context.get(.integer(bitWidth: 1))
     constructed.body.operations.append(
       .function(
         "swap",
-        returnTypes: [i1, i1],
+        returnTypes: [IntegerType.integer(bitWidth: 1), .integer(bitWidth: 1)],
         blocks: [
-          Block(i1, i1) { ops, a, b in
-            ops.append(.return(b, a), at: location.viaCallsite())
+          Block(IntegerType.integer(bitWidth: 1), IntegerType.integer(bitWidth: 1), in: context) { ops, a, b in
+            ops.append(.return(b, a, at: location.viaCallsite()))
           }
         ],
-        in: context),
-      at: location.viaCallsite())
+        at: location.viaCallsite()))
     XCTAssertTrue(constructed.body.operations.map(\.isValid).reduce(true, { $0 && $1 }))
     XCTAssertTrue(constructed.operation.isValid)
     

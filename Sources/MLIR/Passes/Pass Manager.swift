@@ -1,29 +1,35 @@
 import CMLIR
 
-public struct Pass: CRepresentable {
-  public init(_ cRepresentation: MlirPass) {
-    c = cRepresentation
-  }
-  let c: MlirPass
+/**
+ An MLIR pass
+ */
+public struct Pass: MlirRepresentable {
+  public let mlir: MlirPass
+
+  /// Suppress synthesized initializer
+  private init() { fatalError() }
 }
 
-public final class PassManager: CRepresentable {
+/**
+ An object which manages a pass pipeline
+ */
+public final class PassManager {
   public convenience init(context: Context, passes: Pass...) {
     self.init(context: context, passes: Array(passes))
   }
   public init(context: Context, passes: [Pass]) {
-    c = mlirPassManagerCreate(context.cRepresentation)
+    mlir = mlirPassManagerCreate(context.mlir)
     for pass in passes {
-      mlirPassManagerAddOwnedPass(c, pass.c)
+      mlirPassManagerAddOwnedPass(mlir, pass.mlir)
     }
   }
   deinit {
-    mlirPassManagerDestroy(c)
+    mlirPassManagerDestroy(mlir)
   }
 
   public func runPasses(on module: Module) {
-    mlirPassManagerRun(c, module.c)
+    mlirPassManagerRun(mlir, module.mlir)
   }
 
-  let c: MlirPassManager
+  let mlir: MlirPassManager
 }

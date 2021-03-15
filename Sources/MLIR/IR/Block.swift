@@ -1,36 +1,66 @@
 import CMLIR
 
-public struct Block: CRepresentable, Printable {
+/**
+ An IR node which can have arguments and holds operations
+ */
+public struct Block: MlirRepresentable, Equatable {
+
+  /**
+   Creates a block with the specified argument types
+   */
   public init(argumentTypes: [Type] = []) {
-    c = argumentTypes.withUnsafeCRepresentation {
-      mlirBlockCreate($0.count, $0.baseAddress)
+    self = argumentTypes.withUnsafeMlirRepresentation {
+      Self(mlirBlockCreate($0.count, $0.baseAddress))
     }
   }
-  public func destroy() {
-    mlirBlockDestroy(c)
-  }
-  public var arguments: Arguments {
-    Arguments(c: c)
-  }
-  public var operations: Operations {
-    Operations(c: c)
+
+  /**
+   Creates a block with the specified argument types
+   */
+  public init(argumentTypes: [ContextualType], in context: Context) {
+    self.init(argumentTypes: argumentTypes.map { $0.in(context) })
   }
 
-  public var owningOperation: Operation? {
-    Operation(c: mlirBlockGetParentOperation(c))
+  public init(_ mlir: MlirBlock) {
+    precondition(!mlirBlockIsNull(mlir))
+    self.mlir = mlir
   }
-  public var context: Context? {
-    owningOperation?.context
+  public let mlir: MlirBlock
+
+  /**
+   Destroys this block
+
+   This block **must not** be used after `destroy` returns, doing so will lead to undefined behavior
+   */
+  public func destroy() {
+    mlirBlockDestroy(mlir)
+  }
+
+  /**
+   The arguments to this block
+   */
+  public var arguments: Arguments {
+    Arguments(block: mlir)
+  }
+
+  /**
+   The operations in this block
+   */
+  public var operations: Operations {
+    Operations(block: mlir)
+  }
+
+  /**
+   The operation that owns this block
+   */
+  public var owningOperation: AnyOperation? {
+    Operation(checkingForNull: mlirBlockGetParentOperation(mlir))
   }
 
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    mlirBlockEqual(lhs.c, rhs.c)
+    mlirBlockEqual(lhs.mlir, rhs.mlir)
   }
 
-  let c: MlirBlock
-
-  static let isNull = mlirBlockIsNull
-  static let print = mlirBlockPrint
 }
 
 // MARK: - Arguments
@@ -38,14 +68,14 @@ public struct Block: CRepresentable, Printable {
 extension Block {
   public struct Arguments: RandomAccessCollection {
     public let startIndex = 0
-    public var endIndex: Int { mlirBlockGetNumArguments(c) }
+    public var endIndex: Int { mlirBlockGetNumArguments(block) }
     public subscript(position: Int) -> MLIR.Value {
-      Value(c: mlirBlockGetArgument(c, position))!
+      Value(mlirBlockGetArgument(block, position))
     }
     public func append(_ type: MLIR.`Type`) -> MLIR.Value {
-      Value(c: mlirBlockAddArgument(c, type.c))!
+      Value(mlirBlockAddArgument(block, type.mlir))
     }
-    fileprivate let c: MlirBlock
+    fileprivate let block: MlirBlock
   }
 }
 
@@ -54,38 +84,33 @@ extension Block {
 extension Block {
   public struct Operations: Collection {
     public typealias Index = LinkedListIndex<Self>
-    public typealias Element = Operation
-    public var startIndex: Index { .starting(with: mlirBlockGetFirstOperation(c)) }
+    public typealias Element = AnyOperation
+    public var startIndex: Index { .starting(with: mlirBlockGetFirstOperation(block)) }
     public var endIndex: Index { .end }
     public func index(after i: Index) -> Index {
       i.successor(using: mlirOperationGetNextInBlock)
     }
 
     /**
-     Appends an operation and transfers ownership of that operation to this block
+     Takes ownership of an operation and appends it to this block
      */
-    public func append(_ ownedOperation: Operation) {
+    public func append(_ ownedOperation: AnyOperation) {
       /**
-       The module terminator must always be at the end.
-       If there is no terminator, `mlirBlockGetTerminator` returns `NULL` which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
+       If present, the module terminator must always be at the end.
+       If there is no terminator, `mlirBlockGetTerminator` returns null which causes `mlirBlockInsertOwnedOperationBefore` to act like `mlirBlockAppendOwnedOperation`.
        */
-      mlirBlockInsertOwnedOperationBefore(c, mlirBlockGetTerminator(c), ownedOperation.c)
+      mlirBlockInsertOwnedOperationBefore(block, mlirBlockGetTerminator(block), ownedOperation.mlir)
     }
 
     /**
-     Creates an operation owned by this block using the provided definition
-     - parameter definition: A **valid** operation definition.
-     - returns: The results of the operation
-     - precondition: `definition` must be valid or this will crash
+     Appends an operation with 0 results
      */
-    public func append(_ definition: OperationDefinition<Operation.Results>, at location: Location)
-      -> Operation.Results
-    {
-      let operation = Operation(definition, location: location)!
+    public func append(_ operation: Operation<()>) {
+      let operation = operation.typeErased
+      precondition(operation.results.count == 0)
       append(operation)
-      return operation.results
     }
 
-    let c: MlirBlock
+    public let block: MlirBlock
   }
 }

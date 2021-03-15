@@ -6,17 +6,28 @@ import CMLIR
 final class AttributeTests: XCTestCase {
   func testAttributes() throws {
     let context = MLIR.OwnedContext()
-    XCTAssertEqual("\(Attribute.string("Foo", in: context))", #""Foo""#)
     
-    let dictionaryAttribute: Attribute = .dictionary(
-      NamedAttribute(name: "foo", attribute: .string("bar", in: context))
-    )
-    XCTAssertEqual("\(dictionaryAttribute)", #"{foo = "bar"}"#)
+    func test(
+      _ source: String,
+      parsesAs attribute: ContextualAttribute,
+      file: StaticString = #filePath, line: UInt = #line
+    ) {
+      do {
+        let parsed = try context.parse(source, as: Attribute.self)
+        XCTAssertEqual(parsed, attribute.in(context), file: file, line: line)
+      } catch {
+        XCTFail(file: file, line: line)
+      }
+    }
+
+    test(#""foo""#, parsesAs: StringAttribute.string("foo"))
     
-    let arrayAttribute: Attribute = .array(
-      .string("Foo", in: context),
-      .string("Bar", in: context)
-    )
-    XCTAssertEqual("\(arrayAttribute)", #"["Foo", "Bar"]"#)
+    test(#"["foo", "bar"]"#, parsesAs: ArrayAttribute.array([.string("foo"), StringAttribute.string("bar")]))
+    /// When Swift 5.4 is released, we will be able to do the following:
+//    test(#"["foo", "bar"]"#, parsesAs: .array([.string("foo"), .string("bar")]))
+    
+    test(#"{foo = "bar"}"#, parsesAs: DictionaryAttribute.dictionary(["foo": StringAttribute.string("bar")]))
+    /// When Swift 5.4 is released, we will be able to do the following:
+//     test(#"{foo = "bar"}"#, parsesAs: .dictionary(["foo": StringAttribute.string("bar")]))
   }
 }

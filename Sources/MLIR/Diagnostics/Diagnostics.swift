@@ -22,7 +22,7 @@ public struct Diagnostic: Swift.Error {
 
 // MARK: - Internal
 
-struct UnsafeDiagnostic: CRepresentable, Printable {
+struct UnsafeDiagnostic {
 
   struct Notes: Sequence {
     func makeIterator() -> Iterator {
@@ -35,7 +35,7 @@ struct UnsafeDiagnostic: CRepresentable, Printable {
       }
       mutating func next() -> UnsafeDiagnostic? {
         guard index < count else { return nil }
-        let diagnostic = UnsafeDiagnostic(c: mlirDiagnosticGetNote(parent, index))
+        let diagnostic = UnsafeDiagnostic(mlir: mlirDiagnosticGetNote(parent, index))
         index += 1
         return diagnostic
       }
@@ -46,15 +46,14 @@ struct UnsafeDiagnostic: CRepresentable, Printable {
     fileprivate let parent: MlirDiagnostic
   }
 
-  var location: Location { Location(c: mlirDiagnosticGetLocation(c)) }
+  var location: Location { Location(mlirDiagnosticGetLocation(mlir)) }
   var severity: Diagnostic.Severity {
-    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(c))
+    Diagnostic.Severity(c: mlirDiagnosticGetSeverity(mlir))
   }
-  var notes: Notes { Notes(parent: c) }
+  var notes: Notes { Notes(parent: mlir) }
 
-  let c: MlirDiagnostic
+  let mlir: MlirDiagnostic
 
-  static let print = mlirDiagnosticPrint
 }
 
 enum DiagnosticHandlingDirective {
@@ -89,14 +88,14 @@ extension Context {
   func register(_ handler: DiagnosticHandler) -> DiagnosticHandlerRegistration {
     let userData = UnsafeMutableRawPointer(Unmanaged.passRetained(handler as AnyObject).toOpaque())
     let id = mlirContextAttachDiagnosticHandler(
-      cRepresentation,
+      mlir,
       mlirDiagnosticHandler,
       userData,
       mlirDeleteUserData)
     return DiagnosticHandlerRegistration(id: id)
   }
   func unregister(_ registration: DiagnosticHandlerRegistration) {
-    mlirContextDetachDiagnosticHandler(cRepresentation, registration.id)
+    mlirContextDetachDiagnosticHandler(mlir, registration.id)
   }
 }
 
@@ -129,7 +128,7 @@ private func mlirDiagnosticHandler(
 ) -> MlirLogicalResult {
   let handler =
     Unmanaged<AnyObject>.fromOpaque(userData).takeUnretainedValue() as! DiagnosticHandler
-  return handler.handle(UnsafeDiagnostic(c: mlirDiagnostic)).logicalResult
+  return handler.handle(UnsafeDiagnostic(mlir: mlirDiagnostic)).logicalResult
 }
 
 private func mlirDeleteUserData(userData: UnsafeMutableRawPointer!) {

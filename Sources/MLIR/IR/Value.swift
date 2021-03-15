@@ -1,8 +1,11 @@
 import CMLIR
 
-public struct Value: CRepresentable, Printable {
+public struct Value: MlirRepresentable {
+
+  public let mlir: MlirValue
+
   public var type: MLIR.`Type` {
-    MLIR.`Type`(c: mlirValueGetType(c))!
+    Type(mlirValueGetType(mlir))
   }
   public var context: UnownedContext {
     type.context
@@ -10,21 +13,17 @@ public struct Value: CRepresentable, Printable {
 
   public enum Kind {
     case argument(of: Block)
-    case result(of: Operation)
+    case result(of: AnyOperation)
   }
   public var kind: Kind {
-    if mlirValueIsABlockArgument(c) {
-      return .argument(of: Block(c: mlirBlockArgumentGetOwner(c))!)
-    } else if mlirValueIsAOpResult(c) {
-      return .result(of: Operation(c: mlirOpResultGetOwner(c))!)
+    if mlirValueIsABlockArgument(mlir) {
+      return .argument(of: Block(mlirBlockArgumentGetOwner(mlir)))
+    } else if mlirValueIsAOpResult(mlir) {
+      return .result(of: AnyOperation(mlirOpResultGetOwner(mlir)))
     } else {
       fatalError()
     }
   }
-  let c: MlirValue
-
-  static let isNull = mlirValueIsNull
-  static let print = mlirValuePrint
 
   /// Suppress initializer synthesis
   private init() { fatalError() }
