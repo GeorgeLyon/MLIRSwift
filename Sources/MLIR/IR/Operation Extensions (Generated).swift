@@ -12,8 +12,7 @@ extension Operation where Results == (Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1],
@@ -30,8 +29,7 @@ extension Operation where Results == (Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -59,8 +57,7 @@ extension Operation where Results == (Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2],
@@ -77,8 +74,7 @@ extension Operation where Results == (Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -107,8 +103,7 @@ extension Operation where Results == (Value, Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3],
@@ -126,8 +121,7 @@ extension Operation where Results == (Value, Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -156,8 +150,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4],
@@ -175,8 +168,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value) {
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -205,8 +197,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value) 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4, t5],
@@ -224,8 +215,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value) 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -254,8 +244,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4, t5, t6],
@@ -273,8 +262,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -304,8 +292,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4, t5, t6, t7],
@@ -324,8 +311,7 @@ extension Operation where Results == (Value, Value, Value, Value, Value, Value, 
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -358,8 +344,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value)
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8],
@@ -378,8 +363,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value)
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,
@@ -413,8 +397,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value,
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9],
@@ -433,8 +416,7 @@ where Results == (Value, Value, Value, Value, Value, Value, Value, Value, Value,
     location: Location
   ) {
     self.init(
-      dialect: dialect,
-      name: name,
+      dialect, name,
       attributes: attributes,
       operands: operands,
       resultTypes: nil,

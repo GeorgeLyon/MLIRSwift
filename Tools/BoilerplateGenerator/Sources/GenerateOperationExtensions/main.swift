@@ -20,8 +20,7 @@ for numResults in 2...maxNumResults {
       location: Location
     ) {
       self.init(
-        dialect: dialect,
-        name: name,
+        dialect, name,
         attributes: attributes,
         operands: operands,
         resultTypes: [\(names.joined(separator: ", "))],
@@ -39,8 +38,7 @@ for numResults in 2...maxNumResults {
       location: Location
     ) {
       self.init(
-        dialect: dialect,
-        name: name,
+        dialect, name,
         attributes: attributes,
         operands: operands,
         resultTypes: nil,

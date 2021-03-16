@@ -21,8 +21,7 @@ public struct Operation<Results>: MlirRepresentable {
    - parameter resultTypes: `nil` implies type inference
    */
   public init(
-    dialect: Dialect,
-    name: String,
+    _ dialect: Dialect, _ name: String,
     attributes: [ContextualNamedAttribute] = [],
     operands: [Value] = [],
     resultTypes: [ContextualType]? = [],
