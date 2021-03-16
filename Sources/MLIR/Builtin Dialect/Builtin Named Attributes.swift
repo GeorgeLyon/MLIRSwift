@@ -2,39 +2,28 @@ import CMLIR
 
 // MARK: - Arguments and Results
 
-public struct NestedNamedAttributes: ContextualNamedAttribute {
-  public let name: String
-  public let attributes: [ContextualNamedAttribute]
-  public func `in`(_ context: Context) -> NamedAttribute {
-    NamedAttribute(
-      name: name,
-      attribute: DictionaryAttribute.dictionary(attributes).in(context))
-  }
-}
-public extension
-  ContextualNamedAttribute where Self == NestedNamedAttributes
-{
+public extension ContextualNamedAttributeProtocol where Self == ContextualNamedAttribute {
   static func argument(
     _ index: Int,
-    attributes: [ContextualNamedAttribute]
+    attributes: [ContextualNamedAttributeProtocol]
   ) -> Self {
-    Self(name: "arg\(index)", attributes: attributes)
+    Self(name: "arg\(index)", attribute: DictionaryAttribute.dictionary(attributes))
   }
   static func argument(
     _ index: Int,
-    attributes: ContextualNamedAttribute...
+    attributes: ContextualNamedAttributeProtocol...
   ) -> Self {
     .argument(index, attributes: attributes)
   }
   static func result(
     _ index: Int,
-    attributes: [ContextualNamedAttribute]
+    attributes: [ContextualNamedAttributeProtocol]
   ) -> Self {
-    Self(name: "result\(index)", attributes: attributes)
+    Self(name: "result\(index)", attribute: DictionaryAttribute.dictionary(attributes))
   }
   static func result(
     _ index: Int,
-    attributes: ContextualNamedAttribute...
+    attributes: ContextualNamedAttributeProtocol...
   ) -> Self {
     .result(index, attributes: attributes)
   }
@@ -42,32 +31,20 @@ public extension
 
 // MARK: - Symbol Name
 
-public struct SymbolNameNamedAttribute: ContextualNamedAttribute {
-  public let name: String
-  public func `in`(_ context: Context) -> NamedAttribute {
-    NamedAttribute(
-      name: "sym_name",
-      attribute: StringAttribute.string(name).in(context))
-  }
-}
-public extension ContextualNamedAttribute where Self == SymbolNameNamedAttribute {
+public extension ContextualNamedAttributeProtocol where Self == ContextualNamedAttribute {
   static func symbolName(_ name: String) -> Self {
-    Self(name: name)
+    ContextualNamedAttribute(
+      name: "sym_name",
+      attribute: StringAttribute.string(name))
   }
 }
 
 // MARK: - Type Attribute
 
-public struct TypeNamedAttribute: ContextualNamedAttribute {
-  public let type: ContextualType
-  public func `in`(_ context: Context) -> NamedAttribute {
-    NamedAttribute(
-      name: "type",
-      attribute: TypeAttribute.type(type.in(context)).in(context))
-  }
-}
-public extension ContextualNamedAttribute where Self == TypeNamedAttribute {
+public extension ContextualNamedAttributeProtocol where Self == ContextualNamedAttribute {
   static func type(_ type: ContextualType) -> Self {
-    Self(type: type)
+    ContextualNamedAttribute(
+      name: "type",
+      attribute: TypeAttribute.type(type))
   }
 }

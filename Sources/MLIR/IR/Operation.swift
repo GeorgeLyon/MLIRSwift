@@ -22,7 +22,7 @@ public struct Operation<Results>: MlirRepresentable {
    */
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
     resultTypes: [ContextualType]? = [],
     ownedRegions: [Region] = [],
@@ -43,7 +43,7 @@ public struct Operation<Results>: MlirRepresentable {
    */
   public init(
     builtin name: String,
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
     resultTypes: [ContextualType]? = [],
     ownedRegions: [Region] = [],
@@ -97,7 +97,7 @@ public struct Operation<Results>: MlirRepresentable {
   private init(
     dialect: Dialect? = nil,
     name: String,
-    attributes: [ContextualNamedAttribute],
+    attributes: [ContextualNamedAttributeProtocol],
     operands: [Value],
     resultTypes: [ContextualType]?,
     ownedRegions: [Region],
@@ -304,7 +304,7 @@ extension Operation where Results == () {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
     ownedRegions: [Region] = [],
     location: Location
@@ -327,7 +327,7 @@ extension Operation where Results == Value {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
     resultType type: ContextualType,
     ownedRegions: [Region] = [],
@@ -345,7 +345,7 @@ extension Operation where Results == Value {
 
   public init(
     _ dialect: Dialect, _ name: String,
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
     resultTypes _: Self.InferredResultType, _: Self.InferredResultType,
     ownedRegions: [Region] = [],

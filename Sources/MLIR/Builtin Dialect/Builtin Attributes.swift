@@ -73,7 +73,7 @@ public extension ContextualAttribute where Self == ArrayAttribute {
 // MARK: - Dictionary
 
 public struct DictionaryAttribute: ContextualAttribute {
-  public let elements: [ContextualNamedAttribute]
+  public let elements: [ContextualNamedAttributeProtocol]
   public func `in`(_ context: Context) -> Attribute {
     elements
       .map { $0.in(context) }
@@ -83,10 +83,10 @@ public struct DictionaryAttribute: ContextualAttribute {
   }
 }
 public extension ContextualAttribute where Self == DictionaryAttribute {
-  static func dictionary(_ elements: [ContextualNamedAttribute]) -> Self {
+  static func dictionary(_ elements: [ContextualNamedAttributeProtocol]) -> Self {
     DictionaryAttribute(elements: elements)
   }
-  static func dictionary(_ elements: ContextualNamedAttribute...) -> Self {
+  static func dictionary(_ elements: ContextualNamedAttributeProtocol...) -> Self {
     DictionaryAttribute(elements: elements)
   }
   static func dictionary<Pairs: Sequence>(_ pairs: Pairs) -> Self
@@ -97,7 +97,7 @@ public extension ContextualAttribute where Self == DictionaryAttribute {
   }
 }
 
-private struct NameContextualAttributePair: ContextualNamedAttribute {
+private struct NameContextualAttributePair: ContextualNamedAttributeProtocol {
   let name: String
   let attribute: ContextualAttribute
   func `in`(_ context: Context) -> NamedAttribute {

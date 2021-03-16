@@ -5,7 +5,7 @@ extension Operation where Results == () {
   public static func function(
     _ name: String,
     returnTypes: [ContextualType] = [],
-    attributes: [ContextualNamedAttribute] = [],
+    attributes: [ContextualNamedAttributeProtocol] = [],
     blocks: [Block],
     at location: Location
   ) -> Self {
@@ -14,9 +14,9 @@ extension Operation where Results == () {
     var attributes = attributes
 
     /// These will hopefully be able to use dot syntax as Swift 5.4 matures
-    attributes.append(SymbolNameNamedAttribute.symbolName(name))
+    attributes.append(ContextualNamedAttribute.symbolName(name))
     attributes.append(
-      TypeNamedAttribute.type(
+      ContextualNamedAttribute.type(
         FunctionType.function(of: entryBlock.arguments.map(\.type), to: returnTypes)))
 
     return Self(

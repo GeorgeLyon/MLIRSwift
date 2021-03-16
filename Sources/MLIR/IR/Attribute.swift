@@ -69,9 +69,26 @@ public func == (lhs: Attribute?, rhs: ContextualAttribute?) -> Bool {
 
 /**
  A representation of an MLIR named attribute that is independent of a context
+
+ - note: Unlike `ContextualType` and `ContextualAttribute`, named attributes are most often just the union of an identifier and an attribute, so we provide a concrete `ContextualNamedAttribute` type to simplify the common case.
  */
-public protocol ContextualNamedAttribute {
+public protocol ContextualNamedAttributeProtocol {
   func `in`(_ context: Context) -> NamedAttribute
+}
+
+/**
+ A concrete type for the common case of contextual named attributes
+ */
+public struct ContextualNamedAttribute: ContextualNamedAttributeProtocol {
+  public init(name: String, attribute: ContextualAttribute) {
+    self.name = name
+    self.attribute = attribute
+  }
+  public func `in`(_ context: Context) -> NamedAttribute {
+    NamedAttribute(name: name, attribute: attribute.in(context))
+  }
+  let name: String
+  let attribute: ContextualAttribute
 }
 
 /**
@@ -79,7 +96,7 @@ public protocol ContextualNamedAttribute {
 
  - note: We model this as its own type, and collections of named attributes as arrays of `NamedAttribute`, because often the type of an attribute can be inferred from the identifier which we would not have access to if we represented the collection as a dictionary of attributes.
  */
-public struct NamedAttribute: ContextualNamedAttribute {
+public struct NamedAttribute: ContextualNamedAttributeProtocol {
 
   /**
    Creates a named attribute from an identifier and an attribute
