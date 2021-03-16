@@ -28,13 +28,10 @@ public struct IntegerAttribute: ContextualAttribute {
 }
 extension ContextualAttribute where Self == IntegerAttribute {
   public static func integer(
-    _ signedness: IntegerType.Signedness? = nil,
-    bitWidth: Int,
+    type: IntegerType,
     value: Int
   ) -> Self {
-    IntegerAttribute(
-      type: IntegerType(signedness: signedness, bitWidth: bitWidth),
-      value: value)
+    IntegerAttribute(type: type, value: value)
   }
 }
 

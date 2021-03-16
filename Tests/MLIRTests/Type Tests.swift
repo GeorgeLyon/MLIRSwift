@@ -22,6 +22,6 @@ final class TypeTests: XCTestCase {
     test("i1", parsesAs: IntegerType.integer(bitWidth: 1))
     test("si1", parsesAs: IntegerType.integer(.signed, bitWidth: 1))
     test("ui1", parsesAs: IntegerType.integer(.unsigned, bitWidth: 1))
-    test("memref<?xf32>", parsesAs: MemoryReferenceType.memoryReference(to: Float32Type.float32, withDimensions: [.dynamic], inMemorySpace: IntegerAttribute.integer(bitWidth: 64, value: 0)))
+    test("memref<?xf32>", parsesAs: MemoryReferenceType.memoryReference(to: Float32Type.float32, withDimensions: [.dynamic], inMemorySpace: IntegerAttribute.integer(type: .integer(bitWidth: 64), value: 0)))
   }
 }
