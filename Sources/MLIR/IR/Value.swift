@@ -28,6 +28,13 @@ public struct Value: MlirRepresentable {
     }
   }
 
+  public var block: Block? {
+    switch kind {
+    case .argument(of: let block): return block
+    case .result(of: let operation): return operation.owningBlock
+    }
+  }
+
   /// Suppress initializer synthesis
   private init() { fatalError() }
 }
