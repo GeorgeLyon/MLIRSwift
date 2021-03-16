@@ -323,7 +323,7 @@ extension Operation where Results == () {
 
 // MARK: - Single Result Operations
 
-extension Operation where Results == Value {
+extension Operation where Results == (Value) {
 
   public init(
     _ dialect: Dialect, _ name: String,
@@ -347,7 +347,7 @@ extension Operation where Results == Value {
     _ dialect: Dialect, _ name: String,
     attributes: [ContextualNamedAttributeProtocol] = [],
     operands: [Value] = [],
-    resultTypes _: Self.InferredResultType, _: Self.InferredResultType,
+    resultType _: Self.InferredResultType,
     ownedRegions: [Region] = [],
     location: Location
   ) {
