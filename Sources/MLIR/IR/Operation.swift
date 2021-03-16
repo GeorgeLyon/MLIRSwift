@@ -3,7 +3,7 @@ import CMLIR
 /**
  An operation which has no constraints on its results
  */
-public typealias AnyOperation = Operation<_OperationResults>
+public typealias AnyOperation = Operation<OperationResults>
 
 /**
  Swift representation of an MLIR Operation
@@ -191,7 +191,7 @@ public struct _OperationRegions: RandomAccessCollection {
 
 // MARK: Results
 
-public struct _OperationResults: RandomAccessCollection {
+public struct OperationResults: RandomAccessCollection {
   public let startIndex = 0
   public var endIndex: Int { mlirOperationGetNumResults(mlir) }
   public subscript(position: Int) -> Value {
