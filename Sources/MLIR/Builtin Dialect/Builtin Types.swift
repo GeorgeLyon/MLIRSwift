@@ -71,7 +71,7 @@ extension Type {
     } else if mlirIntegerTypeIsUnsigned(mlir) {
       signedness = .unsigned
     } else {
-      preconditionFailure()
+      fatalError()
     }
     return IntegerType(signedness: signedness, bitWidth: Int(mlirIntegerTypeGetWidth(mlir)))
   }

@@ -5,7 +5,7 @@ public struct Location: MlirRepresentable {
   /**
    Creates a location owned by `context` with the provided file, line and column
    */
-  public static func file(_ file: StaticString, line: Int, column: Int, in context: Context)
+  public static func file(_ file: StaticString, line: UInt, column: UInt, in context: Context)
     -> Location
   {
     file.withUnsafeMlirStringRef {
@@ -36,7 +36,7 @@ public struct Location: MlirRepresentable {
    Creates a call site location with `self` as the callee and the current source location as the caller
    */
   public func viaCallsite(
-    file: StaticString = #fileID, line: Int = #line, column: Int = #column
+    file: StaticString = #fileID, line: UInt = #line, column: UInt = #column
   ) -> Location {
     Location.file(file, line: line, column: column, in: context)
       .called(from: self)
