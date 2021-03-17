@@ -4,7 +4,7 @@ extension Operation {
 
   public static func constant(
     _ value: Attribute,
-    ofType type: Type,
+    of type: Type,
     at location: Location
   ) -> Self
   where
