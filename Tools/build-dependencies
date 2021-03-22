@@ -6,22 +6,28 @@ if [[ "$VERBOSE" == "true" ]]; then
   set -x
 fi
 
-which git > /dev/null
-which cmake > /dev/null
-which ninja > /dev/null
+function check_executable {
+  if ! which "$1" > /dev/null; then
+    echo "$1 not installed."
+    exit 1
+  fi
+}
+
+check_executable git
+check_executable cmake
+check_executable ninja
 
 # Configuration
 TOOLS_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd $(git rev-parse --show-toplevel) && pwd)}
+PROJECT_ROOT=${PROJECT_ROOT:-$(cd "$TOOLS_ROOT" && cd "$(git rev-parse --show-toplevel)" && pwd)}
 DEPENDENCIES_ROOT=${DEPENDENCIES_ROOT:-$PROJECT_ROOT/.dependencies}
 INSTALL_PATH=${INSTALL_PATH:-$DEPENDENCIES_ROOT/installed}
-LLVM_COMMIT=${LLVM_COMMIT:-$(cat $TOOLS_ROOT/llvm-commit)}
+LLVM_COMMIT=${LLVM_COMMIT:-$(cat "$TOOLS_ROOT/llvm-commit")}
 LLVM_REPO=${LLVM_REPO:-https://github.com/llvm/llvm-project}
 LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/llvm-repo}
 LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
 LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
-LLVM_ADDITIONAL_CMAKE_ARGS=${LLVM_ADDITIONAL_CMAKE_ARGS:-""}
 LLVM_SYSTEM_LIBRARY_TARGETS="
   $PROJECT_ROOT/Sources/CDialects
   $PROJECT_ROOT/Sources/CMLIR
@@ -47,12 +53,16 @@ Libs: -lcurses $(
 EOF
 )
 
-LLVM_INSTALL_TARGETS=$(echo $(
-  for SYSTEM_LIBRARY_TARGET in $(echo $LLVM_SYSTEM_LIBRARY_TARGETS); do
-    cat $SYSTEM_LIBRARY_TARGET/module.modulemap | sed -n 's/link "\(.*\)"/install-\1/p'
+LLVM_INSTALL_TARGETS=()
+for TARGET in $(echo "$(
+  for SYSTEM_LIBRARY_TARGET in $LLVM_SYSTEM_LIBRARY_TARGETS; do
+    sed -n 's/link "\(.*\)"/install-\1/p' < "$SYSTEM_LIBRARY_TARGET/module.modulemap"
   done;
-  echo $LLVM_HEADER_TARGETS
-  ) | xargs | tr ' ' '\n' | sort | uniq)
+  echo "$LLVM_HEADER_TARGETS"
+  )" | xargs | tr ' ' '\n' | sort | uniq)
+do
+  LLVM_INSTALL_TARGETS+=("$TARGET")
+done
 
 # If shell is interactive, prompt for comfirmation
 echo "This script will perform the following tasks:"
@@ -62,12 +72,12 @@ if [[ "$LLVM_REPO" != "local" ]]; then
 fi
 echo " - Build LLVM from ${LLVM_ROOT}"
 echo "   - The following targets will be built:"
-for TARGET in $(echo $LLVM_INSTALL_TARGETS); do
+for TARGET in "${LLVM_INSTALL_TARGETS[@]}"; do
   echo "       $TARGET"
 done
-if [[ -n "$LLVM_ADDITIONAL_CMAKE_ARGS" ]]; then
+if [ ${#LLVM_ADDITIONAL_CMAKE_ARGS[@]} -eq 0 ]; then
   echo "   - Additional cmake arguments:"
-  for ARG in $(echo $LLVM_ADDITIONAL_CMAKE_ARGS); do
+  for ARG in "${LLVM_ADDITIONAL_CMAKE_ARGS[@]}"; do
     echo "       $ARG"
   done
 fi
@@ -79,7 +89,7 @@ echo ""
 
 if [[ "$NO_INTERACTION" != "true" ]]; then
   echo "Press enter to continue."
-  read
+  read -r
 fi
 
 # Clone/checkout LLVM or other another project that includes LLVM
@@ -103,13 +113,16 @@ if [[ "$LLVM_REPO" != "local" ]]; then
   popd > /dev/null
 fi
 
+CMAKE_OSX_DEPLOYMENT_TARGET=""
+[[ "$OSTYPE" == "darwin"* ]] && CMAKE_OSX_DEPLOYMENT_TARGET="10.15"
+
 # Build LLVM
 cmake \
   -S "$LLVM_ROOT/llvm" \
   -B "$LLVM_BUILD_ROOT" \
   -G Ninja \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
-  $([[ "$OSTYPE" == "darwin"* ]] && echo "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15") \
+  ${CMAKE_OSX_DEPLOYMENT_TARGET:+ "-DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET"} \
   -DLLVM_BUILD_EXAMPLES=OFF \
   -DLLVM_INSTALL_UTILS=OFF \
   -DLLVM_BUILD_TOOLS=OFF \
@@ -120,11 +133,11 @@ cmake \
   -DLLVM_ENABLE_ASSERTIONS=ON \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-RelWithDebInfo} \
-  $(echo $LLVM_ADDITIONAL_CMAKE_ARGS)
+  -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-RelWithDebInfo}" \
+  "${LLVM_ADDITIONAL_CMAKE_ARGS[@]}"
 cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target $(echo $LLVM_INSTALL_TARGETS)
+  --target "${LLVM_INSTALL_TARGETS[@]}"
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
@@ -136,11 +149,11 @@ if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
 fi
 
 # Install swift-format
-if [[ -n "$TOOLS_INSTALL_PATH/swift-format" ]]; then
+if [[ ! -f "$TOOLS_INSTALL_PATH/swift-format" ]]; then
   echo "Installing swift-format"
   # `swift build` doesn't seem to actually build the swift-format executable (likely because it is a dependency), so we use `swift run`. Also, the first invocatin of this fails for some reason in dependent projects.
   swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version || \
     swift run --package-path "$TOOLS_ROOT/SwiftFormat" -c release swift-format --version
   mkdir -p "$TOOLS_INSTALL_PATH"
-  cp $(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format "$TOOLS_INSTALL_PATH"
+  cp "$(swift build --package-path "$TOOLS_ROOT/SwiftFormat" -c release --show-bin-path)/swift-format" "$TOOLS_INSTALL_PATH"
 fi
