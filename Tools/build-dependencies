@@ -28,6 +28,7 @@ LLVM_REPO_PATH=${LLVM_REPO_PATH:-$DEPENDENCIES_ROOT/llvm-repo}
 LLVM_PATH_IN_REPO=${LLVM_PATH_IN_REPO:-""}
 LLVM_ROOT="$LLVM_REPO_PATH/$LLVM_PATH_IN_REPO"
 LLVM_BUILD_ROOT="$DEPENDENCIES_ROOT/llvm-build"
+IFS=" " read -r -a LLVM_ADDITIONAL_CMAKE_ARGS_ARRAY <<< "$LLVM_ADDITIONAL_CMAKE_ARGS"
 LLVM_SYSTEM_LIBRARY_TARGETS="
   $PROJECT_ROOT/Sources/CDialects
   $PROJECT_ROOT/Sources/CMLIR
@@ -75,9 +76,9 @@ echo "   - The following targets will be built:"
 for TARGET in "${LLVM_INSTALL_TARGETS[@]}"; do
   echo "       $TARGET"
 done
-if [[ ! ${#LLVM_ADDITIONAL_CMAKE_ARGS[@]} -eq 0 ]]; then
+if [[ ! ${#LLVM_ADDITIONAL_CMAKE_ARGS_ARRAY[@]} -eq 0 ]]; then
   echo "   - Additional cmake arguments:"
-  for ARG in "${LLVM_ADDITIONAL_CMAKE_ARGS[@]}"; do
+  for ARG in "${LLVM_ADDITIONAL_CMAKE_ARGS_ARRAY[@]}"; do
     echo "       $ARG"
   done
 fi
@@ -117,7 +118,7 @@ CMAKE_OSX_DEPLOYMENT_TARGET=""
 [[ "$OSTYPE" == "darwin"* ]] && CMAKE_OSX_DEPLOYMENT_TARGET="10.15"
 
 # Build LLVM
-cmake \
+(set -x; cmake \
   -S "$LLVM_ROOT/llvm" \
   -B "$LLVM_BUILD_ROOT" \
   -G Ninja \
@@ -134,10 +135,10 @@ cmake \
   -DCMAKE_C_COMPILER=clang \
   -DCMAKE_CXX_COMPILER=clang++ \
   -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-RelWithDebInfo}" \
-  "${LLVM_ADDITIONAL_CMAKE_ARGS[@]}"
-cmake \
+  "${LLVM_ADDITIONAL_CMAKE_ARGS_ARRAY[@]}")
+(set -x; cmake \
   --build "$LLVM_BUILD_ROOT" \
-  --target "${LLVM_INSTALL_TARGETS[@]}"
+  --target "${LLVM_INSTALL_TARGETS[@]}")
 
 # Install the LLVM package config
 if [[ -n "$PKG_CONFIG_FILE_PATH" ]]; then
