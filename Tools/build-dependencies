@@ -75,7 +75,7 @@ echo "   - The following targets will be built:"
 for TARGET in "${LLVM_INSTALL_TARGETS[@]}"; do
   echo "       $TARGET"
 done
-if [ ${#LLVM_ADDITIONAL_CMAKE_ARGS[@]} -eq 0 ]; then
+if [[ ! ${#LLVM_ADDITIONAL_CMAKE_ARGS[@]} -eq 0 ]]; then
   echo "   - Additional cmake arguments:"
   for ARG in "${LLVM_ADDITIONAL_CMAKE_ARGS[@]}"; do
     echo "       $ARG"
