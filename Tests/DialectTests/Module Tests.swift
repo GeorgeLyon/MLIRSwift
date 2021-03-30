@@ -28,6 +28,30 @@ final class ModuleTests: XCTestCase {
       """)
   }
   
+  func testCanonicalization2() throws {
+    let context = MLIR.OwnedContext(dialects: .std)
+    let passManager = PassManager(context: context, passes: .canonicalization)
+    let module: Module = try context.parse("""
+      module  {
+        func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
+          %0 = "std.addi"(%arg0, %arg0) : (i1, i1) -> i1
+          return %arg1, %arg0 : i1, i1
+        }
+      }
+
+      """)
+    passManager.runPasses(on: module)
+    XCTAssertEqual(
+      "\(module.operation)", """
+      module  {
+        func @swap(%arg0: i1, %arg1: i1) -> (i1, i1) {
+          return %arg1, %arg0 : i1, i1
+        }
+      }
+
+      """)
+  }
+  
   func testModule() throws {
     let context = MLIR.OwnedContext(dialects: .std)
     let reference = """

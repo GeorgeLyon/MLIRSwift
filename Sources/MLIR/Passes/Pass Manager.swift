@@ -1,20 +1,6 @@
 import CMLIR
 
 /**
- An MLIR pass
- */
-public struct Pass: MlirRepresentable {
-
-  public init(_ mlir: MlirPass) {
-    self.init(mlir: mlir)
-  }
-  public let mlir: MlirPass
-
-  /// Suppress synthesized initializer
-  private init() { fatalError() }
-}
-
-/**
  An object which manages a pass pipeline
  */
 public final class PassManager {
@@ -24,7 +10,7 @@ public final class PassManager {
   public init(context: Context, passes: [Pass]) {
     mlir = mlirPassManagerCreate(context.mlir)
     for pass in passes {
-      mlirPassManagerAddOwnedPass(mlir, pass.mlir)
+      mlirPassManagerAddOwnedPass(mlir, pass.build())
     }
   }
   deinit {
