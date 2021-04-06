@@ -5,3 +5,6 @@
 #include <mlir-c/BuiltinTypes.h>
 #include <mlir-c/Registration.h>
 #include <mlir-c/Transforms.h>
+
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
