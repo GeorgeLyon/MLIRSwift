@@ -12,13 +12,18 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
+set(MLIR_MAIN_SRC_DIR ${LLVM_MAIN_SRC_DIR}/../mlir )
+set(MLIR_INCLUDE_DIR ${MLIR_MAIN_SRC_DIR}/include )
+include_directories(SYSTEM ${MLIR_INCLUDE_DIR})
+
 # Sources
 file(GLOB sources *.cpp)
 add_llvm_library(MLIRSwiftSupport
     ${sources}
     
     LINK_LIBS PUBLIC
-    DebugInfoDWARF)
+    DebugInfoDWARF
+    MLIRCAPI)
     
 # Headers
 file(GLOB headers *.h)

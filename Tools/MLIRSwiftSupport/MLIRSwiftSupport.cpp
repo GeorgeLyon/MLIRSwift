@@ -1,6 +1,8 @@
 
 #include "MLIRSwiftSupport.h"
 
+#include "mlir/CAPI/Support.h"
+
 #include "llvm/DebugInfo/DIContext.h"
 #include "llvm/DebugInfo/DWARF/DWARFContext.h"
 #include "llvm/Object/Archive.h"

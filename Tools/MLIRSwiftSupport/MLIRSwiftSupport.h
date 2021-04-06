@@ -1,6 +1,6 @@
 #ifndef MLIRSwiftSupport_h
 #define MLIRSwiftSupport_h
 
-const char *message();
+#include "mlir-c/Support.h"
 
 #endif /* MLIRSwiftSupport_h */
