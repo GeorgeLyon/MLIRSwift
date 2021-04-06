@@ -69,7 +69,7 @@ for TARGET in $(echo "$(
     sed -n 's/link "\(.*\)"/install-\1/p' < "$SYSTEM_LIBRARY_TARGET/module.modulemap"
   done;
   echo "
-    install-MLIRSwiftSupport
+    install-MLIRSwiftSupport-headers
     install-llvm-headers
     install-mlir-headers
     $LLVM_ADDITIONAL_TARGETS"

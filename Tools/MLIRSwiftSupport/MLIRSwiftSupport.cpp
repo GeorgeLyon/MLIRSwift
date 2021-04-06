@@ -1,6 +1,15 @@
-#include <iostream>
 
-int main() {
-    std::cout << "Hello World!";
-    return 0;
+#include "MLIRSwiftSupport.h"
+
+#include "llvm/DebugInfo/DIContext.h"
+#include "llvm/DebugInfo/DWARF/DWARFContext.h"
+#include "llvm/Object/Archive.h"
+#include "llvm/Object/MachOUniversal.h"
+#include "llvm/Object/ObjectFile.h"
+
+using namespace llvm;
+using namespace llvm::object;
+
+const char *message() {
+    return "Hello, World!";
 }
