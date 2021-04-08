@@ -43,7 +43,7 @@ Name: LLVM for Swift
 Description: LLVM, potentially with additional projects. Installed using Tools/build-dependencies in MLIRSwift.
 Version: local
 Cflags: -I\${prefix}/include
-Libs: -lcurses $(
+Libs: -lcurses -lz $(
   # For some reason, linking the C++ standard libary is different on Linux and macOS
   [[ "$OSTYPE" == "darwin"* ]] && echo "-lc++" || echo "-lstdc++"
 ) -L\${prefix}/lib

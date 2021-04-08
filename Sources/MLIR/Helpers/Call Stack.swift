@@ -134,7 +134,7 @@ extension CallStack {
       var info = Dl_info()
       guard
         let pointer = address.rawPointer,
-        dladdr(pointer, &info) == 0,
+        dladdr(pointer, &info) > 0,
         let slide = imageSlides[String(cString: info.dli_fname)]
       else {
         return nil
@@ -162,6 +162,16 @@ extension CallStack {
      */
     public init(dSYM path: String) throws {
       container = path.withCString(LLVMDWARFContainerCreate)
+    }
+    
+    public func lookup(_ address: Frame.Address) {
+      LLVMDWARFContainerLookup(
+        container,
+        { (file, line, column, userData) in
+          print(" - \(file.string):\(line):\(column)")
+        },
+        UInt64(address.value),
+        nil)
     }
   }
 }

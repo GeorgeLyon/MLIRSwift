@@ -2,12 +2,18 @@ module CMLIR [system] {
   header "CMLIR.h"
   
   /// For now, we link the entire contents of lib
+  link "LLVMBitReader"
   link "LLVMBinaryFormat"
   link "LLVMBitstreamReader"
   link "LLVMCore"
+  link "LLVMDebugInfoDWARF"
   link "LLVMDemangle"
+  link "LLVMMC"
+  link "LLVMMCParser"
+  link "LLVMObject"
   link "LLVMRemarks"
   link "LLVMSupport"
+  link "LLVMTextAPI"
   link "MLIRAffine"
   link "MLIRAffineEDSC"
   link "MLIRAnalysis"

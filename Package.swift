@@ -25,6 +25,8 @@ let package = Package(
       name: "MLIRTests",
       dependencies: ["MLIR"]),
     
+    .target(name: "CallStackTest", dependencies: ["MLIR"]),
+    
     .systemLibrary(
       name: "CDialects",
       pkgConfig: "LLVM-for-Swift"),

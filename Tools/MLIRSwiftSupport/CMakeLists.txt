@@ -17,13 +17,14 @@ set(MLIR_INCLUDE_DIR ${MLIR_MAIN_SRC_DIR}/include )
 include_directories(SYSTEM ${MLIR_INCLUDE_DIR})
 
 # Sources
+llvm_map_components_to_libnames(llvm_component_libs DebugInfoDWARF)
 file(GLOB sources *.cpp)
 add_llvm_library(MLIRSwiftSupport
     ${sources}
     
     LINK_LIBS PUBLIC
-    MLIRCAPI)
-target_link_libraries(MLIRSwiftSupport DebugInfoDWARF)
+    MLIRCAPI
+    ${llvm_component_libs})
     
 # Headers
 add_custom_target(MLIRSwiftSupport-headers)
