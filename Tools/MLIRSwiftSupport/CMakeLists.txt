@@ -22,14 +22,14 @@ add_llvm_library(MLIRSwiftSupport
     ${sources}
     
     LINK_LIBS PUBLIC
-    DebugInfoDWARF
     MLIRCAPI)
+target_link_libraries(MLIRSwiftSupport DebugInfoDWARF)
     
 # Headers
-file(GLOB headers *.h)
 add_custom_target(MLIRSwiftSupport-headers)
 set_target_properties(MLIRSwiftSupport-headers PROPERTIES FOLDER "Misc")
-install(FILES ${headers}
+install(FILES 
+    MLIRSwiftSupport.h
     DESTINATION include/MLIRSwiftSupport
     COMPONENT MLIRSwiftSupport-headers)
 add_llvm_install_targets(install-MLIRSwiftSupport-headers

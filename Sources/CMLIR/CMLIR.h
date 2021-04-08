@@ -6,4 +6,9 @@
 #include <mlir-c/Registration.h>
 #include <mlir-c/Transforms.h>
 
+#include <llvm-c/Core.h>
+#include <llvm-c/Object.h>
 #include <MLIRSwiftSupport/MLIRSwiftSupport.h>
+
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
