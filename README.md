@@ -1,3 +1,5 @@
+# This project has moved to https://github.com/circt/MLIRSwift
+
 # MLIR Bindings for Swift
 
 This project intends to make MLIR APIs accessible from Swift via the MLIR C Bindings.
