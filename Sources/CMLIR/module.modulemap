@@ -37,6 +37,7 @@ module CMLIR [system] {
   link "MLIRSideEffectInterfaces"
   link "MLIRStandard"
   link "MLIRSupport"
+  link "MLIRSwiftSupport"
   link "MLIRTensor"
   link "MLIRTransformUtils"
   link "MLIRTransforms"
