@@ -33,10 +33,6 @@ LLVM_SYSTEM_LIBRARY_TARGETS="
   $PROJECT_ROOT/Sources/CDialects
   $PROJECT_ROOT/Sources/CMLIR
   $LLVM_ADDITIONAL_SYSTEM_LIBRARY_TARGETS"
-LLVM_HEADER_TARGETS="
-  install-llvm-headers
-  install-mlir-headers
-  $LLVM_ADDITIONAL_HEADER_TARGETS"
 TOOLS_INSTALL_PATH="$DEPENDENCIES_ROOT/installed/tools"
 PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-/usr/local/lib/pkgconfig}
 PKG_CONFIG_FILE_PATH="$PKG_CONFIG_PATH/LLVM-for-Swift.pc"
@@ -54,13 +50,30 @@ Libs: -lcurses $(
 EOF
 )
 
+# Create a comma-separated list of external projects
+LLVM_EXTERNAL_PROJECTS=$(
+  delim=""
+  for TARGET in $(echo "
+      MLIRSwiftSupport
+      $LLVM_ADDITIONAL_EXTERNAL_PROJECTS")
+  do
+    printf "%s" "$delim$TARGET"
+    delim=","
+  done
+)
+
+# Create a list of install targets with some extra ceremony so they up as a bash array
 LLVM_INSTALL_TARGETS=()
 for TARGET in $(echo "$(
   for SYSTEM_LIBRARY_TARGET in $LLVM_SYSTEM_LIBRARY_TARGETS; do
     sed -n 's/link "\(.*\)"/install-\1/p' < "$SYSTEM_LIBRARY_TARGET/module.modulemap"
   done;
-  echo "$LLVM_HEADER_TARGETS"
-  )" | xargs | tr ' ' '\n' | sort | uniq)
+  echo "
+    install-MLIRSwiftSupport-headers
+    install-llvm-headers
+    install-mlir-headers
+    $LLVM_ADDITIONAL_TARGETS"
+  )" | xargs | tr ' ' '\n' | sort -u)
 do
   LLVM_INSTALL_TARGETS+=("$TARGET")
 done
@@ -124,6 +137,9 @@ CMAKE_OSX_DEPLOYMENT_TARGET=""
   -G Ninja \
   -DCMAKE_INSTALL_PREFIX="$INSTALL_PATH" \
   ${CMAKE_OSX_DEPLOYMENT_TARGET:+ "-DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET"} \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_CXX_COMPILER=clang++ \
+  -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-Release}" \
   -DLLVM_BUILD_EXAMPLES=OFF \
   -DLLVM_INSTALL_UTILS=OFF \
   -DLLVM_BUILD_TOOLS=OFF \
@@ -132,9 +148,8 @@ CMAKE_OSX_DEPLOYMENT_TARGET=""
   -DLLVM_ENABLE_OCAMLDOC=OFF \
   -DLLVM_ENABLE_BINDINGS=OFF \
   -DLLVM_ENABLE_ASSERTIONS=ON \
-  -DCMAKE_C_COMPILER=clang \
-  -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:-RelWithDebInfo}" \
+  -DLLVM_EXTERNAL_PROJECTS="$LLVM_EXTERNAL_PROJECTS" \
+  -DLLVM_EXTERNAL_MLIRSWIFTSUPPORT_SOURCE_DIR="${TOOLS_ROOT}/MLIRSwiftSupport" \
   "${LLVM_ADDITIONAL_CMAKE_ARGS_ARRAY[@]}")
 (set -x; cmake \
   --build "$LLVM_BUILD_ROOT" \
